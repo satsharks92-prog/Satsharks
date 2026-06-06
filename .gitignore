@@ -14,6 +14,11 @@ dist-ssr
 .vinxi
 .tanstack/**
 .nitro
+frontend/dist
+frontend/.output
+frontend/.vinxi
+frontend/.tanstack/**
+frontend/.nitro
 *.local
 
 # Wrangler / Cloudflare
