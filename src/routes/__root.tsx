@@ -50,12 +50,18 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-on-primary hover:bg-primary-container"
           >
             Try again
           </button>
-          <a href="/" className="rounded-xl border border-outline-variant px-5 py-2.5 text-sm font-medium hover:bg-surface-container-low">
+          <a
+            href="/"
+            className="rounded-xl border border-outline-variant px-5 py-2.5 text-sm font-medium hover:bg-surface-container-low"
+          >
             Go home
           </a>
         </div>
@@ -70,9 +76,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "SAT Sharks — Achieve Your Dream SAT Score & College Admission" },
-      { name: "description", content: "Personalized SAT preparation, expert college counseling, essay reviews, and proven strategies that give you the competitive edge." },
+      {
+        name: "description",
+        content:
+          "Personalized SAT preparation, expert college counseling, essay reviews, and proven strategies that give you the competitive edge.",
+      },
       { property: "og:title", content: "SAT Sharks — Achieve Your Dream SAT Score" },
-      { property: "og:description", content: "Personalized SAT prep, college counseling, and essay reviews to secure top university admissions." },
+      {
+        property: "og:description",
+        content:
+          "Personalized SAT prep, college counseling, and essay reviews to secure top university admissions.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "SAT Sharks" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -81,8 +95,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -94,8 +114,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <head><HeadContent /></head>
-      <body>{children}<Scripts /></body>
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        {children}
+        <Scripts />
+      </body>
     </html>
   );
 }
