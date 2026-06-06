@@ -1,57 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
 import { Header } from "../components/layout/Header";
 import { Footer } from "../components/layout/Footer";
 import { Icon } from "../components/common/Icon";
+import { api } from "../services/api";
 
 export const Route = createFileRoute("/success-stories")({
   component: SuccessStories,
 });
 
 function SuccessStories() {
-  const stories = [
-    {
-      name: "Sarah M.",
-      score: "Scored 1580 (+210)",
-      quote:
-        "The personalized study plan was a game-changer. I felt completely prepared on test day and got into my dream school! The mentors really took the time to understand my weaknesses.",
-      university: "Harvard University",
-    },
-    {
-      name: "David L.",
-      score: "Scored 1550 (+180)",
-      quote:
-        "The instructors genuinely care about your success. The practice materials perfectly mirrored the actual exam, making the real test feel like just another practice session.",
-      university: "Stanford University",
-    },
-    {
-      name: "Emily R.",
-      score: "Scored 1590 (+150)",
-      quote:
-        "I struggled with the math section, but the targeted drills helped me achieve a perfect 800. Thank you SAT Sharks for giving me the confidence I needed.",
-      university: "MIT",
-    },
-    {
-      name: "Michael T.",
-      score: "Scored 1540 (+230)",
-      quote:
-        "SAT Sharks transformed my approach to reading comprehension. The strategies taught were not just tips, but foundational skills that helped me tremendously.",
-      university: "Yale University",
-    },
-    {
-      name: "Jessica K.",
-      score: "Scored 1560 (+190)",
-      quote:
-        "The essay review sessions were incredibly detailed. My advisor helped me craft a compelling narrative that stood out to admissions officers.",
-      university: "Princeton University",
-    },
-    {
-      name: "James B.",
-      score: "Scored 1570 (+200)",
-      quote:
-        "From diagnostic to final test day, the support was unwavering. I couldn't have achieved this score without the structured timeline and rigorous practice.",
-      university: "Columbia University",
-    },
-  ];
+  const [stories, setStories] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchStories = async () => {
+      try {
+        const res = await api.get("/api/success-stories");
+        if (res.success) {
+          setStories(res.stories);
+        }
+      } catch (e) {
+        console.error("Failed to fetch stories", e);
+      }
+    };
+    fetchStories();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background text-on-background animate-fade-up flex flex-col">

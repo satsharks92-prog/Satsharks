@@ -1,10 +1,12 @@
 import { createContext, useState, useEffect, type ReactNode } from "react";
 import type { User } from "../types";
+import { api } from "../services/api";
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string) => Promise<void>;
+  login: (email: string, password?: string) => Promise<void>;
+  register: (name: string, email: string, password?: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -15,40 +17,56 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate initial auth check
-    const storedUser = localStorage.getItem("auth_user");
-    if (storedUser) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (e) {
-        // ignore
+    const fetchUser = async () => {
+      const token = localStorage.getItem("accessToken");
+      if (token) {
+        try {
+          const res = await api.get("/api/users/me");
+          if (res.success) {
+            setUser(res.user);
+          } else {
+            logout();
+          }
+        } catch (e) {
+          logout();
+        }
       }
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    };
+    fetchUser();
   }, []);
 
-  const login = async (email: string) => {
+  const login = async (email: string, password?: string) => {
     setIsLoading(true);
-    // Mock login, assign a role based on email or default to LOCAL_FREE
-    await new Promise((resolve) => setTimeout(resolve, 800)); // fake delay
-    const mockUser: User = {
-      id: Math.random().toString(36).substring(7),
-      email,
-      name: email.split("@")[0],
-      role: email.includes("admin") ? "ADMIN" : "LOCAL_FREE",
-    };
-    setUser(mockUser);
-    localStorage.setItem("auth_user", JSON.stringify(mockUser));
+    const res = await api.post("/api/auth/login", { email, password: password || "password123" });
+    if (res.success) {
+      localStorage.setItem("accessToken", res.accessToken);
+      setUser(res.user);
+    } else {
+      console.error(res.error);
+    }
+    setIsLoading(false);
+  };
+
+  const register = async (name: string, email: string, password?: string) => {
+    setIsLoading(true);
+    const res = await api.post("/api/auth/register", { name, email, password: password || "password123" });
+    if (res.success) {
+      localStorage.setItem("accessToken", res.accessToken);
+      setUser(res.user);
+    } else {
+      console.error(res.error);
+    }
     setIsLoading(false);
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("auth_user");
+    localStorage.removeItem("accessToken");
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );
