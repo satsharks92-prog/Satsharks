@@ -19,7 +19,7 @@ function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
-      await login(email);
+      await login(email, password);
       navigate({ to: "/" });
     }
   };

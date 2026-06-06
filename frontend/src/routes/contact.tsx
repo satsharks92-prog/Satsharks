@@ -1,15 +1,45 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { Header } from "../components/layout/Header";
 import { Footer } from "../components/layout/Footer";
 import { Icon } from "../components/common/Icon";
 import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
+import { api } from "../services/api";
 
 export const Route = createFileRoute("/contact")({
   component: Contact,
 });
 
 function Contact() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [category, setCategory] = useState("General Inquiry");
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const res = await api.post("/api/contact/inquiry", {
+        firstName, lastName, email, category, message
+      });
+      if (res.success) {
+        setSuccess(true);
+        setFirstName("");
+        setLastName("");
+        setEmail("");
+        setMessage("");
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    setIsSubmitting(false);
+  };
+
   return (
     <div className="min-h-screen bg-background text-on-background animate-fade-up flex flex-col">
       <Header />
@@ -51,21 +81,22 @@ function Contact() {
             </div>
             
             <form
-              onSubmit={(e) => e.preventDefault()}
+              onSubmit={handleSubmit}
               className="lg:col-span-3 rounded-2xl bg-surface-container-lowest text-on-surface p-8 md:p-10 shark-shadow border border-outline-variant/40"
             >
               <h3 className="font-headline text-2xl font-semibold">Send us a message</h3>
+              {success && <div className="mt-4 p-4 bg-primary-container text-on-primary-container rounded-xl text-sm">Thanks for reaching out! We'll get back to you soon.</div>}
               <div className="mt-8 space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <Input label="First Name" type="text" placeholder="Jane" required />
-                  <Input label="Last Name" type="text" placeholder="Doe" required />
+                  <Input label="First Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} type="text" placeholder="Jane" required />
+                  <Input label="Last Name" value={lastName} onChange={(e) => setLastName(e.target.value)} type="text" placeholder="Doe" required />
                 </div>
-                <Input label="Email Address" type="email" placeholder="you@example.com" required />
+                <Input label="Email Address" value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" required />
                 <div>
                   <label className="mb-1.5 block font-mono text-[12px] uppercase tracking-[0.08em] text-on-surface-variant">
                     Inquiry Category
                   </label>
-                  <select className="w-full rounded-xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none">
+                  <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full rounded-xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none">
                     <option>General Inquiry</option>
                     <option>SAT Prep Programs</option>
                     <option>College Counseling</option>
@@ -77,14 +108,15 @@ function Contact() {
                     Message
                   </label>
                   <textarea
+                    value={message} onChange={(e) => setMessage(e.target.value)}
                     rows={5}
                     placeholder="Tell us about your goals..."
                     className="w-full rounded-xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 resize-none"
                     required
                   />
                 </div>
-                <Button type="submit" className="w-full py-3.5 mt-4">
-                  Submit Inquiry <Icon name="send" className="text-[18px]" />
+                <Button type="submit" disabled={isSubmitting} className="w-full py-3.5 mt-4">
+                  {isSubmitting ? "Sending..." : "Submit Inquiry"} <Icon name="send" className="text-[18px]" />
                 </Button>
               </div>
             </form>
