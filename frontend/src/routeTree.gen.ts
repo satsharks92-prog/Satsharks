@@ -11,12 +11,16 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SuccessStoriesRouteImport } from './routes/success-stories'
 import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
+import { Route as AdminSuccessStoriesRouteImport } from './routes/admin/success-stories'
+import { Route as AdminContactRequestsRouteImport } from './routes/admin/contact-requests'
 
 const SuccessStoriesRoute = SuccessStoriesRouteImport.update({
   id: '/success-stories',
@@ -28,6 +32,11 @@ const SubscriptionsRoute = SubscriptionsRouteImport.update({
   path: '/subscriptions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -36,6 +45,11 @@ const ContactRoute = ContactRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/admin/',
+  path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
@@ -58,80 +72,118 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/auth/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSuccessStoriesRoute = AdminSuccessStoriesRouteImport.update({
+  id: '/admin/success-stories',
+  path: '/admin/success-stories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminContactRequestsRoute = AdminContactRequestsRouteImport.update({
+  id: '/admin/contact-requests',
+  path: '/admin/contact-requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/success-stories': typeof SuccessStoriesRoute
+  '/admin/contact-requests': typeof AdminContactRequestsRoute
+  '/admin/success-stories': typeof AdminSuccessStoriesRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/success-stories': typeof SuccessStoriesRoute
+  '/admin/contact-requests': typeof AdminContactRequestsRoute
+  '/admin/success-stories': typeof AdminSuccessStoriesRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/success-stories': typeof SuccessStoriesRoute
+  '/admin/contact-requests': typeof AdminContactRequestsRoute
+  '/admin/success-stories': typeof AdminSuccessStoriesRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/contact'
+    | '/dashboard'
     | '/subscriptions'
     | '/success-stories'
+    | '/admin/contact-requests'
+    | '/admin/success-stories'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/contact'
+    | '/dashboard'
     | '/subscriptions'
     | '/success-stories'
+    | '/admin/contact-requests'
+    | '/admin/success-stories'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
+    | '/admin'
   id:
     | '__root__'
     | '/'
     | '/contact'
+    | '/dashboard'
     | '/subscriptions'
     | '/success-stories'
+    | '/admin/contact-requests'
+    | '/admin/success-stories'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContactRoute: typeof ContactRoute
+  DashboardRoute: typeof DashboardRoute
   SubscriptionsRoute: typeof SubscriptionsRoute
   SuccessStoriesRoute: typeof SuccessStoriesRoute
+  AdminContactRequestsRoute: typeof AdminContactRequestsRoute
+  AdminSuccessStoriesRoute: typeof AdminSuccessStoriesRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  AdminIndexRoute: typeof AdminIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -150,6 +202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SubscriptionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -162,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/admin'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/reset-password': {
@@ -192,18 +258,36 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/success-stories': {
+      id: '/admin/success-stories'
+      path: '/admin/success-stories'
+      fullPath: '/admin/success-stories'
+      preLoaderRoute: typeof AdminSuccessStoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/contact-requests': {
+      id: '/admin/contact-requests'
+      path: '/admin/contact-requests'
+      fullPath: '/admin/contact-requests'
+      preLoaderRoute: typeof AdminContactRequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactRoute: ContactRoute,
+  DashboardRoute: DashboardRoute,
   SubscriptionsRoute: SubscriptionsRoute,
   SuccessStoriesRoute: SuccessStoriesRoute,
+  AdminContactRequestsRoute: AdminContactRequestsRoute,
+  AdminSuccessStoriesRoute: AdminSuccessStoriesRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
+  AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

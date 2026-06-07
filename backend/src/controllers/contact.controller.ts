@@ -21,3 +21,34 @@ export const submitInquiry = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
+export const getInquiries = async (req: Request, res: Response) => {
+  try {
+    if (!process.env.DATABASE_URL) {
+      return res.status(200).json({ success: true, inquiries: [] });
+    }
+
+    const inquiries = await Inquiry.find().sort({ createdAt: -1 });
+    res.status(200).json({ success: true, inquiries });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+export const updateInquiryStatus = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    if (!process.env.DATABASE_URL) {
+      return res.status(200).json({ success: true, message: "Status updated (mock)" });
+    }
+
+    const inquiry = await Inquiry.findByIdAndUpdate(id, { status }, { new: true });
+    if (!inquiry) return res.status(404).json({ success: false, error: "Inquiry not found" });
+
+    res.status(200).json({ success: true, inquiry });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};

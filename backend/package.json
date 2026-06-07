@@ -8,6 +8,7 @@
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
     "seed:phase1": "tsx src/scripts/seedPhaseOne.ts",
+    "seed": "tsx scripts/seed.ts",
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {

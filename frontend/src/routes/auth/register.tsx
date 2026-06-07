@@ -14,6 +14,9 @@ function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [region, setRegion] = useState("LOCAL");
+  const [subscription, setSubscription] = useState("FREE");
   const [error, setError] = useState("");
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -22,8 +25,13 @@ function Register() {
     e.preventDefault();
     setError("");
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     if (email && name && password) {
-      const success = await register(name, email, password);
+      const success = await register(name, email, password, region, subscription);
       if (!success) {
         setError("Unable to create this account. Please check your details or try another email.");
         return;
@@ -71,6 +79,34 @@ function Register() {
               placeholder="••••••••"
               required
             />
+            <Input
+              label="Confirm Password"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+            />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="mb-1.5 block font-mono text-[12px] uppercase tracking-[0.08em] text-on-surface-variant">
+                  Region
+                </label>
+                <select value={region} onChange={(e) => setRegion(e.target.value)} className="w-full rounded-xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none">
+                  <option value="LOCAL">Local</option>
+                  <option value="INTERNATIONAL">International</option>
+                </select>
+              </div>
+              <div>
+                <label className="mb-1.5 block font-mono text-[12px] uppercase tracking-[0.08em] text-on-surface-variant">
+                  Subscription
+                </label>
+                <select value={subscription} onChange={(e) => setSubscription(e.target.value)} className="w-full rounded-xl border border-outline-variant bg-surface-container-low px-4 py-3 text-sm outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none">
+                  <option value="FREE">Free</option>
+                  <option value="PAID">Paid</option>
+                </select>
+              </div>
+            </div>
             {error && (
               <p className="rounded-lg border border-error/30 bg-error/10 px-3 py-2 text-sm font-medium text-error">
                 {error}

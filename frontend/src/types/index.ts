@@ -1,17 +1,16 @@
-export type Role = "LOCAL_FREE" | "LOCAL_PAID" | "INTL_FREE" | "INTL_PAID" | "ADMIN";
-
 export interface User {
   id: string;
-  email: string;
   name: string;
-  role: Role;
+  email: string;
+  role: "ADMIN" | "STUDENT";
+  region?: "LOCAL" | "INTERNATIONAL";
+  subscription?: "FREE" | "PAID";
 }
 
 export interface SubscriptionPlan {
   id: string;
   name: string;
-  description: string;
-  price: string;
+  price: number;
+  interval: "month" | "year";
   features: string[];
-  role: Role;
 }

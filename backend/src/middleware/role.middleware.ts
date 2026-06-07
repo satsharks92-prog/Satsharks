@@ -1,10 +1,46 @@
 import { Response, NextFunction } from "express";
 import { AuthRequest } from "./auth.middleware";
 
-export const requireRole = (roles: string[]) => {
+export const requireAdmin = () => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (!req.user || !roles.includes(req.user.role)) {
-      return res.status(403).json({ success: false, error: "Forbidden: insufficient permissions" });
+    if (!req.user || req.user.role !== "ADMIN") {
+      return res.status(403).json({ success: false, error: "Forbidden: Admin access required" });
+    }
+    next();
+  };
+};
+
+export const requireStudent = () => {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user || req.user.role !== "STUDENT") {
+      return res.status(403).json({ success: false, error: "Forbidden: Student access required" });
+    }
+    next();
+  };
+};
+
+export const requirePaidUser = () => {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user || req.user.subscription !== "PAID") {
+      return res.status(403).json({ success: false, error: "Forbidden: Paid subscription required" });
+    }
+    next();
+  };
+};
+
+export const requireLocalUser = () => {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user || req.user.region !== "LOCAL") {
+      return res.status(403).json({ success: false, error: "Forbidden: Local region required" });
+    }
+    next();
+  };
+};
+
+export const requireInternationalUser = () => {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user || req.user.region !== "INTERNATIONAL") {
+      return res.status(403).json({ success: false, error: "Forbidden: International region required" });
     }
     next();
   };

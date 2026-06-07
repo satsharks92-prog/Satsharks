@@ -5,8 +5,8 @@ import { api } from "../services/api";
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string) => Promise<boolean>;
+  login: (email: string, password?: string) => Promise<boolean>;
+  register: (name: string, email: string, password?: string, region?: string, subscription?: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -51,9 +51,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false;
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (name: string, email: string, password?: string, region?: string, subscription?: string) => {
     setIsLoading(true);
-    const res = await api.post("/api/auth/register", { name, email, password });
+    const res = await api.post("/api/auth/register", { name, email, password: password || "password123", region, subscription });
     if (res.success) {
       localStorage.setItem("accessToken", res.accessToken);
       setUser(res.user);

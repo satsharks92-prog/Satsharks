@@ -4,8 +4,10 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password?: string;
-  role: "LOCAL_FREE" | "LOCAL_PAID" | "INTL_FREE" | "INTL_PAID" | "ADMIN";
-  subscriptionId?: mongoose.Types.ObjectId;
+  role: "ADMIN" | "STUDENT";
+  region?: "LOCAL" | "INTERNATIONAL";
+  subscription?: "FREE" | "PAID";
+  isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -14,13 +16,27 @@ const UserSchema: Schema = new Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
-    password: { type: String }, // optional for OAuth or mock
+    password: { type: String },
     role: {
       type: String,
-      enum: ["LOCAL_FREE", "LOCAL_PAID", "INTL_FREE", "INTL_PAID", "ADMIN"],
-      default: "LOCAL_FREE",
+      enum: ["ADMIN", "STUDENT"],
+      default: "STUDENT",
     },
-    subscriptionId: { type: Schema.Types.ObjectId, ref: "SubscriptionPlan" },
+    region: {
+      type: String,
+      enum: ["LOCAL", "INTERNATIONAL"],
+      required: function (this: any) {
+        return this.role === "STUDENT";
+      },
+    },
+    subscription: {
+      type: String,
+      enum: ["FREE", "PAID"],
+      required: function (this: any) {
+        return this.role === "STUDENT";
+      },
+    },
+    isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

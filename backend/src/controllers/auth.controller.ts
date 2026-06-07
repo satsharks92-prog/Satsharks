@@ -2,20 +2,15 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import User from "../models/User";
 import { generateTokens } from "../utils/jwt";
-import { env } from "../config/env";
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, region, subscription } = req.body;
     
-    if (!env.isDatabaseConfigured && env.allowMockAuth) {
+    if (!process.env.DATABASE_URL) {
       // Mock mode
-      const tokens = generateTokens("mock-id", "LOCAL_FREE");
-      return res.status(201).json({ success: true, user: { id: "mock-id", name, email, role: "LOCAL_FREE" }, ...tokens });
-    }
-
-    if (!env.isDatabaseConfigured) {
-      return res.status(503).json({ success: false, error: "Database is not configured" });
+      const tokens = generateTokens("mock-id", "STUDENT", region, subscription);
+      return res.status(201).json({ success: true, user: { id: "mock-id", name, email, role: "STUDENT", region, subscription }, ...tokens });
     }
 
     const existingUser = await User.findOne({ email });
@@ -24,10 +19,17 @@ export const register = async (req: Request, res: Response) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({ name, email, password: hashedPassword, role: "LOCAL_FREE" });
+    const user = await User.create({ 
+      name, 
+      email, 
+      password: hashedPassword, 
+      role: "STUDENT",
+      region,
+      subscription
+    });
 
-    const tokens = generateTokens(user.id, user.role);
-    res.status(201).json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role }, ...tokens });
+    const tokens = generateTokens(user.id, user.role, user.region, user.subscription);
+    res.status(201).json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role, region: user.region, subscription: user.subscription }, ...tokens });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -37,15 +39,13 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    if (!env.isDatabaseConfigured && env.allowMockAuth) {
+    if (!process.env.DATABASE_URL) {
       // Mock mode
-      const mockRole = email.includes("admin") ? "ADMIN" : "LOCAL_FREE";
-      const tokens = generateTokens("mock-id", mockRole);
-      return res.status(200).json({ success: true, user: { id: "mock-id", name: email.split("@")[0], email, role: mockRole }, ...tokens });
-    }
-
-    if (!env.isDatabaseConfigured) {
-      return res.status(503).json({ success: false, error: "Database is not configured" });
+      const mockRole = email.includes("admin") ? "ADMIN" : "STUDENT";
+      const mockRegion = mockRole === "STUDENT" ? "LOCAL" : undefined;
+      const mockSubscription = mockRole === "STUDENT" ? "FREE" : undefined;
+      const tokens = generateTokens("mock-id", mockRole, mockRegion, mockSubscription);
+      return res.status(200).json({ success: true, user: { id: "mock-id", name: email.split("@")[0], email, role: mockRole, region: mockRegion, subscription: mockSubscription }, ...tokens });
     }
 
     const user = await User.findOne({ email });
@@ -58,8 +58,8 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ success: false, error: "Invalid credentials" });
     }
 
-    const tokens = generateTokens(user.id, user.role);
-    res.status(200).json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role }, ...tokens });
+    const tokens = generateTokens(user.id, user.role, user.region, user.subscription);
+    res.status(200).json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role, region: user.region, subscription: user.subscription }, ...tokens });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }

@@ -1,11 +1,12 @@
 import { Router } from "express";
-import { getSuccessStories, createSuccessStory } from "../controllers/success-stories.controller";
+import { getSuccessStories, createSuccessStory, deleteSuccessStory } from "../controllers/success-stories.controller";
 import { authenticate } from "../middleware/auth.middleware";
-import { requireRole } from "../middleware/role.middleware";
+import { requireAdmin } from "../middleware/role.middleware";
 
 const router = Router();
 
 router.get("/", getSuccessStories);
-router.post("/", authenticate, requireRole(["ADMIN"]), createSuccessStory);
+router.post("/", authenticate, requireAdmin(), createSuccessStory);
+router.delete("/:id", authenticate, requireAdmin(), deleteSuccessStory);
 
 export default router;
