@@ -5,8 +5,8 @@ import { api } from "../services/api";
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password?: string) => Promise<void>;
-  register: (name: string, email: string, password?: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -36,28 +36,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fetchUser();
   }, []);
 
-  const login = async (email: string, password?: string) => {
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
-    const res = await api.post("/api/auth/login", { email, password: password || "password123" });
+    const res = await api.post("/api/auth/login", { email, password });
     if (res.success) {
       localStorage.setItem("accessToken", res.accessToken);
       setUser(res.user);
+      setIsLoading(false);
+      return true;
     } else {
       console.error(res.error);
     }
     setIsLoading(false);
+    return false;
   };
 
-  const register = async (name: string, email: string, password?: string) => {
+  const register = async (name: string, email: string, password: string) => {
     setIsLoading(true);
-    const res = await api.post("/api/auth/register", { name, email, password: password || "password123" });
+    const res = await api.post("/api/auth/register", { name, email, password });
     if (res.success) {
       localStorage.setItem("accessToken", res.accessToken);
       setUser(res.user);
+      setIsLoading(false);
+      return true;
     } else {
       console.error(res.error);
     }
     setIsLoading(false);
+    return false;
   };
 
   const logout = () => {

@@ -20,6 +20,11 @@ frontend/.vinxi
 frontend/.tanstack/**
 frontend/.nitro
 *.local
+.env
+.env.*
+!.env.example
+!backend/.env.example
+!frontend/.env.example
 
 # Wrangler / Cloudflare
 .wrangler/

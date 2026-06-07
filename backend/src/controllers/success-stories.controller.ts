@@ -1,25 +1,12 @@
 import { Request, Response } from "express";
 import SuccessStory from "../models/SuccessStory";
+import { env } from "../config/env";
+import { phaseOneSuccessStories } from "../data/phaseOne";
 
 export const getSuccessStories = async (req: Request, res: Response) => {
   try {
-    if (!process.env.DATABASE_URL) {
-      // Return mock stories
-      const mockStories = [
-        {
-          name: "Sarah M.",
-          score: "Scored 1580 (+210)",
-          quote: "The personalized study plan was a game-changer.",
-          university: "Harvard University",
-        },
-        {
-          name: "David L.",
-          score: "Scored 1550 (+180)",
-          quote: "The instructors genuinely care about your success.",
-          university: "Stanford University",
-        }
-      ];
-      return res.status(200).json({ success: true, stories: mockStories });
+    if (!env.isDatabaseConfigured) {
+      return res.status(200).json({ success: true, stories: phaseOneSuccessStories });
     }
 
     const stories = await SuccessStory.find().sort({ createdAt: -1 });
@@ -33,8 +20,12 @@ export const createSuccessStory = async (req: Request, res: Response) => {
   try {
     const { name, score, quote, university } = req.body;
 
-    if (!process.env.DATABASE_URL) {
+    if (!env.isDatabaseConfigured && env.allowMockAuth) {
       return res.status(201).json({ success: true, message: "Success story created (mock)" });
+    }
+
+    if (!env.isDatabaseConfigured) {
+      return res.status(503).json({ success: false, error: "Database is not configured" });
     }
 
     const story = await SuccessStory.create({ name, score, quote, university });

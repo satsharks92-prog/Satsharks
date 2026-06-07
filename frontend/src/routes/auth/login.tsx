@@ -13,13 +13,21 @@ export const Route = createFileRoute("/auth/login")({
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      await login(email, password);
+    setError("");
+
+    if (email && password) {
+      const success = await login(email, password);
+      if (!success) {
+        setError("Invalid email or password.");
+        return;
+      }
+
       navigate({ to: "/" });
     }
   };
@@ -54,6 +62,11 @@ function Login() {
               placeholder="••••••••"
               required
             />
+            {error && (
+              <p className="rounded-lg border border-error/30 bg-error/10 px-3 py-2 text-sm font-medium text-error">
+                {error}
+              </p>
+            )}
             <div className="flex justify-end">
               <Link
                 to="/auth/forgot-password"

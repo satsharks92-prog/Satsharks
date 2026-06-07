@@ -14,13 +14,21 @@ function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const { register } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && name) {
-      await register(name, email, password);
+    setError("");
+
+    if (email && name && password) {
+      const success = await register(name, email, password);
+      if (!success) {
+        setError("Unable to create this account. Please check your details or try another email.");
+        return;
+      }
+
       navigate({ to: "/" });
     }
   };
@@ -63,6 +71,11 @@ function Register() {
               placeholder="••••••••"
               required
             />
+            {error && (
+              <p className="rounded-lg border border-error/30 bg-error/10 px-3 py-2 text-sm font-medium text-error">
+                {error}
+              </p>
+            )}
             <Button type="submit" className="w-full">
               Create Account
             </Button>

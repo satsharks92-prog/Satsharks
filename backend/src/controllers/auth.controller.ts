@@ -2,15 +2,20 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import User from "../models/User";
 import { generateTokens } from "../utils/jwt";
+import { env } from "../config/env";
 
 export const register = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
     
-    if (!process.env.DATABASE_URL) {
+    if (!env.isDatabaseConfigured && env.allowMockAuth) {
       // Mock mode
       const tokens = generateTokens("mock-id", "LOCAL_FREE");
       return res.status(201).json({ success: true, user: { id: "mock-id", name, email, role: "LOCAL_FREE" }, ...tokens });
+    }
+
+    if (!env.isDatabaseConfigured) {
+      return res.status(503).json({ success: false, error: "Database is not configured" });
     }
 
     const existingUser = await User.findOne({ email });
@@ -32,11 +37,15 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    if (!process.env.DATABASE_URL) {
+    if (!env.isDatabaseConfigured && env.allowMockAuth) {
       // Mock mode
       const mockRole = email.includes("admin") ? "ADMIN" : "LOCAL_FREE";
       const tokens = generateTokens("mock-id", mockRole);
       return res.status(200).json({ success: true, user: { id: "mock-id", name: email.split("@")[0], email, role: mockRole }, ...tokens });
+    }
+
+    if (!env.isDatabaseConfigured) {
+      return res.status(503).json({ success: false, error: "Database is not configured" });
     }
 
     const user = await User.findOne({ email });
