@@ -5,7 +5,6 @@ export function Footer() {
   const links = [
     { label: "Privacy Policy", to: "/" },
     { label: "Terms of Service", to: "/" },
-    { label: "FAQ", to: "/" },
     { label: "Careers", to: "/" },
     { label: "Contact Us", to: "/contact" },
   ];

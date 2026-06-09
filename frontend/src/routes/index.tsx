@@ -7,7 +7,6 @@ import { Stats } from "../components/sections/Stats";
 import { Services } from "../components/sections/Services";
 import { Testimonials } from "../components/sections/Testimonials";
 import { Process } from "../components/sections/Process";
-import { Resources } from "../components/sections/Resources";
 import { Booking } from "../components/sections/Booking";
 import { CTA } from "../components/sections/CTA";
 
@@ -43,7 +42,6 @@ function Landing() {
         <Services />
         <Testimonials />
         <Process />
-        <Resources />
         <Booking />
         <CTA />
       </main>
