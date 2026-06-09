@@ -13,7 +13,7 @@ export const phaseOneSubscriptionPlans = [
     roleRequired: "LOCAL_FREE",
   },
   {
-    name: "Local Paid",
+    name: "Local Premium",
     price: "$199",
     period: "per month",
     description: "Premium SAT prep and mentoring for local students.",
@@ -25,6 +25,7 @@ export const phaseOneSubscriptionPlans = [
       "Personalized study plan",
     ],
     roleRequired: "LOCAL_PAID",
+    highlight: true,
   },
   {
     name: "International Free",
@@ -40,10 +41,11 @@ export const phaseOneSubscriptionPlans = [
     roleRequired: "INTL_FREE",
   },
   {
-    name: "International Paid",
+    name: "International Premium",
     price: "$299",
     period: "per month",
-    description: "Complete SAT prep and admissions support for international students.",
+    description:
+      "Complete SAT prep and admissions support for international students.",
     features: [
       "Everything in International Free",
       "Full proprietary curriculum",
@@ -52,6 +54,7 @@ export const phaseOneSubscriptionPlans = [
       "Comprehensive visa and admissions counseling",
     ],
     roleRequired: "INTL_PAID",
+    highlight: true,
   },
 ];
 

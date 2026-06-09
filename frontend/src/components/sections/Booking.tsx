@@ -1,8 +1,25 @@
 import { Icon } from "../common/Icon";
 import { CalendlyWidget } from "../common/CalendlyWidget";
-import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { openCalendly } from "../../lib/calendly";
 
 export function Booking() {
+  const [isOpeningCalendly, setIsOpeningCalendly] = useState(false);
+  const [calendlyError, setCalendlyError] = useState("");
+
+  const handleBookConsultation = async () => {
+    setCalendlyError("");
+    setIsOpeningCalendly(true);
+
+    try {
+      await openCalendly();
+    } catch (error) {
+      setCalendlyError(error instanceof Error ? error.message : "Unable to open Calendly.");
+    } finally {
+      setIsOpeningCalendly(false);
+    }
+  };
+
   return (
     <section id="booking" className="py-24 md:py-32">
       <div className="mx-auto max-w-[1100px] px-6">
@@ -23,12 +40,18 @@ export function Booking() {
                 Book a consultation with an expert advisor to discuss your goals and how we can help
                 you achieve them.
               </p>
-              <Link
-                to="/contact"
+              <button
+                type="button"
+                onClick={handleBookConsultation}
+                disabled={isOpeningCalendly}
                 className="btn-shimmer mt-8 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-on-primary hover:bg-primary-container transition-colors"
               >
-                <Icon name="calendar_month" className="text-[18px]" /> Book Consultation
-              </Link>
+                <Icon name="calendar_month" className="text-[18px]" />
+                {isOpeningCalendly ? "Opening..." : "Book Consultation"}
+              </button>
+              {calendlyError && (
+                <p className="mt-3 text-sm font-medium text-primary-fixed-dim">{calendlyError}</p>
+              )}
             </div>
             <CalendlyWidget />
           </div>

@@ -10,9 +10,13 @@ export interface User {
 }
 
 export interface SubscriptionPlan {
-  id: string;
+  _id?: string;
+  id?: string;
   name: string;
-  price: number;
-  interval: "month" | "year";
+  price: string;
+  period: string;
+  description: string;
   features: string[];
+  roleRequired: "LOCAL_FREE" | "LOCAL_PAID" | "INTL_FREE" | "INTL_PAID";
+  highlight?: boolean;
 }
