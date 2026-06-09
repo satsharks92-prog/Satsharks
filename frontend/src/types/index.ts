@@ -3,8 +3,10 @@ export interface User {
   name: string;
   email: string;
   role: "ADMIN" | "STUDENT";
-  region?: "LOCAL" | "INTERNATIONAL";
-  subscription?: "FREE" | "PAID";
+  country: string;
+  region: "LOCAL" | "INTERNATIONAL";
+  subscription: "FREE" | "PAID";
+  status: "ACTIVE" | "SUSPENDED";
 }
 
 export interface SubscriptionPlan {

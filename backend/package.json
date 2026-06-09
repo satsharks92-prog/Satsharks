@@ -9,6 +9,7 @@
     "dev": "tsx watch src/server.ts",
     "seed:phase1": "tsx src/scripts/seedPhaseOne.ts",
     "seed": "tsx scripts/seed.ts",
+    "migrate": "tsx scripts/migrate.ts",
     "lint": "eslint src/**/*.ts"
   },
   "dependencies": {

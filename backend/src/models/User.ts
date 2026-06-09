@@ -5,9 +5,10 @@ export interface IUser extends Document {
   email: string;
   password?: string;
   role: "ADMIN" | "STUDENT";
-  region?: "LOCAL" | "INTERNATIONAL";
-  subscription?: "FREE" | "PAID";
-  isActive: boolean;
+  country: string;
+  region: "LOCAL" | "INTERNATIONAL";
+  subscription: "FREE" | "PAID";
+  status: "ACTIVE" | "SUSPENDED";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,21 +23,29 @@ const UserSchema: Schema = new Schema(
       enum: ["ADMIN", "STUDENT"],
       default: "STUDENT",
     },
+    country: {
+      type: String,
+      required: true,
+      default: "Unknown",
+    },
     region: {
       type: String,
       enum: ["LOCAL", "INTERNATIONAL"],
-      required: function (this: any) {
-        return this.role === "STUDENT";
-      },
+      required: true,
+      default: "INTERNATIONAL",
     },
     subscription: {
       type: String,
       enum: ["FREE", "PAID"],
-      required: function (this: any) {
-        return this.role === "STUDENT";
-      },
+      required: true,
+      default: "FREE",
     },
-    isActive: { type: Boolean, default: true },
+    status: {
+      type: String,
+      enum: ["ACTIVE", "SUSPENDED"],
+      required: true,
+      default: "ACTIVE",
+    },
   },
   { timestamps: true }
 );

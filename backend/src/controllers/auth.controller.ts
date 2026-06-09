@@ -5,12 +5,16 @@ import { generateTokens } from "../utils/jwt";
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { name, email, password, region, subscription } = req.body;
+    const { name, email, password, country } = req.body;
+    
+    const region = country.toLowerCase() === "pakistan" ? "LOCAL" : "INTERNATIONAL";
+    const subscription = "FREE";
+    const status = "ACTIVE";
     
     if (!process.env.DATABASE_URL) {
       // Mock mode
-      const tokens = generateTokens("mock-id", "STUDENT", region, subscription);
-      return res.status(201).json({ success: true, user: { id: "mock-id", name, email, role: "STUDENT", region, subscription }, ...tokens });
+      const tokens = generateTokens("mock-id", "STUDENT", region, subscription, status);
+      return res.status(201).json({ success: true, user: { id: "mock-id", name, email, role: "STUDENT", country, region, subscription, status }, ...tokens });
     }
 
     const existingUser = await User.findOne({ email });
@@ -24,12 +28,14 @@ export const register = async (req: Request, res: Response) => {
       email, 
       password: hashedPassword, 
       role: "STUDENT",
+      country,
       region,
-      subscription
+      subscription,
+      status
     });
 
-    const tokens = generateTokens(user.id, user.role, user.region, user.subscription);
-    res.status(201).json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role, region: user.region, subscription: user.subscription }, ...tokens });
+    const tokens = generateTokens(user.id, user.role, user.region, user.subscription, user.status);
+    res.status(201).json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role, country: user.country, region: user.region, subscription: user.subscription, status: user.status }, ...tokens });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -42,10 +48,10 @@ export const login = async (req: Request, res: Response) => {
     if (!process.env.DATABASE_URL) {
       // Mock mode
       const mockRole = email.includes("admin") ? "ADMIN" : "STUDENT";
-      const mockRegion = mockRole === "STUDENT" ? "LOCAL" : undefined;
-      const mockSubscription = mockRole === "STUDENT" ? "FREE" : undefined;
-      const tokens = generateTokens("mock-id", mockRole, mockRegion, mockSubscription);
-      return res.status(200).json({ success: true, user: { id: "mock-id", name: email.split("@")[0], email, role: mockRole, region: mockRegion, subscription: mockSubscription }, ...tokens });
+      const mockRegion = mockRole === "STUDENT" ? "LOCAL" : "INTERNATIONAL";
+      const mockSubscription = mockRole === "STUDENT" ? "FREE" : "FREE";
+      const tokens = generateTokens("mock-id", mockRole, mockRegion, mockSubscription, "ACTIVE");
+      return res.status(200).json({ success: true, user: { id: "mock-id", name: email.split("@")[0], email, role: mockRole, country: "Pakistan", region: mockRegion, subscription: mockSubscription, status: "ACTIVE" }, ...tokens });
     }
 
     const user = await User.findOne({ email });
@@ -53,19 +59,22 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ success: false, error: "Invalid credentials" });
     }
 
+    if (user.status === "SUSPENDED") {
+      return res.status(403).json({ success: false, error: "Your account is suspended. Please contact support." });
+    }
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ success: false, error: "Invalid credentials" });
     }
 
-    const tokens = generateTokens(user.id, user.role, user.region, user.subscription);
-    res.status(200).json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role, region: user.region, subscription: user.subscription }, ...tokens });
+    const tokens = generateTokens(user.id, user.role, user.region, user.subscription, user.status);
+    res.status(200).json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role, country: user.country, region: user.region, subscription: user.subscription, status: user.status }, ...tokens });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }
 };
 
 export const resetPassword = async (req: Request, res: Response) => {
-  // Mock logic for password reset email
   res.status(200).json({ success: true, message: "Reset instructions sent if email exists" });
 };

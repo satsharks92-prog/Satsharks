@@ -6,7 +6,7 @@ interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password?: string) => Promise<boolean>;
-  register: (name: string, email: string, password?: string, region?: string, subscription?: string) => Promise<boolean>;
+  register: (name: string, email: string, password?: string, country?: string) => Promise<boolean>;
   logout: () => void;
 }
 
@@ -51,9 +51,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return false;
   };
 
-  const register = async (name: string, email: string, password?: string, region?: string, subscription?: string) => {
+  const register = async (name: string, email: string, password?: string, country?: string) => {
     setIsLoading(true);
-    const res = await api.post("/api/auth/register", { name, email, password: password || "password123", region, subscription });
+    const res = await api.post("/api/auth/register", { name, email, password: password || "password123", country });
     if (res.success) {
       localStorage.setItem("accessToken", res.accessToken);
       setUser(res.user);

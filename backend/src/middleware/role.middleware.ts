@@ -45,3 +45,12 @@ export const requireInternationalUser = () => {
     next();
   };
 };
+
+export const requireActiveUser = () => {
+  return (req: AuthRequest, res: Response, next: NextFunction) => {
+    if (!req.user || req.user.status === "SUSPENDED") {
+      return res.status(403).json({ success: false, error: "Forbidden: Account is suspended" });
+    }
+    next();
+  };
+};
