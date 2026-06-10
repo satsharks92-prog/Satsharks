@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Icon } from "../common/Icon";
 import { CalendlyWidget } from "../common/CalendlyWidget";
 import { useState } from "react";
@@ -21,41 +22,61 @@ export function Booking() {
   };
 
   return (
-    <section id="booking" className="py-24 md:py-32">
+    <section id="booking" className="py-24 md:py-36 bg-background">
       <div className="mx-auto max-w-[1100px] px-6">
-        <div className="rounded-2xl bg-inverse-surface text-inverse-on-surface p-8 md:p-14 shark-shadow relative overflow-hidden">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="rounded-2xl bg-primary text-on-primary p-8 md:p-16 shark-shadow relative overflow-hidden border border-accent/40"
+        >
+          {/* Subtle gold decorative glow */}
           <div
             aria-hidden
-            className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-primary/40 blur-3xl"
+            className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-accent/20 blur-3xl"
           />
-          <div className="relative grid gap-10 md:grid-cols-2 md:items-center">
-            <div>
-              <span className="font-mono text-[12px] uppercase tracking-[0.08em] text-primary-fixed-dim">
-                Booking
+          <div
+            aria-hidden
+            className="absolute -left-24 -bottom-24 h-80 w-80 rounded-full bg-secondary-container/10 blur-3xl"
+          />
+
+          <div className="relative grid gap-12 md:grid-cols-12 md:items-center">
+            {/* Text description side */}
+            <div className="md:col-span-7 space-y-6">
+              <span className="font-body text-[11px] font-bold uppercase tracking-[0.2em] text-accent">
+                Private Consultation
               </span>
-              <h2 className="mt-3 font-display text-3xl font-bold tracking-[-0.01em] md:text-4xl">
-                Schedule Your Session Now
+              <h2 className="font-display text-4xl font-extrabold tracking-tight md:text-5xl leading-tight text-on-primary">
+                Schedule Your Admissions Assessment
               </h2>
-              <p className="mt-4 text-inverse-on-surface/80">
-                Book a consultation with an expert advisor to discuss your goals and how we can help
-                you achieve them.
+              <p className="font-body text-base font-light leading-relaxed text-on-primary/80">
+                Align with an elite advisor to map your baseline scores, review target university lists, and design a strategic roadmap tailored to your admissions timeline.
               </p>
+              
               <button
                 type="button"
                 onClick={handleBookConsultation}
                 disabled={isOpeningCalendly}
-                className="btn-shimmer mt-8 inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-semibold text-on-primary hover:bg-primary-container transition-colors"
+                className="btn-shimmer inline-flex items-center gap-3 rounded-xl bg-accent px-8 py-4 text-xs font-bold uppercase tracking-[0.1em] text-primary shark-shadow hover:bg-on-primary hover:text-primary transition-all duration-300 cursor-pointer disabled:opacity-70"
               >
-                <Icon name="calendar_month" className="text-[18px]" />
-                {isOpeningCalendly ? "Opening..." : "Book Consultation"}
+                <Icon name="calendar_month" className="text-[16px]" />
+                {isOpeningCalendly ? "Initializing Secure Link..." : "Select Booking Slot"}
               </button>
+
               {calendlyError && (
-                <p className="mt-3 text-sm font-medium text-primary-fixed-dim">{calendlyError}</p>
+                <p className="text-sm font-medium text-red-300 font-body flex items-center gap-1.5">
+                  <Icon name="error" className="text-[16px]" /> {calendlyError}
+                </p>
               )}
             </div>
-            <CalendlyWidget />
+
+            {/* Widget illustration side */}
+            <div className="md:col-span-5">
+              <CalendlyWidget />
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

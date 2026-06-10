@@ -1,25 +1,58 @@
+import { motion } from "framer-motion";
+
 export function Stats() {
   const stats = [
-    { v: "98%", l: "Satisfaction" },
-    { v: "1500+", l: "Mentored" },
-    { v: "250+", l: "Admissions" },
-    { v: "200+", l: "Score Improvement" },
+    { v: "98%", l: "Success Rate" },
+    { v: "1,500+", l: "Students Mentored" },
+    { v: "250+", l: "Elite Admissions" },
+    { v: "+220", l: "Average SAT Gain" },
   ];
+
+  const container = {
+    hidden: { opacity: 0, y: 15 },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        staggerChildren: 0.1,
+        duration: 0.8,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 10 },
+    show: { opacity: 1, y: 0 },
+  };
+
   return (
-    <section className="relative -mt-10">
+    <section className="relative z-10 -mt-12 md:-mt-16">
       <div className="mx-auto max-w-[1200px] px-6">
-        <div className="glass-card shark-shadow grid grid-cols-2 gap-6 rounded-2xl px-6 py-8 md:grid-cols-4 md:px-10">
-          {stats.map((s) => (
-            <div key={s.l} className="text-center">
-              <div className="font-display text-3xl font-extrabold tracking-[-0.02em] text-primary md:text-4xl">
+        <motion.div 
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, margin: "-50px" }}
+          className="glass-card shark-shadow grid grid-cols-2 gap-y-8 py-10 md:grid-cols-4 md:py-12 rounded-2xl bg-surface/90"
+        >
+          {stats.map((s, idx) => (
+            <motion.div 
+              key={s.l} 
+              variants={item}
+              className={`text-center px-4 ${
+                idx < 3 ? "md:border-r md:border-outline-variant/50" : ""
+              }`}
+            >
+              <div className="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-primary">
                 {s.v}
               </div>
-              <div className="mt-1 font-mono text-[12px] uppercase tracking-[0.08em] text-on-surface-variant">
+              <div className="mt-2 font-body text-[11px] font-bold uppercase tracking-[0.15em] text-on-surface-variant/80">
                 {s.l}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

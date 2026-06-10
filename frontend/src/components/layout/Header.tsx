@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { Icon } from "../common/Icon";
 import logoAsset from "@/assets/logo.png.asset.json";
@@ -6,7 +6,16 @@ import { useAuth } from "../../hooks/useAuth";
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { user, logout } = useAuth();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const links = [
     { to: "/", hash: "services", label: "Services" },
@@ -18,58 +27,65 @@ export function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 glass-card border-b border-outline-variant/40">
-      <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-3">
-        <Link to="/" className="flex items-center gap-2">
-          <img src={logoAsset.url} alt="SAT Sharks" className="h-10 w-auto" />
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 w-full ${
+        scrolled
+          ? "py-3 bg-surface/90 backdrop-blur-md border-b border-outline-variant/60 shadow-sm"
+          : "py-5 bg-transparent"
+      }`}
+    >
+      <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6">
+        <Link to="/" className="flex items-center gap-2 group transition-transform duration-300 hover:scale-[1.02]">
+          <img src={logoAsset.url} alt="SAT Sharks" className="h-9 md:h-11 w-auto" />
         </Link>
-        <nav className="hidden items-center gap-6 lg:flex">
+        <nav className="hidden items-center gap-8 lg:flex">
           {links.map((l) => (
             <Link
               key={l.label}
               to={l.to}
               hash={l.hash}
-              className="font-mono text-[12px] uppercase tracking-[0.08em] text-on-surface-variant hover:text-primary transition-colors"
+              className="relative py-1 font-body text-[13px] font-semibold uppercase tracking-[0.08em] text-on-surface-variant hover:text-primary transition-colors duration-300 group"
             >
               {l.label}
+              <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-accent transition-all duration-300 group-hover:w-full" />
             </Link>
           ))}
         </nav>
-        <div className="hidden lg:flex items-center gap-4">
+        <div className="hidden lg:flex items-center gap-5">
           {user ? (
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-5">
               <span className="text-sm font-semibold text-on-surface">Hi, {user.name}</span>
               <button
                 onClick={logout}
-                className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors"
+                className="text-[13px] font-bold uppercase tracking-[0.08em] text-on-surface-variant hover:text-accent transition-colors cursor-pointer"
               >
                 Logout
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-5">
               <Link
                 to="/auth/login"
-                className="text-sm font-semibold text-on-surface hover:text-primary transition-colors"
+                className="text-[13px] font-bold uppercase tracking-[0.08em] text-on-surface-variant hover:text-primary transition-colors"
               >
                 Login
               </Link>
               <Link
                 to="/auth/register"
-                className="btn-shimmer inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-on-primary shark-shadow hover:bg-primary-container transition-colors"
+                className="btn-shimmer inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-xs font-bold uppercase tracking-[0.08em] text-on-primary shark-shadow hover:bg-accent transition-all duration-300"
               >
                 Register
-                <Icon name="arrow_forward" className="text-[18px]" />
+                <Icon name="arrow_forward" className="text-[16px]" />
               </Link>
             </div>
           )}
         </div>
         <button
           onClick={() => setOpen(!open)}
-          className="lg:hidden rounded-lg p-2 text-on-surface"
+          className="lg:hidden rounded-lg p-2 text-on-surface hover:bg-surface-container-low transition-colors"
           aria-label="menu"
         >
-          <Icon name={open ? "close" : "menu"} />
+          <Icon name={open ? "close" : "menu"} className="text-[28px]" />
         </button>
       </div>
       {open && (
