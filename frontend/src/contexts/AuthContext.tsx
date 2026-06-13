@@ -5,8 +5,8 @@ import { api } from "../services/api";
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (email: string, password?: string) => Promise<boolean>;
-  register: (name: string, email: string, password?: string, country?: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<string | null>;
+  register: (name: string, email: string, password?: string, country?: string) => Promise<string | null>;
   logout: () => void;
 }
 
@@ -43,12 +43,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("accessToken", res.accessToken);
       setUser(res.user);
       setIsLoading(false);
-      return true;
-    } else {
-      console.error(res.error);
+      return null;
     }
     setIsLoading(false);
-    return false;
+    return res.error || "Invalid email or password.";
   };
 
   const register = async (name: string, email: string, password?: string, country?: string) => {
@@ -58,12 +56,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("accessToken", res.accessToken);
       setUser(res.user);
       setIsLoading(false);
-      return true;
-    } else {
-      console.error(res.error);
+      return null;
     }
     setIsLoading(false);
-    return false;
+    return res.error || "Unable to create this account.";
   };
 
   const logout = () => {

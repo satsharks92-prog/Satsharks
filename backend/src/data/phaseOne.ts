@@ -64,11 +64,15 @@ export const phaseOneSuccessStories = [
     score: "Scored 1580 (+210)",
     quote: "The personalized study plan was a game-changer.",
     university: "Harvard University",
+    imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&h=256&q=80",
+    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
   },
   {
     name: "David L.",
     score: "Scored 1550 (+180)",
     quote: "The instructors genuinely care about your success.",
     university: "Stanford University",
+    imageUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&h=256&q=80",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
   },
 ];

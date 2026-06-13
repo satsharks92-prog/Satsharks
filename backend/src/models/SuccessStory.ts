@@ -5,6 +5,8 @@ export interface ISuccessStory extends Document {
   score: string;
   quote: string;
   university: string;
+  imageUrl?: string;
+  videoUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -15,6 +17,8 @@ const SuccessStorySchema: Schema = new Schema(
     score: { type: String, required: true },
     quote: { type: String, required: true },
     university: { type: String, required: true },
+    imageUrl: { type: String, required: false },
+    videoUrl: { type: String, required: false },
   },
   { timestamps: true }
 );

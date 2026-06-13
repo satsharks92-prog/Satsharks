@@ -22,9 +22,9 @@ function Login() {
     setError("");
 
     if (email && password) {
-      const success = await login(email, password);
-      if (!success) {
-        setError("Invalid email or password.");
+      const loginError = await login(email, password);
+      if (loginError) {
+        setError(loginError);
         return;
       }
 

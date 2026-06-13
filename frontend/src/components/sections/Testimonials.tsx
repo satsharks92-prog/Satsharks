@@ -1,14 +1,22 @@
 import { motion } from "framer-motion";
 import { Icon } from "../common/Icon";
+import { useState, useEffect } from "react";
+import { api } from "../../services/api";
+import { Link } from "@tanstack/react-router";
 
 export function Testimonials() {
-  const testimonials = [
+  const [stories, setStories] = useState<any[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+
+  const defaultTestimonials = [
     {
       name: "Sarah M.",
       score: "Scored 1580 (+210)",
       destination: "Stanford University '28",
       quote:
         "The personalized study plan was a complete game-changer. I felt confident, focused, and fully prepared on test day. Getting into my dream school still feels surreal!",
+      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&h=256&q=80",
+      videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     },
     {
       name: "David L.",
@@ -16,6 +24,8 @@ export function Testimonials() {
       destination: "Princeton University '29",
       quote:
         "The mentors genuinely care about your success. The study material and timed drills perfectly mirrored the actual exam environment, removing all test-day anxiety.",
+      imageUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&h=256&q=80",
+      videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
     },
     {
       name: "Emily R.",
@@ -23,8 +33,39 @@ export function Testimonials() {
       destination: "Yale University '28",
       quote:
         "I was struggling to break 700 in the Math section, but the targeted problem walkthroughs helped me achieve a perfect 800. I couldn't have done it without SAT Sharks!",
+      imageUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=256&h=256&q=80",
     },
   ];
+
+  useEffect(() => {
+    api.get("/api/success-stories").then((res) => {
+      if (res.success && res.stories && res.stories.length > 0) {
+        setStories(res.stories.slice(0, 3));
+      }
+    });
+  }, []);
+
+  const getEmbedUrl = (url: string) => {
+    if (!url) return "";
+    const ytRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/;
+    const ytMatch = url.match(ytRegex);
+    if (ytMatch && ytMatch[1]) {
+      return `https://www.youtube.com/embed/${ytMatch[1]}?autoplay=1`;
+    }
+    const vimeoRegex = /(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)/;
+    const vimeoMatch = url.match(vimeoRegex);
+    if (vimeoMatch && vimeoMatch[1]) {
+      return `https://player.vimeo.com/video/${vimeoMatch[1]}?autoplay=1`;
+    }
+    return url;
+  };
+
+  const isEmbeddable = (url: string) => {
+    const embedUrl = getEmbedUrl(url);
+    return embedUrl.includes("youtube.com/embed") || embedUrl.includes("vimeo.com/video");
+  };
+
+  const displayStories = stories.length > 0 ? stories : defaultTestimonials;
 
   const container = {
     hidden: { opacity: 0 },
@@ -74,43 +115,107 @@ export function Testimonials() {
           viewport={{ once: true, margin: "-100px" }}
           className="mt-20 grid gap-8 md:grid-cols-3"
         >
-          {testimonials.map((t) => (
+          {displayStories.map((t) => (
             <motion.figure
-              key={t.name}
+              key={t._id || t.name}
               variants={item}
               whileHover={{ y: -6 }}
-              className="relative rounded-xl bg-surface p-8 md:p-10 shark-shadow border border-outline-variant/40 flex flex-col justify-between"
+              className="relative rounded-2xl bg-surface p-8 md:p-10 shark-shadow border border-outline-variant/40 flex flex-col items-center text-center justify-between min-h-[420px]"
             >
-              {/* Gold Quote Icon */}
-              <div className="text-accent/20 absolute -top-5 left-8">
-                <span className="font-display text-[80px] leading-none select-none">“</span>
+              <div className="flex flex-col items-center w-full">
+                {/* Centered Large Student Avatar on Top */}
+                {t.imageUrl ? (
+                  <img
+                    src={t.imageUrl}
+                    alt={t.name}
+                    className="w-20 h-20 rounded-full object-cover border-2 border-primary/20 shadow-md mb-4"
+                  />
+                ) : (
+                  <div className="grid h-20 w-20 place-items-center rounded-full bg-primary text-accent font-display text-2xl font-bold border-2 border-accent/30 shadow-md mb-4">
+                    {t.name.charAt(0)}
+                  </div>
+                )}
+                
+                {/* Student Info */}
+                <div className="font-body text-base font-bold text-primary">{t.name}</div>
+                <div className="font-body text-xs font-bold uppercase tracking-[0.05em] text-accent mt-1">
+                  {t.score}
+                </div>
+                <div className="mt-1 text-xs text-on-surface-variant flex items-center justify-center gap-1">
+                  <Icon name="school" className="text-[14px]" /> {t.university || t.destination}
+                </div>
+
+                {/* Centered Watch Video button */}
+                {t.videoUrl && (
+                  <button
+                    onClick={() => setSelectedVideo(t.videoUrl)}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-on-primary px-3.5 py-1.5 font-body text-xs font-bold uppercase tracking-wider transition-all duration-300 mt-3 border border-primary/20 cursor-pointer shadow-sm"
+                    title="Watch Video Testimonial"
+                  >
+                    <Icon name="play_arrow" className="text-[12px]" />
+                    Watch Video
+                  </button>
+                )}
               </div>
 
-              <blockquote className="relative mt-4 font-headline italic text-lg leading-relaxed text-on-surface font-light">
-                "{t.quote}"
-              </blockquote>
+              <div className="w-full">
+                {/* Divider Line */}
+                <div className="h-[1px] w-full bg-outline-variant/30 my-4" />
 
-              <figcaption className="mt-8 pt-6 border-t border-outline-variant/30 flex items-center gap-4">
-                <div className="grid h-11 w-11 place-items-center rounded-full bg-primary text-accent font-display text-[16px] font-bold border border-accent/30">
-                  {t.name.charAt(0)}
-                </div>
-                <div>
-                  <div className="font-body text-sm font-bold text-primary">{t.name}</div>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-x-2 gap-y-0.5 mt-0.5">
-                    <span className="font-body text-[11px] font-bold uppercase tracking-[0.05em] text-accent">
-                      {t.score}
-                    </span>
-                    <span className="hidden sm:inline text-outline-variant text-[11px]">•</span>
-                    <span className="font-body text-[11px] font-medium text-on-surface-variant">
-                      {t.destination}
-                    </span>
-                  </div>
-                </div>
-              </figcaption>
+                {/* Testimonial Quote */}
+                <blockquote className="text-on-surface leading-relaxed text-sm italic font-light">
+                  "{t.quote}"
+                </blockquote>
+              </div>
             </motion.figure>
           ))}
         </motion.div>
+
+        {/* View All Stories Button */}
+        <div className="mt-16 text-center">
+          <Link
+            to="/success-stories"
+            className="btn-shimmer inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3.5 text-sm font-bold uppercase tracking-[0.08em] text-on-primary shark-shadow hover:bg-accent transition-all duration-300"
+          >
+            <span>View All Success Stories</span>
+            <Icon name="arrow_forward" className="text-lg" />
+          </Link>
+        </div>
       </div>
+
+      {/* Video Lightbox Modal */}
+      {selectedVideo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-fade-in">
+          <div className="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden shadow-2xl border border-outline-variant/20">
+            <button
+              onClick={() => setSelectedVideo(null)}
+              className="absolute top-4 right-4 z-10 text-white bg-black/40 hover:bg-black/80 p-2 rounded-full transition-colors cursor-pointer"
+              aria-label="Close video player"
+            >
+              <Icon name="close" className="text-2xl" />
+            </button>
+            
+            <div className="w-full aspect-video">
+              {isEmbeddable(selectedVideo) ? (
+                <iframe
+                  src={getEmbedUrl(selectedVideo)}
+                  title="Student Video Testimonial"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full h-full border-none"
+                />
+              ) : (
+                <video
+                  src={selectedVideo}
+                  controls
+                  autoPlay
+                  className="w-full h-full object-contain"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { Icon } from "../common/Icon";
-import logoAsset from "@/assets/logo.png.asset.json";
+import logoImg from "@/assets/logo.png";
 import { useAuth } from "../../hooks/useAuth";
 
 export function Header() {
@@ -24,19 +24,20 @@ export function Header() {
     { to: "/success-stories", hash: undefined, label: "Success Stories" },
     { to: "/subscriptions", hash: undefined, label: "Pricing" },
     { to: "/contact", hash: undefined, label: "Contact" },
+    ...(user?.role === "ADMIN" ? [{ to: "/admin", hash: undefined, label: "Admin Panel" }] : []),
   ];
 
   return (
     <header
       className={`sticky top-0 z-50 transition-all duration-300 w-full ${
         scrolled
-          ? "py-3 bg-surface/90 backdrop-blur-md border-b border-outline-variant/60 shadow-sm"
+          ? "py-3 bg-surface/90 backdrop-blur-md"
           : "py-5 bg-transparent"
       }`}
     >
       <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6">
         <Link to="/" className="flex items-center gap-2 group transition-transform duration-300 hover:scale-[1.02]">
-          <img src={logoAsset.url} alt="SAT Sharks" className="h-9 md:h-11 w-auto" />
+          <img src={logoImg} alt="SAT Sharks" className="h-12 md:h-16 w-auto relative -top-1 md:-top-1.5 mix-blend-multiply" />
         </Link>
         <nav className="hidden items-center gap-8 lg:flex">
           {links.map((l) => (
@@ -54,7 +55,7 @@ export function Header() {
         <div className="hidden lg:flex items-center gap-5">
           {user ? (
             <div className="flex items-center gap-5">
-              <span className="text-sm font-semibold text-on-surface">Hi, {user.name}</span>
+              <span className="font-body text-[13px] font-semibold uppercase tracking-[0.08em] text-on-surface">Hi, {user.name}</span>
               <button
                 onClick={logout}
                 className="text-[13px] font-bold uppercase tracking-[0.08em] text-on-surface-variant hover:text-accent transition-colors cursor-pointer"

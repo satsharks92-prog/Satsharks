@@ -30,9 +30,9 @@ function Register() {
     }
 
     if (email && name && password && country) {
-      const success = await register(name, email, password, country);
-      if (!success) {
-        setError("Unable to create this account. Please check your details or try another email.");
+      const registerError = await register(name, email, password, country);
+      if (registerError) {
+        setError(registerError);
         return;
       }
 

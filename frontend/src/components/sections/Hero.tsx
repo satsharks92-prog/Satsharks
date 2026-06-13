@@ -5,7 +5,7 @@ import { Link } from "@tanstack/react-router";
 
 export function Hero() {
   return (
-    <section id="top" className="relative pt-16 pb-28 md:pt-24 md:pb-40 overflow-hidden bg-background">
+    <section id="top" className="relative pt-4 pb-28 md:pt-8 md:pb-40 overflow-hidden bg-background">
       {/* Background Subtle Textures */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
         <div className="absolute top-0 left-1/4 h-[32rem] w-[32rem] rounded-full bg-secondary-container/40 blur-3xl opacity-60" />

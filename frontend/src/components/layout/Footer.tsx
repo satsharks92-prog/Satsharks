@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import logoAsset from "@/assets/logo.png.asset.json";
+import logoImg from "@/assets/logo.png";
 
 export function Footer() {
   const links = [
@@ -13,11 +13,11 @@ export function Footer() {
     <footer className="bg-primary border-t border-accent/30 text-on-primary/80">
       <div className="mx-auto max-w-[1200px] px-6 py-12">
         <div className="flex flex-col items-center justify-between gap-6 border-b border-white/10 pb-8 md:flex-row">
-          <Link to="/" className="flex items-center gap-3 group transition-transform duration-300 hover:scale-[1.01]">
+          <Link to="/" className="flex items-center gap-3 group">
             <img
-              src={logoAsset.url}
+              src={logoImg}
               alt="SAT Sharks"
-              className="h-8 w-auto brightness-0 invert opacity-95"
+              className="h-14 w-auto invert mix-blend-screen opacity-95"
             />
           </Link>
           

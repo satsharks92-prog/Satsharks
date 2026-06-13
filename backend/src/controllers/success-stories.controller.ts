@@ -18,7 +18,7 @@ export const getSuccessStories = async (req: Request, res: Response) => {
 
 export const createSuccessStory = async (req: Request, res: Response) => {
   try {
-    const { name, score, quote, university } = req.body;
+    const { name, score, quote, university, imageUrl, videoUrl } = req.body;
 
     if (!env.isDatabaseConfigured && env.allowMockAuth) {
       return res.status(201).json({ success: true, message: "Success story created (mock)" });
@@ -28,8 +28,37 @@ export const createSuccessStory = async (req: Request, res: Response) => {
       return res.status(503).json({ success: false, error: "Database is not configured" });
     }
 
-    const story = await SuccessStory.create({ name, score, quote, university });
+    const story = await SuccessStory.create({ name, score, quote, university, imageUrl, videoUrl });
     res.status(201).json({ success: true, story });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+export const updateSuccessStory = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { name, score, quote, university, imageUrl, videoUrl } = req.body;
+
+    if (!env.isDatabaseConfigured && env.allowMockAuth) {
+      return res.status(200).json({ success: true, message: "Success story updated (mock)" });
+    }
+
+    if (!env.isDatabaseConfigured) {
+      return res.status(503).json({ success: false, error: "Database is not configured" });
+    }
+
+    const story = await SuccessStory.findByIdAndUpdate(
+      id,
+      { name, score, quote, university, imageUrl, videoUrl },
+      { new: true, runValidators: true }
+    );
+
+    if (!story) {
+      return res.status(404).json({ success: false, error: "Story not found" });
+    }
+
+    res.status(200).json({ success: true, story });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }
