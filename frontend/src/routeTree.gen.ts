@@ -14,14 +14,25 @@ import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as DashboardTestsRouteImport } from './routes/dashboard/tests'
+import { Route as DashboardPracticeRouteImport } from './routes/dashboard/practice'
+import { Route as DashboardHistoryRouteImport } from './routes/dashboard/history'
+import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard/analytics'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminUploadsRouteImport } from './routes/admin/uploads'
+import { Route as AdminTestsRouteImport } from './routes/admin/tests'
 import { Route as AdminSuccessStoriesRouteImport } from './routes/admin/success-stories'
+import { Route as AdminQuestionsRouteImport } from './routes/admin/questions'
 import { Route as AdminContactRequestsRouteImport } from './routes/admin/contact-requests'
+import { Route as DashboardTestResultAttemptIdRouteImport } from './routes/dashboard/test-result.$attemptId'
+import { Route as DashboardTakeTestAttemptIdRouteImport } from './routes/dashboard/take-test.$attemptId'
+import { Route as AdminReviewUploadUploadIdRouteImport } from './routes/admin/review-upload.$uploadId'
 
 const SuccessStoriesRoute = SuccessStoriesRouteImport.update({
   id: '/success-stories',
@@ -48,10 +59,35 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardTestsRoute = DashboardTestsRouteImport.update({
+  id: '/tests',
+  path: '/tests',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardPracticeRoute = DashboardPracticeRouteImport.update({
+  id: '/practice',
+  path: '/practice',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   id: '/auth/reset-password',
@@ -78,9 +114,24 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/admin/users',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUploadsRoute = AdminUploadsRouteImport.update({
+  id: '/admin/uploads',
+  path: '/admin/uploads',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminTestsRoute = AdminTestsRouteImport.update({
+  id: '/admin/tests',
+  path: '/admin/tests',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminSuccessStoriesRoute = AdminSuccessStoriesRouteImport.update({
   id: '/admin/success-stories',
   path: '/admin/success-stories',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminQuestionsRoute = AdminQuestionsRouteImport.update({
+  id: '/admin/questions',
+  path: '/admin/questions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminContactRequestsRoute = AdminContactRequestsRouteImport.update({
@@ -88,52 +139,102 @@ const AdminContactRequestsRoute = AdminContactRequestsRouteImport.update({
   path: '/admin/contact-requests',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardTestResultAttemptIdRoute =
+  DashboardTestResultAttemptIdRouteImport.update({
+    id: '/test-result/$attemptId',
+    path: '/test-result/$attemptId',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardTakeTestAttemptIdRoute =
+  DashboardTakeTestAttemptIdRouteImport.update({
+    id: '/take-test/$attemptId',
+    path: '/take-test/$attemptId',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const AdminReviewUploadUploadIdRoute =
+  AdminReviewUploadUploadIdRouteImport.update({
+    id: '/admin/review-upload/$uploadId',
+    path: '/admin/review-upload/$uploadId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/subscriptions': typeof SubscriptionsRoute
   '/success-stories': typeof SuccessStoriesRoute
   '/admin/contact-requests': typeof AdminContactRequestsRoute
+  '/admin/questions': typeof AdminQuestionsRoute
   '/admin/success-stories': typeof AdminSuccessStoriesRoute
+  '/admin/tests': typeof AdminTestsRoute
+  '/admin/uploads': typeof AdminUploadsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/practice': typeof DashboardPracticeRoute
+  '/dashboard/tests': typeof DashboardTestsRoute
   '/admin/': typeof AdminIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/admin/review-upload/$uploadId': typeof AdminReviewUploadUploadIdRoute
+  '/dashboard/take-test/$attemptId': typeof DashboardTakeTestAttemptIdRoute
+  '/dashboard/test-result/$attemptId': typeof DashboardTestResultAttemptIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
-  '/dashboard': typeof DashboardRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/success-stories': typeof SuccessStoriesRoute
   '/admin/contact-requests': typeof AdminContactRequestsRoute
+  '/admin/questions': typeof AdminQuestionsRoute
   '/admin/success-stories': typeof AdminSuccessStoriesRoute
+  '/admin/tests': typeof AdminTestsRoute
+  '/admin/uploads': typeof AdminUploadsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/practice': typeof DashboardPracticeRoute
+  '/dashboard/tests': typeof DashboardTestsRoute
   '/admin': typeof AdminIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/admin/review-upload/$uploadId': typeof AdminReviewUploadUploadIdRoute
+  '/dashboard/take-test/$attemptId': typeof DashboardTakeTestAttemptIdRoute
+  '/dashboard/test-result/$attemptId': typeof DashboardTestResultAttemptIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/contact': typeof ContactRoute
-  '/dashboard': typeof DashboardRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/subscriptions': typeof SubscriptionsRoute
   '/success-stories': typeof SuccessStoriesRoute
   '/admin/contact-requests': typeof AdminContactRequestsRoute
+  '/admin/questions': typeof AdminQuestionsRoute
   '/admin/success-stories': typeof AdminSuccessStoriesRoute
+  '/admin/tests': typeof AdminTestsRoute
+  '/admin/uploads': typeof AdminUploadsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/login': typeof AuthLoginRoute
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/practice': typeof DashboardPracticeRoute
+  '/dashboard/tests': typeof DashboardTestsRoute
   '/admin/': typeof AdminIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/admin/review-upload/$uploadId': typeof AdminReviewUploadUploadIdRoute
+  '/dashboard/take-test/$attemptId': typeof DashboardTakeTestAttemptIdRoute
+  '/dashboard/test-result/$attemptId': typeof DashboardTestResultAttemptIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -144,28 +245,49 @@ export interface FileRouteTypes {
     | '/subscriptions'
     | '/success-stories'
     | '/admin/contact-requests'
+    | '/admin/questions'
     | '/admin/success-stories'
+    | '/admin/tests'
+    | '/admin/uploads'
     | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
+    | '/dashboard/analytics'
+    | '/dashboard/history'
+    | '/dashboard/practice'
+    | '/dashboard/tests'
     | '/admin/'
+    | '/dashboard/'
+    | '/admin/review-upload/$uploadId'
+    | '/dashboard/take-test/$attemptId'
+    | '/dashboard/test-result/$attemptId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/contact'
-    | '/dashboard'
     | '/subscriptions'
     | '/success-stories'
     | '/admin/contact-requests'
+    | '/admin/questions'
     | '/admin/success-stories'
+    | '/admin/tests'
+    | '/admin/uploads'
     | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
+    | '/dashboard/analytics'
+    | '/dashboard/history'
+    | '/dashboard/practice'
+    | '/dashboard/tests'
     | '/admin'
+    | '/dashboard'
+    | '/admin/review-upload/$uploadId'
+    | '/dashboard/take-test/$attemptId'
+    | '/dashboard/test-result/$attemptId'
   id:
     | '__root__'
     | '/'
@@ -174,29 +296,44 @@ export interface FileRouteTypes {
     | '/subscriptions'
     | '/success-stories'
     | '/admin/contact-requests'
+    | '/admin/questions'
     | '/admin/success-stories'
+    | '/admin/tests'
+    | '/admin/uploads'
     | '/admin/users'
     | '/auth/forgot-password'
     | '/auth/login'
     | '/auth/register'
     | '/auth/reset-password'
+    | '/dashboard/analytics'
+    | '/dashboard/history'
+    | '/dashboard/practice'
+    | '/dashboard/tests'
     | '/admin/'
+    | '/dashboard/'
+    | '/admin/review-upload/$uploadId'
+    | '/dashboard/take-test/$attemptId'
+    | '/dashboard/test-result/$attemptId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ContactRoute: typeof ContactRoute
-  DashboardRoute: typeof DashboardRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   SubscriptionsRoute: typeof SubscriptionsRoute
   SuccessStoriesRoute: typeof SuccessStoriesRoute
   AdminContactRequestsRoute: typeof AdminContactRequestsRoute
+  AdminQuestionsRoute: typeof AdminQuestionsRoute
   AdminSuccessStoriesRoute: typeof AdminSuccessStoriesRoute
+  AdminTestsRoute: typeof AdminTestsRoute
+  AdminUploadsRoute: typeof AdminUploadsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminReviewUploadUploadIdRoute: typeof AdminReviewUploadUploadIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -236,12 +373,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/admin/': {
       id: '/admin/'
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/tests': {
+      id: '/dashboard/tests'
+      path: '/tests'
+      fullPath: '/dashboard/tests'
+      preLoaderRoute: typeof DashboardTestsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/practice': {
+      id: '/dashboard/practice'
+      path: '/practice'
+      fullPath: '/dashboard/practice'
+      preLoaderRoute: typeof DashboardPracticeRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/history': {
+      id: '/dashboard/history'
+      path: '/history'
+      fullPath: '/dashboard/history'
+      preLoaderRoute: typeof DashboardHistoryRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/analytics': {
+      id: '/dashboard/analytics'
+      path: '/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof DashboardAnalyticsRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/auth/reset-password': {
       id: '/auth/reset-password'
@@ -278,11 +450,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/uploads': {
+      id: '/admin/uploads'
+      path: '/admin/uploads'
+      fullPath: '/admin/uploads'
+      preLoaderRoute: typeof AdminUploadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/tests': {
+      id: '/admin/tests'
+      path: '/admin/tests'
+      fullPath: '/admin/tests'
+      preLoaderRoute: typeof AdminTestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/success-stories': {
       id: '/admin/success-stories'
       path: '/admin/success-stories'
       fullPath: '/admin/success-stories'
       preLoaderRoute: typeof AdminSuccessStoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/questions': {
+      id: '/admin/questions'
+      path: '/admin/questions'
+      fullPath: '/admin/questions'
+      preLoaderRoute: typeof AdminQuestionsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/contact-requests': {
@@ -292,23 +485,72 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContactRequestsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/test-result/$attemptId': {
+      id: '/dashboard/test-result/$attemptId'
+      path: '/test-result/$attemptId'
+      fullPath: '/dashboard/test-result/$attemptId'
+      preLoaderRoute: typeof DashboardTestResultAttemptIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/take-test/$attemptId': {
+      id: '/dashboard/take-test/$attemptId'
+      path: '/take-test/$attemptId'
+      fullPath: '/dashboard/take-test/$attemptId'
+      preLoaderRoute: typeof DashboardTakeTestAttemptIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/admin/review-upload/$uploadId': {
+      id: '/admin/review-upload/$uploadId'
+      path: '/admin/review-upload/$uploadId'
+      fullPath: '/admin/review-upload/$uploadId'
+      preLoaderRoute: typeof AdminReviewUploadUploadIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface DashboardRouteChildren {
+  DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
+  DashboardHistoryRoute: typeof DashboardHistoryRoute
+  DashboardPracticeRoute: typeof DashboardPracticeRoute
+  DashboardTestsRoute: typeof DashboardTestsRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardTakeTestAttemptIdRoute: typeof DashboardTakeTestAttemptIdRoute
+  DashboardTestResultAttemptIdRoute: typeof DashboardTestResultAttemptIdRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAnalyticsRoute: DashboardAnalyticsRoute,
+  DashboardHistoryRoute: DashboardHistoryRoute,
+  DashboardPracticeRoute: DashboardPracticeRoute,
+  DashboardTestsRoute: DashboardTestsRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+  DashboardTakeTestAttemptIdRoute: DashboardTakeTestAttemptIdRoute,
+  DashboardTestResultAttemptIdRoute: DashboardTestResultAttemptIdRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ContactRoute: ContactRoute,
-  DashboardRoute: DashboardRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   SubscriptionsRoute: SubscriptionsRoute,
   SuccessStoriesRoute: SuccessStoriesRoute,
   AdminContactRequestsRoute: AdminContactRequestsRoute,
+  AdminQuestionsRoute: AdminQuestionsRoute,
   AdminSuccessStoriesRoute: AdminSuccessStoriesRoute,
+  AdminTestsRoute: AdminTestsRoute,
+  AdminUploadsRoute: AdminUploadsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminReviewUploadUploadIdRoute: AdminReviewUploadUploadIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

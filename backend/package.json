@@ -8,6 +8,7 @@
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
     "seed:phase1": "tsx src/scripts/seedPhaseOne.ts",
+    "seed:phase2": "tsx src/scripts/seedPhaseTwo.ts",
     "seed": "tsx scripts/seed.ts",
     "migrate": "tsx scripts/migrate.ts",
     "lint": "eslint src/**/*.ts"
@@ -21,7 +22,8 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "multer": "^2.2.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -29,6 +31,7 @@
     "@types/express": "^5.0.0",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/morgan": "^1.9.9",
+    "@types/multer": "^2.1.0",
     "@types/node": "^22.10.7",
     "tsx": "^4.19.2",
     "typescript": "^5.7.3"

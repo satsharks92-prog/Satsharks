@@ -1,0 +1,286 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { AdminLayout } from "../../components/layout/AdminLayout";
+import { Modal } from "../../components/ui/Modal";
+import { Badge } from "../../components/ui/Badge";
+import { Icon } from "../../components/common/Icon";
+import { Input } from "../../components/ui/Input";
+import { Select } from "../../components/ui/Select";
+import { Textarea } from "../../components/ui/Textarea";
+import { SearchInput } from "../../components/ui/SearchInput";
+import { EmptyState } from "../../components/ui/EmptyState";
+import { api } from "../../services/api";
+import type { Question, QuestionCategory } from "../../types";
+
+export const Route = createFileRoute("/admin/questions")({
+  component: AdminQuestions,
+});
+
+function AdminQuestions() {
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [categories, setCategories] = useState<QuestionCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [sectionFilter, setSectionFilter] = useState("");
+  const [difficultyFilter, setDifficultyFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Create/Edit modal
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingQ, setEditingQ] = useState<Question | null>(null);
+  const [form, setForm] = useState({
+    text: "", correctAnswer: "A", explanation: "", category: "", difficulty: "MEDIUM", section: "MATH",
+    tags: "",
+    optA: "", optB: "", optC: "", optD: "",
+  });
+  const [formError, setFormError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  // Category modal
+  const [catModalOpen, setCatModalOpen] = useState(false);
+  const [catName, setCatName] = useState("");
+  const [catSection, setCatSection] = useState("MATH");
+
+  const fetchQuestions = async () => {
+    setLoading(true);
+    const params = new URLSearchParams({ page: String(page), limit: "20" });
+    if (search) params.set("search", search);
+    if (sectionFilter) params.set("section", sectionFilter);
+    if (difficultyFilter) params.set("difficulty", difficultyFilter);
+    if (statusFilter) params.set("status", statusFilter);
+
+    const res = await api.get(`/api/questions/admin?${params}`);
+    if (res.success) {
+      setQuestions(res.questions || []);
+      setTotalPages(res.pagination?.pages || 1);
+    }
+    setLoading(false);
+  };
+
+  const fetchCategories = async () => {
+    const res = await api.get("/api/categories");
+    if (res.success) setCategories(res.categories || []);
+  };
+
+  useEffect(() => { fetchCategories(); }, []);
+  useEffect(() => { fetchQuestions(); }, [page, search, sectionFilter, difficultyFilter, statusFilter]);
+
+  const openCreate = () => {
+    setEditingQ(null);
+    setForm({ text: "", correctAnswer: "A", explanation: "", category: categories[0]?._id || "", difficulty: "MEDIUM", section: "MATH", tags: "", optA: "", optB: "", optC: "", optD: "" });
+    setFormError("");
+    setModalOpen(true);
+  };
+
+  const openEdit = (q: Question) => {
+    setEditingQ(q);
+    const cat = typeof q.category === "object" ? q.category._id : q.category;
+    setForm({
+      text: q.text, correctAnswer: q.correctAnswer, explanation: q.explanation,
+      category: cat, difficulty: q.difficulty, section: q.section,
+      tags: q.tags.join(", "),
+      optA: q.options[0]?.text || "", optB: q.options[1]?.text || "",
+      optC: q.options[2]?.text || "", optD: q.options[3]?.text || "",
+    });
+    setFormError("");
+    setModalOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError("");
+    if (!form.text || !form.optA || !form.optB || !form.optC || !form.optD) {
+      setFormError("Question text and all four options are required.");
+      return;
+    }
+    setSubmitting(true);
+    const body = {
+      text: form.text,
+      options: [
+        { label: "A", text: form.optA }, { label: "B", text: form.optB },
+        { label: "C", text: form.optC }, { label: "D", text: form.optD },
+      ],
+      correctAnswer: form.correctAnswer,
+      explanation: form.explanation,
+      category: form.category,
+      difficulty: form.difficulty,
+      section: form.section,
+      tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
+    };
+
+    const res = editingQ
+      ? await api.put(`/api/questions/${editingQ._id}`, body)
+      : await api.post("/api/questions", body);
+
+    if (res.success) { setModalOpen(false); fetchQuestions(); }
+    else setFormError(res.error || "Failed to save question.");
+    setSubmitting(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete this question?")) return;
+    await api.delete(`/api/questions/${id}`);
+    fetchQuestions();
+  };
+
+  const handleCreateCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!catName) return;
+    const res = await api.post("/api/categories", { name: catName, section: catSection });
+    if (res.success) {
+      fetchCategories();
+      setCatModalOpen(false);
+      setCatName("");
+    }
+  };
+
+  return (
+    <AdminLayout activeItem="/admin/questions">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="text-3xl font-bold">Question Bank</h1>
+        <div className="flex gap-3">
+          <button onClick={() => setCatModalOpen(true)} className="inline-flex items-center gap-2 rounded-xl border border-outline-variant px-4 py-2.5 text-sm font-semibold hover:bg-surface-container-low transition-colors cursor-pointer">
+            <Icon name="category" className="text-lg" /> Categories
+          </button>
+          <button onClick={openCreate} className="btn-shimmer inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-on-primary shark-shadow hover:bg-accent transition-all cursor-pointer">
+            <Icon name="add" className="text-lg" /> Add Question
+          </button>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-end gap-3 mb-6">
+        <div className="flex-1 min-w-[200px]">
+          <SearchInput value={search} onChange={setSearch} placeholder="Search questions..." />
+        </div>
+        <Select value={sectionFilter} onChange={(e) => { setSectionFilter(e.target.value); setPage(1); }} options={[{ value: "", label: "All Sections" }, { value: "MATH", label: "Math" }, { value: "READING_WRITING", label: "Reading & Writing" }]} className="!w-auto !py-2" />
+        <Select value={difficultyFilter} onChange={(e) => { setDifficultyFilter(e.target.value); setPage(1); }} options={[{ value: "", label: "All Difficulties" }, { value: "EASY", label: "Easy" }, { value: "MEDIUM", label: "Medium" }, { value: "HARD", label: "Hard" }]} className="!w-auto !py-2" />
+        <Select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }} options={[{ value: "", label: "All Statuses" }, { value: "PUBLISHED", label: "Published" }, { value: "DRAFT", label: "Draft" }, { value: "REVIEW", label: "Review" }]} className="!w-auto !py-2" />
+      </div>
+
+      {loading ? (
+        <div className="text-center py-12 text-on-surface-variant">Loading...</div>
+      ) : questions.length === 0 ? (
+        <EmptyState icon="help_center" title="No questions found" description="Create questions or adjust your filters" />
+      ) : (
+        <>
+          <div className="rounded-xl bg-surface-container-lowest border border-outline-variant/40 overflow-hidden shark-shadow">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-surface-container-low border-b border-outline-variant/40 text-xs uppercase tracking-wider text-on-surface-variant">
+                  <th className="p-4 font-semibold">Question</th>
+                  <th className="p-4 font-semibold">Category</th>
+                  <th className="p-4 font-semibold">Difficulty</th>
+                  <th className="p-4 font-semibold">Status</th>
+                  <th className="p-4 font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-outline-variant/20">
+                {questions.map((q) => (
+                  <tr key={q._id} className="hover:bg-surface-container-low/50 transition-colors">
+                    <td className="p-4 text-sm max-w-md">
+                      <p className="line-clamp-2">{q.text}</p>
+                      <div className="flex gap-2 mt-1">
+                        <Badge variant="info">{q.section === "MATH" ? "Math" : "R&W"}</Badge>
+                        {q.source === "AI_EXTRACTED" && <Badge variant="accent">AI</Badge>}
+                      </div>
+                    </td>
+                    <td className="p-4 text-sm">{typeof q.category === "object" ? q.category.name : "—"}</td>
+                    <td className="p-4">
+                      <Badge variant={q.difficulty === "EASY" ? "success" : q.difficulty === "HARD" ? "error" : "warning"}>{q.difficulty}</Badge>
+                    </td>
+                    <td className="p-4">
+                      <Badge variant={q.status === "PUBLISHED" ? "success" : q.status === "DRAFT" ? "default" : "warning"}>{q.status}</Badge>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex gap-2">
+                        <button onClick={() => openEdit(q)} className="px-3 py-1 bg-surface-container-high hover:bg-surface-container-highest rounded text-sm transition-colors cursor-pointer">Edit</button>
+                        <button onClick={() => handleDelete(q._id)} className="px-3 py-1 bg-error/10 text-error hover:bg-error/20 rounded text-sm transition-colors cursor-pointer">Delete</button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-6">
+              <button onClick={() => setPage(Math.max(1, page - 1))} disabled={page === 1} className="px-4 py-2 rounded-lg border border-outline-variant text-sm disabled:opacity-30 hover:bg-surface-container-low transition-colors">Previous</button>
+              <span className="text-sm text-on-surface-variant px-4">Page {page} of {totalPages}</span>
+              <button onClick={() => setPage(Math.min(totalPages, page + 1))} disabled={page === totalPages} className="px-4 py-2 rounded-lg border border-outline-variant text-sm disabled:opacity-30 hover:bg-surface-container-low transition-colors">Next</button>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Question Create/Edit Modal */}
+      <Modal open={modalOpen} onClose={() => setModalOpen(false)} title={editingQ ? "Edit Question" : "Add Question"} icon={editingQ ? "edit" : "add_box"} maxWidth="max-w-2xl">
+        {formError && (
+          <div className="mb-4 p-3 bg-error/15 text-error rounded-xl text-sm border border-error/25 flex items-center gap-2">
+            <Icon name="error" className="shrink-0" /><span>{formError}</span>
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+          <Textarea label="Question Text *" value={form.text} onChange={(e) => setForm((p) => ({ ...p, text: e.target.value }))} rows={3} required placeholder="Enter the question..." />
+          <div className="space-y-3">
+            <label className="mb-1.5 block font-mono text-[12px] uppercase tracking-[0.08em] text-on-surface-variant">Answer Options *</label>
+            {(["A", "B", "C", "D"] as const).map((label) => (
+              <div key={label} className="flex items-center gap-3">
+                <span className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold ${form.correctAnswer === label ? "bg-primary text-on-primary" : "bg-surface-container-high"}`}>{label}</span>
+                <input
+                  type="text"
+                  value={form[`opt${label}` as keyof typeof form]}
+                  onChange={(e) => setForm((p) => ({ ...p, [`opt${label}`]: e.target.value }))}
+                  placeholder={`Option ${label}`}
+                  className="flex-1 rounded-xl border border-outline-variant bg-surface-container-low px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors"
+                  required
+                />
+                <button type="button" onClick={() => setForm((p) => ({ ...p, correctAnswer: label }))} className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${form.correctAnswer === label ? "bg-primary text-on-primary" : "bg-surface-container-high hover:bg-surface-container-highest"}`}>
+                  {form.correctAnswer === label ? "Correct" : "Set"}
+                </button>
+              </div>
+            ))}
+          </div>
+          <Textarea label="Explanation" value={form.explanation} onChange={(e) => setForm((p) => ({ ...p, explanation: e.target.value }))} rows={2} placeholder="Why is this the correct answer?" />
+          <div className="grid grid-cols-3 gap-4">
+            <Select
+              label="Category"
+              value={form.category}
+              onChange={(e) => setForm((p) => ({ ...p, category: e.target.value }))}
+              options={[{ value: "", label: "Select category" }, ...categories.map((c) => ({ value: c._id, label: c.name }))]}
+            />
+            <Select label="Difficulty" value={form.difficulty} onChange={(e) => setForm((p) => ({ ...p, difficulty: e.target.value }))} options={[{ value: "EASY", label: "Easy" }, { value: "MEDIUM", label: "Medium" }, { value: "HARD", label: "Hard" }]} />
+            <Select label="Section" value={form.section} onChange={(e) => setForm((p) => ({ ...p, section: e.target.value }))} options={[{ value: "MATH", label: "Math" }, { value: "READING_WRITING", label: "Reading & Writing" }]} />
+          </div>
+          <Input label="Tags (comma separated)" value={form.tags} onChange={(e) => setForm((p) => ({ ...p, tags: e.target.value }))} placeholder="algebra, equations" />
+          <div className="flex gap-4 pt-4 border-t border-outline-variant/30">
+            <button type="button" onClick={() => setModalOpen(false)} className="flex-1 py-2.5 rounded-xl border border-outline-variant hover:bg-surface-container-low text-sm font-semibold transition-colors cursor-pointer">Cancel</button>
+            <button type="submit" disabled={submitting} className="flex-1 py-2.5 rounded-xl bg-primary text-on-primary hover:bg-accent font-semibold transition-all disabled:opacity-50 cursor-pointer">{submitting ? "Saving..." : "Save Question"}</button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Category Modal */}
+      <Modal open={catModalOpen} onClose={() => setCatModalOpen(false)} title="Manage Categories" icon="category">
+        <div className="space-y-3 mb-6">
+          {categories.map((c) => (
+            <div key={c._id} className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-outline-variant/30">
+              <div>
+                <span className="font-semibold text-sm">{c.name}</span>
+                <Badge variant="info" className="ml-2">{c.section === "MATH" ? "Math" : "R&W"}</Badge>
+              </div>
+            </div>
+          ))}
+          {categories.length === 0 && <p className="text-sm text-on-surface-variant text-center py-4">No categories yet</p>}
+        </div>
+        <form onSubmit={handleCreateCategory} className="flex gap-3 items-end">
+          <Input label="New Category" value={catName} onChange={(e) => setCatName(e.target.value)} placeholder="e.g. Algebra" className="flex-1" />
+          <Select value={catSection} onChange={(e) => setCatSection(e.target.value)} options={[{ value: "MATH", label: "Math" }, { value: "READING_WRITING", label: "R&W" }]} className="!w-auto" />
+          <button type="submit" className="px-4 py-3 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-accent transition-colors cursor-pointer">Add</button>
+        </form>
+      </Modal>
+    </AdminLayout>
+  );
+}

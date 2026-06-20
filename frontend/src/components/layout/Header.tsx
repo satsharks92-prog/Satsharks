@@ -24,6 +24,7 @@ export function Header() {
     { to: "/success-stories", hash: undefined, label: "Success Stories" },
     { to: "/subscriptions", hash: undefined, label: "Pricing" },
     { to: "/contact", hash: undefined, label: "Contact" },
+    ...(user?.role === "STUDENT" ? [{ to: "/dashboard/", hash: undefined, label: "Dashboard" }] : []),
     ...(user?.role === "ADMIN" ? [{ to: "/admin", hash: undefined, label: "Admin Panel" }] : []),
   ];
 

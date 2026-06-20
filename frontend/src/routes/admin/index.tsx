@@ -1,58 +1,74 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Header } from "../../components/layout/Header";
-import { useAuth } from "../../hooks/useAuth";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { AdminLayout } from "../../components/layout/AdminLayout";
+import { StatCard } from "../../components/ui/StatCard";
+import { api } from "../../services/api";
+import type { AdminOverview } from "../../types";
 
 export const Route = createFileRoute("/admin/")({
-  component: AdminLayout,
+  component: AdminDashboard,
 });
 
-function AdminLayout() {
-  const { user, isLoading } = useAuth();
+function AdminDashboard() {
+  const [overview, setOverview] = useState<AdminOverview | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (isLoading) return <div>Loading...</div>;
-
-  if (!user || user.role !== "ADMIN") {
-    return <div className="p-8 text-center text-error">Unauthorized. Admins only.</div>;
-  }
+  useEffect(() => {
+    api.get("/api/admin/analytics/overview").then((res) => {
+      if (res.success) setOverview(res.overview);
+      setLoading(false);
+    });
+  }, []);
 
   return (
-    <div className="min-h-screen bg-background text-on-background flex flex-col">
-      <Header />
-      <main className="flex-1 flex max-w-[1400px] mx-auto w-full">
-        {/* Sidebar */}
-        <aside className="w-64 border-r border-outline-variant/30 p-6 hidden md:block">
-          <h2 className="font-bold text-lg mb-6 text-on-surface-variant uppercase tracking-widest text-xs">Admin Panel</h2>
-          <nav className="space-y-2">
-            <Link to="/admin" className="block px-4 py-2 rounded-lg hover:bg-surface-container-low transition-colors [&.active]:bg-primary/10 [&.active]:text-primary [&.active]:font-semibold">Dashboard</Link>
-            <Link to="/admin/users" className="block px-4 py-2 rounded-lg hover:bg-surface-container-low transition-colors [&.active]:bg-primary/10 [&.active]:text-primary [&.active]:font-semibold">Users</Link>
-            <Link to="/admin/success-stories" className="block px-4 py-2 rounded-lg hover:bg-surface-container-low transition-colors [&.active]:bg-primary/10 [&.active]:text-primary [&.active]:font-semibold">Success Stories</Link>
-            <Link to="/admin/contact-requests" className="block px-4 py-2 rounded-lg hover:bg-surface-container-low transition-colors [&.active]:bg-primary/10 [&.active]:text-primary [&.active]:font-semibold">Contact Requests</Link>
-          </nav>
-        </aside>
-        
-        {/* Content */}
-        <div className="flex-1 p-6 lg:p-10">
-          <h1 className="text-3xl font-bold mb-8">Admin Dashboard Overview</h1>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="rounded-xl bg-surface-container-lowest p-6 border border-outline-variant/40">
-              <div className="text-on-surface-variant text-sm mb-1">Total Users</div>
-              <div className="text-3xl font-bold text-primary">--</div>
-            </div>
-            <div className="rounded-xl bg-surface-container-lowest p-6 border border-outline-variant/40">
-              <div className="text-on-surface-variant text-sm mb-1">Paid Users</div>
-              <div className="text-3xl font-bold text-accent">--</div>
-            </div>
-            <div className="rounded-xl bg-surface-container-lowest p-6 border border-outline-variant/40">
-              <div className="text-on-surface-variant text-sm mb-1">Pending Inquiries</div>
-              <div className="text-3xl font-bold text-warning">--</div>
-            </div>
-            <div className="rounded-xl bg-surface-container-lowest p-6 border border-outline-variant/40">
-              <div className="text-on-surface-variant text-sm mb-1">Success Stories</div>
-              <div className="text-3xl font-bold text-secondary">--</div>
-            </div>
+    <AdminLayout activeItem="/admin">
+      <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+
+      {loading ? (
+        <div className="text-center py-12 text-on-surface-variant">Loading dashboard...</div>
+      ) : (
+        <>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <StatCard label="Total Users" value={overview?.totalUsers ?? 0} icon="group" color="primary" />
+            <StatCard label="Paid Users" value={overview?.paidUsers ?? 0} icon="paid" color="accent" />
+            <StatCard label="Published Questions" value={overview?.publishedQuestions ?? 0} icon="help_center" color="secondary" />
+            <StatCard label="Active Tests" value={overview?.activeTests ?? 0} icon="quiz" color="primary" />
           </div>
-        </div>
-      </main>
-    </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+            <StatCard label="Total Attempts" value={overview?.totalAttempts ?? 0} icon="assignment_turned_in" color="primary" />
+            <StatCard label="Pending Uploads" value={overview?.pendingUploads ?? 0} icon="upload_file" color="accent" />
+            <StatCard label="Pending Inquiries" value={overview?.pendingInquiries ?? 0} icon="mail" color="error" />
+            <StatCard label="Success Stories" value={overview?.totalStories ?? 0} icon="social_leaderboard" color="secondary" />
+          </div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <QuickAction to="/admin/tests" icon="quiz" title="Manage Tests" desc="Create and manage diagnostic tests" />
+            <QuickAction to="/admin/questions" icon="help_center" title="Question Bank" desc="Add and organize questions" />
+            <QuickAction to="/admin/uploads" icon="upload_file" title="Upload Tests" desc="Upload PDFs and extract questions" />
+          </div>
+        </>
+      )}
+    </AdminLayout>
+  );
+}
+
+import { Link } from "@tanstack/react-router";
+import { Icon } from "../../components/common/Icon";
+
+function QuickAction({ to, icon, title, desc }: { to: string; icon: string; title: string; desc: string }) {
+  return (
+    <Link
+      to={to}
+      className="flex items-center gap-4 p-6 rounded-2xl bg-surface-container-lowest border border-outline-variant/40 shark-shadow hover-lift group"
+    >
+      <div className="h-12 w-12 rounded-xl bg-primary-fixed flex items-center justify-center group-hover:bg-primary transition-colors">
+        <Icon name={icon} className="text-[24px] text-primary group-hover:text-on-primary transition-colors" />
+      </div>
+      <div>
+        <div className="font-semibold text-sm group-hover:text-primary transition-colors">{title}</div>
+        <div className="text-xs text-on-surface-variant">{desc}</div>
+      </div>
+    </Link>
   );
 }
