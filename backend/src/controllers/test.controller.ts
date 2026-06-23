@@ -10,19 +10,17 @@ export const getTests = async (req: AuthRequest, res: Response) => {
     const filter: any = { isActive: true };
     if (userSub === "FREE") filter.accessLevel = "FREE";
 
-    const tests = await DiagnosticTest.find(filter)
-      .select("-questions")
-      .sort({ createdAt: -1 });
+    const tests = await DiagnosticTest.find(filter).sort({ createdAt: -1 });
 
     const testsWithCount = await Promise.all(
       tests.map(async (t) => {
-        const doc = t.toObject();
         const attemptCount = await TestAttempt.countDocuments({
           student: req.user?.userId,
           test: t._id,
           status: "COMPLETED",
         });
-        return { ...doc, questionCount: t.questions.length, attemptCount };
+        const { questions, ...rest } = t.toObject();
+        return { ...rest, questionCount: (questions || []).length, attemptCount };
       })
     );
 

@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as DashboardTestsRouteImport } from './routes/dashboard/tests'
+import { Route as DashboardSatTestsRouteImport } from './routes/dashboard/sat-tests'
 import { Route as DashboardPracticeRouteImport } from './routes/dashboard/practice'
 import { Route as DashboardHistoryRouteImport } from './routes/dashboard/history'
 import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard/analytics'
@@ -32,6 +33,8 @@ import { Route as AdminQuestionsRouteImport } from './routes/admin/questions'
 import { Route as AdminContactRequestsRouteImport } from './routes/admin/contact-requests'
 import { Route as DashboardTestResultAttemptIdRouteImport } from './routes/dashboard/test-result.$attemptId'
 import { Route as DashboardTakeTestAttemptIdRouteImport } from './routes/dashboard/take-test.$attemptId'
+import { Route as DashboardSatRunnerAttemptIdRouteImport } from './routes/dashboard/sat-runner.$attemptId'
+import { Route as DashboardSatResultAttemptIdRouteImport } from './routes/dashboard/sat-result.$attemptId'
 import { Route as AdminReviewUploadUploadIdRouteImport } from './routes/admin/review-upload.$uploadId'
 
 const SuccessStoriesRoute = SuccessStoriesRouteImport.update({
@@ -72,6 +75,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const DashboardTestsRoute = DashboardTestsRouteImport.update({
   id: '/tests',
   path: '/tests',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSatTestsRoute = DashboardSatTestsRouteImport.update({
+  id: '/sat-tests',
+  path: '/sat-tests',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardPracticeRoute = DashboardPracticeRouteImport.update({
@@ -151,6 +159,18 @@ const DashboardTakeTestAttemptIdRoute =
     path: '/take-test/$attemptId',
     getParentRoute: () => DashboardRoute,
   } as any)
+const DashboardSatRunnerAttemptIdRoute =
+  DashboardSatRunnerAttemptIdRouteImport.update({
+    id: '/sat-runner/$attemptId',
+    path: '/sat-runner/$attemptId',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardSatResultAttemptIdRoute =
+  DashboardSatResultAttemptIdRouteImport.update({
+    id: '/sat-result/$attemptId',
+    path: '/sat-result/$attemptId',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const AdminReviewUploadUploadIdRoute =
   AdminReviewUploadUploadIdRouteImport.update({
     id: '/admin/review-upload/$uploadId',
@@ -177,10 +197,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
+  '/dashboard/sat-tests': typeof DashboardSatTestsRoute
   '/dashboard/tests': typeof DashboardTestsRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/admin/review-upload/$uploadId': typeof AdminReviewUploadUploadIdRoute
+  '/dashboard/sat-result/$attemptId': typeof DashboardSatResultAttemptIdRoute
+  '/dashboard/sat-runner/$attemptId': typeof DashboardSatRunnerAttemptIdRoute
   '/dashboard/take-test/$attemptId': typeof DashboardTakeTestAttemptIdRoute
   '/dashboard/test-result/$attemptId': typeof DashboardTestResultAttemptIdRoute
 }
@@ -202,10 +225,13 @@ export interface FileRoutesByTo {
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
+  '/dashboard/sat-tests': typeof DashboardSatTestsRoute
   '/dashboard/tests': typeof DashboardTestsRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/admin/review-upload/$uploadId': typeof AdminReviewUploadUploadIdRoute
+  '/dashboard/sat-result/$attemptId': typeof DashboardSatResultAttemptIdRoute
+  '/dashboard/sat-runner/$attemptId': typeof DashboardSatRunnerAttemptIdRoute
   '/dashboard/take-test/$attemptId': typeof DashboardTakeTestAttemptIdRoute
   '/dashboard/test-result/$attemptId': typeof DashboardTestResultAttemptIdRoute
 }
@@ -229,10 +255,13 @@ export interface FileRoutesById {
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
+  '/dashboard/sat-tests': typeof DashboardSatTestsRoute
   '/dashboard/tests': typeof DashboardTestsRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/admin/review-upload/$uploadId': typeof AdminReviewUploadUploadIdRoute
+  '/dashboard/sat-result/$attemptId': typeof DashboardSatResultAttemptIdRoute
+  '/dashboard/sat-runner/$attemptId': typeof DashboardSatRunnerAttemptIdRoute
   '/dashboard/take-test/$attemptId': typeof DashboardTakeTestAttemptIdRoute
   '/dashboard/test-result/$attemptId': typeof DashboardTestResultAttemptIdRoute
 }
@@ -257,10 +286,13 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/history'
     | '/dashboard/practice'
+    | '/dashboard/sat-tests'
     | '/dashboard/tests'
     | '/admin/'
     | '/dashboard/'
     | '/admin/review-upload/$uploadId'
+    | '/dashboard/sat-result/$attemptId'
+    | '/dashboard/sat-runner/$attemptId'
     | '/dashboard/take-test/$attemptId'
     | '/dashboard/test-result/$attemptId'
   fileRoutesByTo: FileRoutesByTo
@@ -282,10 +314,13 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/history'
     | '/dashboard/practice'
+    | '/dashboard/sat-tests'
     | '/dashboard/tests'
     | '/admin'
     | '/dashboard'
     | '/admin/review-upload/$uploadId'
+    | '/dashboard/sat-result/$attemptId'
+    | '/dashboard/sat-runner/$attemptId'
     | '/dashboard/take-test/$attemptId'
     | '/dashboard/test-result/$attemptId'
   id:
@@ -308,10 +343,13 @@ export interface FileRouteTypes {
     | '/dashboard/analytics'
     | '/dashboard/history'
     | '/dashboard/practice'
+    | '/dashboard/sat-tests'
     | '/dashboard/tests'
     | '/admin/'
     | '/dashboard/'
     | '/admin/review-upload/$uploadId'
+    | '/dashboard/sat-result/$attemptId'
+    | '/dashboard/sat-runner/$attemptId'
     | '/dashboard/take-test/$attemptId'
     | '/dashboard/test-result/$attemptId'
   fileRoutesById: FileRoutesById
@@ -392,6 +430,13 @@ declare module '@tanstack/react-router' {
       path: '/tests'
       fullPath: '/dashboard/tests'
       preLoaderRoute: typeof DashboardTestsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/sat-tests': {
+      id: '/dashboard/sat-tests'
+      path: '/sat-tests'
+      fullPath: '/dashboard/sat-tests'
+      preLoaderRoute: typeof DashboardSatTestsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/practice': {
@@ -499,6 +544,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTakeTestAttemptIdRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/sat-runner/$attemptId': {
+      id: '/dashboard/sat-runner/$attemptId'
+      path: '/sat-runner/$attemptId'
+      fullPath: '/dashboard/sat-runner/$attemptId'
+      preLoaderRoute: typeof DashboardSatRunnerAttemptIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/sat-result/$attemptId': {
+      id: '/dashboard/sat-result/$attemptId'
+      path: '/sat-result/$attemptId'
+      fullPath: '/dashboard/sat-result/$attemptId'
+      preLoaderRoute: typeof DashboardSatResultAttemptIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/admin/review-upload/$uploadId': {
       id: '/admin/review-upload/$uploadId'
       path: '/admin/review-upload/$uploadId'
@@ -513,8 +572,11 @@ interface DashboardRouteChildren {
   DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
   DashboardHistoryRoute: typeof DashboardHistoryRoute
   DashboardPracticeRoute: typeof DashboardPracticeRoute
+  DashboardSatTestsRoute: typeof DashboardSatTestsRoute
   DashboardTestsRoute: typeof DashboardTestsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardSatResultAttemptIdRoute: typeof DashboardSatResultAttemptIdRoute
+  DashboardSatRunnerAttemptIdRoute: typeof DashboardSatRunnerAttemptIdRoute
   DashboardTakeTestAttemptIdRoute: typeof DashboardTakeTestAttemptIdRoute
   DashboardTestResultAttemptIdRoute: typeof DashboardTestResultAttemptIdRoute
 }
@@ -523,8 +585,11 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAnalyticsRoute: DashboardAnalyticsRoute,
   DashboardHistoryRoute: DashboardHistoryRoute,
   DashboardPracticeRoute: DashboardPracticeRoute,
+  DashboardSatTestsRoute: DashboardSatTestsRoute,
   DashboardTestsRoute: DashboardTestsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardSatResultAttemptIdRoute: DashboardSatResultAttemptIdRoute,
+  DashboardSatRunnerAttemptIdRoute: DashboardSatRunnerAttemptIdRoute,
   DashboardTakeTestAttemptIdRoute: DashboardTakeTestAttemptIdRoute,
   DashboardTestResultAttemptIdRoute: DashboardTestResultAttemptIdRoute,
 }

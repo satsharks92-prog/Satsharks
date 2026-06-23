@@ -37,6 +37,7 @@ import analyticsRoutes from "./routes/analytics.routes";
 import practiceRoutes from "./routes/practice.routes";
 import uploadRoutes from "./routes/upload.routes";
 import adminAnalyticsRoutes from "./routes/admin-analytics.routes";
+import satRoutes from "./routes/sat.routes";
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -50,6 +51,7 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/practice", practiceRoutes);
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/admin/analytics", adminAnalyticsRoutes);
+app.use("/api/sat", satRoutes);
 
 // Serve uploaded files
 import path from "path";

@@ -14,7 +14,7 @@ export interface IQuestion extends Document {
   difficulty: "EASY" | "MEDIUM" | "HARD";
   section: "READING_WRITING" | "MATH";
   tags: string[];
-  source: "MANUAL" | "AI_EXTRACTED";
+  source: "MANUAL" | "AI_EXTRACTED" | "SAT";
   status: "DRAFT" | "REVIEW" | "PUBLISHED";
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
@@ -26,13 +26,12 @@ const QuestionSchema: Schema = new Schema(
     text: { type: String, required: true },
     options: [
       {
-        label: { type: String, required: true },
-        text: { type: String, required: true },
+        label: { type: String },
+        text: { type: String },
       },
     ],
     correctAnswer: {
       type: String,
-      enum: ["A", "B", "C", "D"],
       required: true,
     },
     explanation: { type: String, default: "" },
@@ -54,7 +53,7 @@ const QuestionSchema: Schema = new Schema(
     tags: [{ type: String }],
     source: {
       type: String,
-      enum: ["MANUAL", "AI_EXTRACTED"],
+      enum: ["MANUAL", "AI_EXTRACTED", "SAT"],
       default: "MANUAL",
     },
     status: {

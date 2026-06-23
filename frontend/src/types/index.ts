@@ -43,7 +43,7 @@ export interface Question {
   difficulty: "EASY" | "MEDIUM" | "HARD";
   section: "READING_WRITING" | "MATH";
   tags: string[];
-  source: "MANUAL" | "AI_EXTRACTED";
+  source: "MANUAL" | "AI_EXTRACTED" | "SAT";
   status: "DRAFT" | "REVIEW" | "PUBLISHED";
   createdBy: string;
   createdAt: string;
@@ -173,4 +173,76 @@ export interface AdminOverview {
   pendingUploads: number;
   pendingInquiries: number;
   totalStories: number;
+}
+
+// --- SAT Test Types ---
+
+export interface SATModuleSummary {
+  name: string;
+  section: "READING_WRITING" | "MATH";
+  questionCount: number;
+  timeLimitMinutes: number;
+}
+
+export interface SATModule {
+  name: string;
+  section: "READING_WRITING" | "MATH";
+  moduleNumber: number;
+  questions: Question[];
+  timeLimitMinutes: number;
+}
+
+export interface SATTest {
+  _id: string;
+  title: string;
+  description: string;
+  year: number;
+  testNumber: number;
+  modules: SATModule[];
+  breakDurationMinutes: number;
+  isActive: boolean;
+  accessLevel: "FREE" | "PAID";
+  pdfUrl: string;
+  totalQuestions?: number;
+  totalMinutes?: number;
+  attemptCount?: number;
+  modulesSummary?: SATModuleSummary[];
+  createdAt: string;
+}
+
+export interface SATModuleAttemptAnswer {
+  question: Question | string;
+  selectedAnswer: string | null;
+  isCorrect: boolean;
+  markedForReview: boolean;
+  timeSpent: number;
+}
+
+export interface SATModuleAttempt {
+  moduleIndex: number;
+  answers: SATModuleAttemptAnswer[];
+  startedAt: string | null;
+  completedAt: string | null;
+  score: number;
+  totalQuestions: number;
+  correctCount: number;
+}
+
+export interface SATTestAttempt {
+  _id: string;
+  student: string;
+  test: SATTest | string;
+  moduleAttempts: SATModuleAttempt[];
+  currentModuleIndex: number;
+  breakStartedAt: string | null;
+  breakCompletedAt: string | null;
+  totalScore: number;
+  totalQuestions: number;
+  totalCorrect: number;
+  percentage: number;
+  totalTimeTaken: number;
+  status: "IN_PROGRESS" | "ON_BREAK" | "COMPLETED" | "ABANDONED" | "TIMED_OUT";
+  startedAt: string;
+  completedAt: string | null;
+  createdAt: string;
 }
