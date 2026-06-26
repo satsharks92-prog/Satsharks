@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Icon } from "../common/Icon";
 import logoImg from "@/assets/logo.png";
 import { useAuth } from "../../hooks/useAuth";
 
 export function Header() {
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate({ to: "/auth/login" as any });
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,7 +63,7 @@ export function Header() {
             <div className="flex items-center gap-5">
               <span className="font-body text-[13px] font-semibold uppercase tracking-[0.08em] text-on-surface">Hi, {user.name}</span>
               <button
-                onClick={logout}
+                onClick={handleLogout}
                 className="text-[13px] font-bold uppercase tracking-[0.08em] text-on-surface-variant hover:text-accent transition-colors cursor-pointer"
               >
                 Logout
@@ -106,7 +112,7 @@ export function Header() {
             {user ? (
               <button
                 onClick={() => {
-                  logout();
+                  handleLogout();
                   setOpen(false);
                 }}
                 className="block w-full text-left font-mono text-[13px] uppercase tracking-[0.08em] text-on-surface-variant"
