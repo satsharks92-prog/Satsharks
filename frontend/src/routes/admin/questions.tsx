@@ -184,6 +184,11 @@ function AdminQuestions() {
                       <div className="flex gap-2 mt-1">
                         <Badge variant="info">{q.section === "MATH" ? "Math" : "R&W"}</Badge>
                         {q.source === "AI_EXTRACTED" && <Badge variant="accent">AI</Badge>}
+                        {q.tags && q.tags.find(t => t.startsWith("sat-test-")) && (
+                          <Badge variant="accent">
+                            SAT {q.tags.find(t => t.startsWith("sat-test-"))?.split("-")[2]}
+                          </Badge>
+                        )}
                       </div>
                     </td>
                     <td className="p-4 text-sm">{typeof q.category === "object" ? q.category.name : "—"}</td>

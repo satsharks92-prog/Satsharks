@@ -207,6 +207,11 @@ function AdminTests() {
                     <div className="flex gap-2 mt-1">
                       <Badge variant="info">{q.section === "MATH" ? "Math" : "R&W"}</Badge>
                       <Badge variant={q.difficulty === "EASY" ? "success" : q.difficulty === "HARD" ? "error" : "warning"}>{q.difficulty}</Badge>
+                      {q.tags && q.tags.find(t => t.startsWith("sat-test-")) && (
+                        <Badge variant="accent">
+                          SAT {q.tags.find(t => t.startsWith("sat-test-"))?.split("-")[2]}
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 </label>

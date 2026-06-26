@@ -10,7 +10,7 @@ export const getTests = async (req: AuthRequest, res: Response) => {
     const filter: any = { isActive: true };
     if (userSub === "FREE") filter.accessLevel = "FREE";
 
-    const tests = await DiagnosticTest.find(filter).sort({ createdAt: -1 });
+    const tests = await DiagnosticTest.find(filter).sort({ createdAt: 1 });
 
     const testsWithCount = await Promise.all(
       tests.map(async (t) => {
@@ -88,7 +88,7 @@ export const deleteTest = async (req: Request, res: Response) => {
 
 export const getAllTestsAdmin = async (req: Request, res: Response) => {
   try {
-    const tests = await DiagnosticTest.find().sort({ createdAt: -1 });
+    const tests = await DiagnosticTest.find().sort({ createdAt: 1 });
     res.status(200).json({ success: true, tests });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
@@ -138,7 +138,9 @@ export const submitTest = async (req: AuthRequest, res: Response) => {
     let correctCount = 0;
     const scoredAnswers = answers.map((a: any) => {
       const q = questionMap.get(a.question);
-      const isCorrect = q ? q.correctAnswer === a.selectedAnswer : false;
+      const isCorrect = q
+        ? (q.correctAnswer || "").trim().toLowerCase() === (a.selectedAnswer || "").trim().toLowerCase()
+        : false;
       if (isCorrect) correctCount++;
       return {
         question: a.question,
