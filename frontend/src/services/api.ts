@@ -4,6 +4,8 @@ const API_BASE_URL = (
   ""
 ).replace(/\/$/, "");
 
+console.log("[API Service] VITE_API_URL is configured as:", API_BASE_URL);
+
 const getUrl = (url: string) => url.startsWith("http") ? url : `${API_BASE_URL}${url}`;
 
 // simple API wrapper with auth token injection and error handling
