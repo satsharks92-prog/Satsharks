@@ -1,4 +1,8 @@
-const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+const API_BASE_URL = (
+  (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_API_URL) ||
+  (typeof process !== "undefined" && process.env && process.env.VITE_API_URL) ||
+  ""
+).replace(/\/$/, "");
 
 const getUrl = (url: string) => url.startsWith("http") ? url : `${API_BASE_URL}${url}`;
 
