@@ -1,3 +1,7 @@
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "").replace(/\/$/, "");
+
+const getUrl = (url: string) => url.startsWith("http") ? url : `${API_BASE_URL}${url}`;
+
 // simple API wrapper with auth token injection and error handling
 export const api = {
   async get(url: string) {
@@ -6,7 +10,7 @@ export const api = {
       const headers: HeadersInit = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch(url, { headers });
+      const res = await fetch(getUrl(url), { headers });
       const data = await res.json().catch(() => null);
       if (!res.ok) {
         return { success: false, error: data?.error || `HTTP error! status: ${res.status}` };
@@ -24,7 +28,7 @@ export const api = {
       const headers: HeadersInit = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch(url, {
+      const res = await fetch(getUrl(url), {
         method: "POST",
         headers,
         body: JSON.stringify(data),
@@ -46,7 +50,7 @@ export const api = {
       const headers: HeadersInit = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch(url, {
+      const res = await fetch(getUrl(url), {
         method: "PUT",
         headers,
         body: data ? JSON.stringify(data) : undefined,
@@ -68,7 +72,7 @@ export const api = {
       const headers: HeadersInit = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const res = await fetch(url, {
+      const res = await fetch(getUrl(url), {
         method: "DELETE",
         headers,
       });
