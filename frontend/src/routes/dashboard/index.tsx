@@ -113,13 +113,13 @@ function DashboardHome() {
 
           <div className="grid sm:grid-cols-3 gap-4">
             <Link
-              to="/dashboard/tests"
+              to="/dashboard/sat-tests"
               className="flex items-center gap-4 p-6 rounded-2xl bg-primary text-on-primary shark-shadow hover:-translate-y-1 transition-transform"
             >
               <Icon name="quiz" className="text-[28px]" />
               <div>
                 <div className="font-semibold">Take a Test</div>
-                <div className="text-xs text-on-primary/70">Start a diagnostic test</div>
+                <div className="text-xs text-on-primary/70">Start a practice mock test</div>
               </div>
             </Link>
             <Link

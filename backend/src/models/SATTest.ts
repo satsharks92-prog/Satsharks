@@ -13,6 +13,7 @@ export interface ISATTest extends Document {
   description: string;
   year: number;
   testNumber: number;
+  isAdaptive: boolean;
   modules: ISATModule[];
   breakDurationMinutes: number;
   isActive: boolean;
@@ -40,6 +41,7 @@ const SATTestSchema: Schema = new Schema(
     description: { type: String, default: "" },
     year: { type: Number, required: true },
     testNumber: { type: Number, required: true },
+    isAdaptive: { type: Boolean, default: false },
     modules: { type: [SATModuleSchema], required: true },
     breakDurationMinutes: { type: Number, default: 10 },
     isActive: { type: Boolean, default: true },

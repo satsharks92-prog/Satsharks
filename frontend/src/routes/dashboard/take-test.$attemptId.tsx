@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router"
 import { useState, useEffect, useCallback } from "react";
 import { Icon } from "../../components/common/Icon";
 import { api } from "../../services/api";
+import { useAuth } from "../../hooks/useAuth";
 import type { Question } from "../../types";
 
 export const Route = createFileRoute("/dashboard/take-test/$attemptId")({
@@ -89,6 +90,7 @@ function TakeTest() {
   const search: any = useSearch({ from: "/dashboard/take-test/$attemptId" });
   const testId = search.testId;
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [questions, setQuestions] = useState<Question[]>([]);
   const [testTitle, setTestTitle] = useState("");
@@ -111,6 +113,10 @@ function TakeTest() {
   const [showDirectionsModal, setShowDirectionsModal] = useState(false);
   const [showCalculatorModal, setShowCalculatorModal] = useState(false);
   const [showReferenceModal, setShowReferenceModal] = useState(false);
+
+  // Bluebook states
+  const [showTime, setShowTime] = useState(true);
+  const [showNavGrid, setShowNavGrid] = useState(false);
 
   useEffect(() => {
     if (!testId) return;
@@ -174,10 +180,9 @@ function TakeTest() {
   // Break Timer
   useEffect(() => {
     if (!isBreakActive || breakTimeLeft <= 0) return;
-    const breakTimer = setInterval(() => {
+    const breakTimer = setTimeout(() => {
       setBreakTimeLeft((prev) => {
         if (prev <= 1) {
-          clearInterval(breakTimer);
           setIsBreakActive(false);
           if (modules) {
             const nextModIdx = 2; // Math Module 1
@@ -190,17 +195,17 @@ function TakeTest() {
         return prev - 1;
       });
     }, 1000);
-    return () => clearInterval(breakTimer);
+    return () => clearTimeout(breakTimer);
   }, [isBreakActive, breakTimeLeft, modules]);
 
   // Main Test / Module Timer ticking
   useEffect(() => {
     if (isBreakActive || timeLeft <= 0) return;
-    const timer = setInterval(() => {
+    const timer = setTimeout(() => {
       setTimeLeft((prev) => prev - 1);
     }, 1000);
-    return () => clearInterval(timer);
-  }, [isBreakActive, timeLeft > 0]);
+    return () => clearTimeout(timer);
+  }, [isBreakActive, timeLeft]);
 
   const handleSubmit = useCallback(async () => {
     if (submitting) return;
@@ -337,29 +342,59 @@ function TakeTest() {
     ? activeModule.questionIndices.length
     : questions.length;
 
+  const getRWTextSplit = (text: string) => {
+    const newlineIdx = text.lastIndexOf("\n");
+    if (newlineIdx !== -1) {
+      return {
+        passage: text.substring(0, newlineIdx).trim(),
+        prompt: text.substring(newlineIdx + 1).trim(),
+      };
+    }
+    return {
+      passage: text,
+      prompt: "",
+    };
+  };
+
+  const isRW = q?.section === "READING_WRITING";
+  const rwSplit = q ? getRWTextSplit(q.text) : { passage: "", prompt: "" };
+
   return (
-    <div className="min-h-screen bg-background text-on-background flex flex-col">
+    <div className="h-screen bg-background text-on-background flex flex-col overflow-hidden">
       {/* Top Bar */}
-      <div className="sticky top-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40 px-6 py-3">
-        <div className="max-w-[1000px] mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="font-semibold text-sm">
+      <div className="sticky top-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40 px-6 py-2.5">
+        <div className="max-w-[1400px] mx-auto grid grid-cols-3 items-center w-full relative">
+          <div className="flex items-center gap-4 justify-self-start">
+            <h1 className="font-bold text-sm text-on-surface">
               {modules ? `${testTitle} - ${activeModule?.name}` : testTitle}
             </h1>
-            <span className="text-xs text-on-surface-variant">
-              Question {relativeQuestionNum} of {totalModuleQuestions}
-            </span>
-          </div>
-
-          {/* Guidelines Tool Buttons */}
-          <div className="flex items-center gap-2">
             <button
               onClick={() => setShowDirectionsModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors text-xs font-semibold cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors text-xs font-semibold cursor-pointer"
             >
-              <Icon name="info" className="text-[16px]" />
-              <span className="hidden sm:inline">Directions</span>
+              <Icon name="info" className="text-[14px]" />
+              <span>Directions</span>
             </button>
+          </div>
+
+          {/* Center Timer */}
+          <div className="flex flex-col items-center gap-1 justify-self-center">
+            <div className={`flex items-center gap-2 font-mono text-base font-bold min-w-[70px] justify-center transition-opacity ${
+              showTime ? "text-primary opacity-100" : "text-transparent opacity-0 pointer-events-none select-none"
+            } ${isWarning && showTime ? "text-error animate-pulse" : ""}`}>
+              <Icon name="timer" className="text-[18px]" />
+              {formatTime(timeLeft)}
+            </div>
+            <button
+              onClick={() => setShowTime(!showTime)}
+              className="px-3 py-0.5 rounded bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-[10px] font-bold tracking-wider uppercase cursor-pointer transition-colors border-none"
+            >
+              {showTime ? "Hide" : "Show"}
+            </button>
+          </div>
+
+          {/* Guidelines Tool Buttons (Calculator/Reference) */}
+          <div className="flex items-center gap-2 justify-self-end">
             {showMathTools && (
               <>
                 <button
@@ -379,23 +414,6 @@ function TakeTest() {
               </>
             )}
           </div>
-
-          <div className="flex items-center gap-6">
-            <div className={`flex items-center gap-2 font-mono text-lg font-bold ${isWarning ? "text-error animate-pulse" : "text-primary"}`}>
-              <Icon name="timer" className="text-[20px]" />
-              {formatTime(timeLeft)}
-            </div>
-            <div className="text-xs text-on-surface-variant">
-              {modules && activeModule ? (
-                (() => {
-                  const moduleAnswers = activeModule.questionIndices.filter(idx => answers[questions[idx]?._id]).length;
-                  return `${moduleAnswers}/${activeModule.questionIndices.length} answered`;
-                })()
-              ) : (
-                `${answered}/${questions.length} answered`
-              )}
-            </div>
-          </div>
         </div>
       </div>
 
@@ -410,132 +428,263 @@ function TakeTest() {
       </div>
 
       {/* Question Area */}
-      <div className="flex-1 flex justify-center px-6 py-10">
-        <div className="w-full max-w-[800px]">
-          {q && (
-            <>
-              {/* Question Number Header */}
-              <div className="mb-4 flex items-center justify-between border-b border-outline-variant/30 pb-2">
-                <span className="text-base font-extrabold text-primary tracking-widest uppercase">
-                  Question {relativeQuestionNum}
-                </span>
-                <span className="text-xs font-medium text-on-surface-variant bg-surface-container-high px-2.5 py-1 rounded-full">
-                  {q.difficulty} • {q.section === "MATH" ? "Math" : "Reading & Writing"}
-                </span>
-              </div>
-
-              {/* Question Text Card */}
-              <div className="rounded-2xl bg-surface-container-lowest p-8 border border-outline-variant/40 shark-shadow mb-8">
-                <p className="text-lg leading-relaxed whitespace-pre-wrap">{q.text}</p>
-              </div>
-
-              {/* Answer Section */}
-              {q.options && q.options.length > 0 ? (
-                /* Multiple Choice Options */
-                <div className="space-y-3">
-                  {q.options.map((opt) => {
-                    const selected = answers[q._id] === opt.label;
-                    return (
-                      <button
-                        key={opt.label}
-                        onClick={() => handleAnswer(q._id, opt.label)}
-                        className={`w-full flex items-center gap-4 p-5 rounded-xl border-2 text-left transition-all cursor-pointer ${
-                          selected
-                            ? "border-primary bg-primary/5 shadow-md"
-                            : "border-outline-variant/40 hover:border-primary/40 hover:bg-surface-container-low"
-                        }`}
-                      >
-                        <span
-                          className={`flex-shrink-0 h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                            selected
-                              ? "bg-primary text-on-primary"
-                              : "bg-surface-container-high text-on-surface"
-                          }`}
-                        >
-                          {opt.label}
-                        </span>
-                        <span className="text-sm leading-relaxed">{opt.text}</span>
-                      </button>
-                    );
-                  })}
+      <div className="flex-1 flex justify-center w-full min-h-0 bg-background overflow-hidden">
+        {q && (
+          isRW ? (
+            /* Split Screen for Reading & Writing */
+            <div className="w-full max-w-[1400px] grid grid-cols-1 md:grid-cols-2 gap-6 px-6 py-5 h-full min-h-0 overflow-hidden">
+              {/* Left Column: Passage */}
+              <div className="flex flex-col h-full min-h-0 overflow-hidden bg-surface-container-lowest border border-outline-variant/40 rounded-2xl shark-shadow">
+                <div className="bg-surface-container-low px-5 py-3 border-b border-outline-variant/30 flex items-center justify-between">
+                  <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Passage</span>
                 </div>
-              ) : (
-                /* Student-Produced Response Input Field */
-                <div className="rounded-2xl bg-surface-container-lowest p-6 border border-outline-variant/40 shark-shadow">
-                  <label className="block text-sm font-bold text-on-surface mb-3 uppercase tracking-wider">
-                    Enter Your Answer
-                  </label>
-                  <input
-                    type="text"
-                    value={answers[q._id] || ""}
-                    onChange={(e) => handleAnswer(q._id, e.target.value)}
-                    placeholder="Type your answer here..."
-                    className="w-full max-w-[300px] px-5 py-4 rounded-xl border-2 border-outline-variant/60 focus:border-primary focus:outline-none text-lg font-mono tracking-wide transition-all bg-surface text-on-surface focus:shadow-md"
-                  />
-                  <div className="mt-5 p-4 bg-primary/5 rounded-xl border border-primary/10">
-                    <span className="flex items-start gap-2.5 text-xs text-on-surface-variant leading-relaxed">
-                      <Icon name="info" className="text-primary text-[16px] mt-0.5 flex-shrink-0" />
-                      <div>
-                        <span className="font-bold text-on-surface">Digital SAT Rules for Student-Produced Responses:</span>
-                        <ul className="list-disc pl-4 mt-1.5 space-y-1 text-[11px]">
-                          <li>Positive answers: up to 5 characters max.</li>
-                          <li>Negative answers: up to 6 characters max (including negative sign).</li>
-                          <li>Fractions: enter as improper fraction (e.g. 7/2) or decimal. Mixed numbers must be entered as fractions/decimals (e.g. enter 3.5 or 7/2, not 3 1/2).</li>
-                          <li>Do not enter symbols (%, $, commas, etc.).</li>
-                        </ul>
-                      </div>
+                <div className="flex-1 overflow-y-auto p-6 scroll-smooth">
+                  <p className="text-[15px] leading-relaxed text-on-surface whitespace-pre-wrap">{rwSplit.passage}</p>
+                </div>
+              </div>
+
+              {/* Right Column: Question Prompt & Options */}
+              <div className="flex flex-col h-full min-h-0 overflow-hidden bg-surface-container-lowest border border-outline-variant/40 rounded-2xl shark-shadow">
+                <div className="bg-surface-container-low px-5 py-2.5 border-b border-outline-variant/30 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="h-6 w-6 bg-primary text-on-primary rounded flex items-center justify-center text-xs font-bold">
+                      {relativeQuestionNum}
                     </span>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Question</span>
                   </div>
                 </div>
-              )}
-            </>
-          )}
-        </div>
+                <div className="flex-1 overflow-y-auto p-6">
+                  {rwSplit.prompt && (
+                    <p className="text-[15px] font-semibold text-on-surface leading-relaxed mb-5 whitespace-pre-wrap">{rwSplit.prompt}</p>
+                  )}
+
+                  {q.options && q.options.length > 0 && (
+                    <div className="space-y-2">
+                      {q.options.map((opt) => {
+                        const selected = answers[q._id] === opt.label;
+                        return (
+                          <button
+                            key={opt.label}
+                            onClick={() => handleAnswer(q._id, opt.label)}
+                            className={`w-full flex items-center gap-4 py-3 px-4 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                              selected
+                                ? "border-primary bg-primary/5 shadow-sm"
+                                : "border-outline-variant/40 hover:border-primary/40 hover:bg-surface-container-low"
+                            }`}
+                          >
+                            <span
+                              className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
+                                selected
+                                  ? "bg-primary text-on-primary"
+                                  : "bg-surface-container-high text-on-surface"
+                              }`}
+                            >
+                              {opt.label}
+                            </span>
+                            <span className="text-sm leading-relaxed">{opt.text}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Split Screen for Math */
+            <div className="w-full max-w-[1400px] grid grid-cols-1 md:grid-cols-2 gap-6 px-6 py-5 h-full min-h-0 overflow-hidden">
+              {/* Left Column: Math Question Text */}
+              <div className="flex flex-col h-full min-h-0 overflow-hidden bg-surface-container-lowest border border-outline-variant/40 rounded-2xl shark-shadow">
+                <div className="bg-surface-container-low px-5 py-3 border-b border-outline-variant/30 flex items-center justify-between">
+                  <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Question Context</span>
+                </div>
+                <div className="flex-1 overflow-y-auto p-6 scroll-smooth">
+                  <p className="text-[15px] leading-relaxed text-on-surface whitespace-pre-wrap">{q.text}</p>
+                </div>
+              </div>
+
+              {/* Right Column: MCQ Options or Student-Produced Response Input Field */}
+              <div className="flex flex-col h-full min-h-0 overflow-hidden bg-surface-container-lowest border border-outline-variant/40 rounded-2xl shark-shadow">
+                <div className="bg-surface-container-low px-5 py-2.5 border-b border-outline-variant/30 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="h-6 w-6 bg-primary text-on-primary rounded flex items-center justify-center text-xs font-bold">
+                      {relativeQuestionNum}
+                    </span>
+                    <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Answer Choices</span>
+                  </div>
+                </div>
+                <div className="flex-1 overflow-y-auto p-6">
+                  {q.options && q.options.length > 0 ? (
+                    <div className="space-y-2">
+                      {q.options.map((opt) => {
+                        const selected = answers[q._id] === opt.label;
+                        return (
+                          <button
+                            key={opt.label}
+                            onClick={() => handleAnswer(q._id, opt.label)}
+                            className={`w-full flex items-center gap-4 py-3 px-4 rounded-xl border-2 text-left transition-all cursor-pointer ${
+                              selected
+                                ? "border-primary bg-primary/5 shadow-sm"
+                                : "border-outline-variant/40 hover:border-primary/40 hover:bg-surface-container-low"
+                            }`}
+                          >
+                            <span
+                              className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
+                                selected
+                                  ? "bg-primary text-on-primary"
+                                  : "bg-surface-container-high text-on-surface"
+                              }`}
+                            >
+                              {opt.label}
+                            </span>
+                            <span className="text-sm leading-relaxed">{opt.text}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    /* Student-Produced Response Input Field */
+                    <div className="space-y-4">
+                      <label className="block text-sm font-bold text-on-surface uppercase tracking-wider">
+                        Enter Your Answer
+                      </label>
+                      <input
+                        type="text"
+                        value={answers[q._id] || ""}
+                        onChange={(e) => handleAnswer(q._id, e.target.value)}
+                        placeholder="Type your answer here..."
+                        className="w-full max-w-[300px] px-5 py-4 rounded-xl border-2 border-outline-variant/60 focus:border-primary focus:outline-none text-lg font-mono tracking-wide transition-all bg-surface text-on-surface focus:shadow-md"
+                      />
+                      <div className="p-4 bg-primary/5 rounded-xl border border-primary/10">
+                        <span className="flex items-start gap-2.5 text-xs text-on-surface-variant leading-relaxed">
+                          <Icon name="info" className="text-primary text-[16px] mt-0.5 flex-shrink-0" />
+                          <div>
+                            <span className="font-bold text-on-surface">Digital SAT Rules for Student-Produced Responses:</span>
+                            <ul className="list-disc pl-4 mt-1.5 space-y-1 text-[11px]">
+                              <li>Positive answers: up to 5 characters max.</li>
+                              <li>Negative answers: up to 6 characters max (including negative sign).</li>
+                              <li>Fractions: enter as improper fraction (e.g. 7/2) or decimal. Mixed numbers must be entered as fractions/decimals (e.g. enter 3.5 or 7/2, not 3 1/2).</li>
+                              <li>Do not enter symbols (%, $, commas, etc.).</li>
+                            </ul>
+                          </div>
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        )}
       </div>
 
-      {/* Question Navigation Grid */}
-      <div className="border-t border-outline-variant/40 bg-surface-container-lowest px-6 py-4">
-        <div className="max-w-[800px] mx-auto">
-          <div className="flex flex-wrap gap-2 mb-4">
-            {modules ? (
-              activeModule?.questionIndices.map((absIdx) => {
-                const questionObj = questions[absIdx];
-                const relativeNum = absIdx - activeModule.questionIndices[0] + 1;
-                return (
+      {/* Footer Navigation Bar */}
+      <div className="border-t border-outline-variant/40 bg-surface-container-lowest px-6 py-3.5 z-40">
+        <div className="max-w-[1400px] mx-auto flex items-center justify-between relative">
+          {/* Left: Student Name */}
+          <div className="text-sm font-bold text-on-surface">
+            {user?.name || "Student"}
+          </div>
+
+          {/* Center: Question Navigation Popover Button */}
+          <div className="relative">
+            <button
+              onClick={() => setShowNavGrid(!showNavGrid)}
+              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-sm font-bold cursor-pointer transition-all border border-outline-variant/40 shadow-sm"
+            >
+              Question {relativeQuestionNum} of {totalModuleQuestions}
+              <Icon name={showNavGrid ? "expand_more" : "expand_less"} className="text-[18px]" />
+            </button>
+
+            {showNavGrid && (
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 bg-surface-container-lowest border border-outline-variant/60 rounded-2xl p-4 shadow-xl z-50 min-w-[300px] max-w-[90vw] animate-scale-in">
+                <div className="flex justify-between items-center mb-3 pb-2 border-b border-outline-variant/30">
+                  <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Question Navigation</span>
                   <button
-                    key={absIdx}
-                    onClick={() => setCurrentIdx(absIdx)}
-                    className={`h-8 w-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                      absIdx === currentIdx
-                        ? "bg-primary text-on-primary"
-                        : answers[questionObj._id]
-                        ? "bg-primary/20 text-primary"
-                        : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest"
-                    }`}
+                    onClick={() => setShowNavGrid(false)}
+                    className="p-1 rounded hover:bg-surface-container-low text-on-surface-variant"
                   >
-                    {relativeNum}
+                    <Icon name="close" className="text-[16px]" />
                   </button>
-                );
-              })
-            ) : (
-              questions.map((q, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentIdx(i)}
-                  className={`h-8 w-8 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    i === currentIdx
-                      ? "bg-primary text-on-primary"
-                      : answers[q._id]
-                      ? "bg-primary/20 text-primary"
-                      : "bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest"
-                  }`}
-                >
-                  {i + 1}
-                </button>
-              ))
+                </div>
+                <div className="grid grid-cols-5 gap-2 max-h-[220px] overflow-y-auto p-1">
+                  {modules ? (
+                    activeModule?.questionIndices.map((absIdx) => {
+                      const questionObj = questions[absIdx];
+                      const relativeNum = absIdx - activeModule.questionIndices[0] + 1;
+                      const hasAnswer = answers[questionObj._id] !== undefined && answers[questionObj._id] !== "";
+                      const isCurrent = absIdx === currentIdx;
+                      return (
+                        <button
+                          key={absIdx}
+                          onClick={() => {
+                            setCurrentIdx(absIdx);
+                            setShowNavGrid(false);
+                          }}
+                          className={`h-9 w-9 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                            isCurrent
+                              ? hasAnswer
+                                ? "bg-primary text-on-primary border-b-[3px] border-b-accent ring-2 ring-primary/40 ring-offset-1"
+                                : "bg-surface-container-low text-on-surface border-b-[3px] border-b-primary border-x border-t border-outline-variant/40 ring-2 ring-primary/40 ring-offset-1"
+                              : hasAnswer
+                              ? "bg-primary text-on-primary hover:bg-primary/90"
+                              : "bg-surface-container-low text-on-surface-variant/70 border border-outline-variant/30 hover:bg-surface-container-high"
+                          }`}
+                        >
+                          {relativeNum}
+                        </button>
+                      );
+                    })
+                  ) : (
+                    questions.map((q, i) => {
+                      const hasAnswer = answers[q._id] !== undefined && answers[q._id] !== "";
+                      const isCurrent = i === currentIdx;
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            setCurrentIdx(i);
+                            setShowNavGrid(false);
+                          }}
+                          className={`h-9 w-9 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                            isCurrent
+                              ? hasAnswer
+                                ? "bg-primary text-on-primary border-b-[3px] border-b-accent ring-2 ring-primary/40 ring-offset-1"
+                                : "bg-surface-container-low text-on-surface border-b-[3px] border-b-primary border-x border-t border-outline-variant/40 ring-2 ring-primary/40 ring-offset-1"
+                              : hasAnswer
+                              ? "bg-primary text-on-primary hover:bg-primary/90"
+                              : "bg-surface-container-low text-on-surface-variant/70 border border-outline-variant/30 hover:bg-surface-container-high"
+                          }`}
+                        >
+                          {i + 1}
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Popover Legend */}
+                <div className="flex gap-4 items-center justify-between text-[10px] font-semibold text-on-surface-variant mt-4 pt-3 border-t border-outline-variant/30">
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-3 w-3 rounded bg-primary" />
+                    <span>Attempted</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-3 w-3 rounded bg-surface-container-low border border-outline-variant/30" />
+                    <span>Unattempted</span>
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-3 w-3 rounded bg-surface-container-low border-b-2 border-b-primary border-x border-t border-outline-variant/30" />
+                    <span>Current</span>
+                  </span>
+                </div>
+              </div>
             )}
           </div>
-          <div className="flex items-center justify-between">
+
+          {/* Right: Previous / Next Actions */}
+          <div className="flex items-center gap-3">
+            {/* Back/Previous Button */}
             <button
               onClick={() => setCurrentIdx(Math.max(0, currentIdx - 1))}
               disabled={
@@ -543,52 +692,52 @@ function TakeTest() {
                   ? currentIdx === activeModule.questionIndices[0]
                   : currentIdx === 0
               }
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-outline-variant text-sm font-semibold disabled:opacity-30 hover:bg-surface-container-low transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-outline-variant text-sm font-semibold disabled:opacity-30 hover:bg-surface-container-low transition-colors cursor-pointer"
             >
-              <Icon name="chevron_left" className="text-[18px]" /> Previous
+              Back
             </button>
+
+            {/* Next Button */}
             {modules ? (
               isLastQuestionInModule ? (
                 isLastModule ? (
                   <button
                     onClick={handleSubmit}
                     disabled={submitting}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-primary text-sm font-bold hover:bg-accent/80 transition-colors disabled:opacity-50 cursor-pointer"
+                    className="flex items-center gap-1.5 px-6 py-2 rounded-xl bg-primary text-on-primary text-sm font-bold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50 cursor-pointer"
                   >
-                    <Icon name="check_circle" className="text-[18px]" />
                     {submitting ? "Submitting..." : "Submit Test"}
                   </button>
                 ) : (
                   <button
                     onClick={() => setShowTransitionModal(true)}
-                    className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-primary text-sm font-bold hover:bg-accent/80 transition-colors cursor-pointer"
+                    className="flex items-center gap-1.5 px-6 py-2 rounded-xl bg-primary text-on-primary text-sm font-bold hover:bg-accent hover:text-primary transition-colors cursor-pointer"
                   >
-                    Next Module <Icon name="arrow_forward" className="text-[18px]" />
+                    Next
                   </button>
                 )
               ) : (
                 <button
                   onClick={() => setCurrentIdx(currentIdx + 1)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-accent transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 px-6 py-2 rounded-xl bg-primary text-on-primary text-sm font-bold hover:bg-accent hover:text-primary transition-colors cursor-pointer"
                 >
-                  Next <Icon name="chevron_right" className="text-[18px]" />
+                  Next
                 </button>
               )
             ) : (
               currentIdx < questions.length - 1 ? (
                 <button
                   onClick={() => setCurrentIdx(currentIdx + 1)}
-                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary text-sm font-semibold hover:bg-accent transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 px-6 py-2 rounded-xl bg-primary text-on-primary text-sm font-bold hover:bg-accent hover:text-primary transition-colors cursor-pointer"
                 >
-                  Next <Icon name="chevron_right" className="text-[18px]" />
+                  Next
                 </button>
               ) : (
                 <button
                   onClick={handleSubmit}
                   disabled={submitting}
-                  className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-accent text-primary text-sm font-bold hover:bg-accent/80 transition-colors disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-1.5 px-6 py-2 rounded-xl bg-primary text-on-primary text-sm font-bold hover:bg-accent hover:text-primary transition-colors disabled:opacity-50 cursor-pointer"
                 >
-                  <Icon name="check_circle" className="text-[18px]" />
                   {submitting ? "Submitting..." : "Submit Test"}
                 </button>
               )

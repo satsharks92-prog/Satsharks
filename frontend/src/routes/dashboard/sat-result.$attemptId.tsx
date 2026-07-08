@@ -48,8 +48,14 @@ function SATResult() {
   };
 
   // Calculate section scores
-  const rwModules = attempt.moduleAttempts.filter((_, i) => i < 2);
-  const mathModules = attempt.moduleAttempts.filter((_, i) => i >= 2);
+  const rwModules = attempt.moduleAttempts.filter((ma) => {
+    const mod = test?.modules?.[ma.moduleIndex];
+    return ma.startedAt && mod?.section === "READING_WRITING";
+  });
+  const mathModules = attempt.moduleAttempts.filter((ma) => {
+    const mod = test?.modules?.[ma.moduleIndex];
+    return ma.startedAt && mod?.section === "MATH";
+  });
 
   const rwCorrect = rwModules.reduce((s, m) => s + m.correctCount, 0);
   const rwTotal = rwModules.reduce((s, m) => s + m.totalQuestions, 0);
@@ -124,10 +130,13 @@ function SATResult() {
         {/* Per-Module Breakdown */}
         <h2 className="text-xl font-bold mb-4">Module Breakdown</h2>
         <div className="space-y-4 mb-8">
-          {attempt.moduleAttempts.map((mod, idx) => {
-            const moduleName = test?.modules?.[idx]?.name || `Module ${idx + 1}`;
-            const isExpanded = expandedModule === idx;
-            const pct = mod.totalQuestions > 0 ? Math.round((mod.correctCount / mod.totalQuestions) * 100) : 0;
+          {attempt.moduleAttempts
+            .filter((mod) => mod.startedAt)
+            .map((mod) => {
+              const idx = mod.moduleIndex;
+              const moduleName = test?.modules?.[idx]?.name || `Module ${idx + 1}`;
+              const isExpanded = expandedModule === idx;
+              const pct = mod.totalQuestions > 0 ? Math.round((mod.correctCount / mod.totalQuestions) * 100) : 0;
 
             return (
               <div key={idx} className="rounded-xl bg-surface-container-lowest border border-outline-variant/40 overflow-hidden">

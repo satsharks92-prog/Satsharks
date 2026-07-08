@@ -148,11 +148,11 @@ function Practice() {
             </Badge>
           </div>
 
-          <div className="rounded-2xl bg-surface-container-lowest p-8 border border-outline-variant/40 shark-shadow mb-6">
-            <p className="text-lg leading-relaxed whitespace-pre-wrap">{q.text}</p>
+          <div className="rounded-xl bg-surface-container-lowest p-6 border border-outline-variant/40 shark-shadow mb-4">
+            <p className="text-[15px] leading-relaxed whitespace-pre-wrap">{q.text}</p>
           </div>
 
-          <div className="space-y-3 mb-6">
+          <div className="space-y-2 mb-6">
             {q.options.map((opt) => {
               const isSelected = selectedAnswer === opt.label;
               let optStyle = "";
@@ -171,11 +171,11 @@ function Practice() {
                   key={opt.label}
                   onClick={() => !showResult && setSelectedAnswer(opt.label)}
                   disabled={showResult}
-                  className={`w-full flex items-center gap-4 p-5 rounded-xl border-2 text-left transition-all cursor-pointer disabled:cursor-default ${
+                  className={`w-full flex items-center gap-4 py-3 px-4 rounded-xl border-2 text-left transition-all cursor-pointer disabled:cursor-default ${
                     optStyle || "border-outline-variant/40 hover:border-primary/40"
                   }`}
                 >
-                  <span className={`flex-shrink-0 h-9 w-9 rounded-full flex items-center justify-center text-sm font-bold ${
+                  <span className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold ${
                     isSelected ? "bg-primary text-on-primary" : "bg-surface-container-high text-on-surface"
                   }`}>
                     {opt.label}

@@ -9,6 +9,8 @@ import {
   getSATAttempt,
   getMySATAttempts,
   getAllSATTestsAdmin,
+  updateSATTestAdmin,
+  deleteSATTestAdmin,
 } from "../controllers/sat.controller";
 import { authenticate } from "../middleware/auth.middleware";
 import { requireAdmin, requireActiveUser } from "../middleware/role.middleware";
@@ -27,5 +29,7 @@ router.post("/attempt/:id/submit", authenticate, submitSATTest);
 
 // Admin routes
 router.get("/admin/all", authenticate, requireAdmin(), getAllSATTestsAdmin);
+router.put("/admin/:id", authenticate, requireAdmin(), updateSATTestAdmin);
+router.delete("/admin/:id", authenticate, requireAdmin(), deleteSATTestAdmin);
 
 export default router;

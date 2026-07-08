@@ -14,11 +14,13 @@ dist-ssr
 .vinxi
 .tanstack/**
 .nitro
+.vercel
 frontend/dist
 frontend/.output
 frontend/.vinxi
 frontend/.tanstack/**
 frontend/.nitro
+frontend/.vercel
 *.local
 .env
 .env.*

@@ -34,9 +34,27 @@ function SATTestList() {
 
   return (
     <StudentLayout activeItem="/dashboard/sat-tests">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Digital SAT Practice Tests</h1>
-        <p className="text-on-surface-variant">Full-length SAT mock tests with real exam timing and structure</p>
+      <div className="mb-8 rounded-2xl bg-surface-container-low p-6 border border-outline-variant/20 flex flex-col lg:flex-row gap-6 justify-between items-start lg:items-center">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Digital SAT Practice Tests</h1>
+          <p className="text-sm text-on-surface-variant max-w-2xl">
+            Take full-length adaptive Digital SAT mock tests. The test structure matches the official digital SAT with a total of 98 questions spanning 4 modules and a 10-minute break.
+          </p>
+        </div>
+        <div className="flex gap-3 shrink-0 flex-wrap">
+          <div className="flex items-center gap-2 bg-surface-container-lowest px-4 py-2.5 rounded-xl border border-outline-variant/30 text-xs font-semibold">
+            <Icon name="help_center" className="text-primary text-[18px]" />
+            <span>98 Questions</span>
+          </div>
+          <div className="flex items-center gap-2 bg-surface-container-lowest px-4 py-2.5 rounded-xl border border-outline-variant/30 text-xs font-semibold">
+            <Icon name="timer" className="text-accent text-[18px]" />
+            <span>134 Min + Break</span>
+          </div>
+          <div className="flex items-center gap-2 bg-surface-container-lowest px-4 py-2.5 rounded-xl border border-outline-variant/30 text-xs font-semibold">
+            <Icon name="device_hub" className="text-secondary text-[18px]" />
+            <span>Adaptive Routing</span>
+          </div>
+        </div>
       </div>
 
       {loading ? (
@@ -48,52 +66,26 @@ function SATTestList() {
           {tests.map((test) => {
             const locked = test.accessLevel === "PAID" && user?.subscription === "FREE";
             return (
-              <div key={test._id} className={`rounded-2xl bg-surface-container-lowest p-8 border border-outline-variant/40 shark-shadow hover-lift ${locked ? "opacity-70" : ""}`}>
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
+              <div key={test._id} className={`rounded-2xl bg-surface-container-lowest p-6 border border-outline-variant/40 shark-shadow hover-lift ${locked ? "opacity-70" : ""}`}>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                  <div>
+                    <div className="flex items-center gap-3 mb-2 flex-wrap">
                       <h2 className="text-xl font-bold">{test.title}</h2>
                       {locked ? (
                         <Badge variant="warning"><Icon name="lock" className="text-[12px] mr-1" />PAID</Badge>
                       ) : (
                         <Badge variant="success">FREE</Badge>
                       )}
-                    </div>
-                    {test.description && <p className="text-sm text-on-surface-variant mb-4">{test.description}</p>}
-
-                    <div className="flex flex-wrap gap-6 text-sm text-on-surface-variant">
-                      <span className="flex items-center gap-1.5">
-                        <Icon name="help_center" className="text-[18px] text-primary" />
-                        {test.totalQuestions} questions
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Icon name="timer" className="text-[18px] text-accent" />
-                        ~{test.totalMinutes} minutes total
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Icon name="view_module" className="text-[18px] text-secondary" />
-                        4 modules + break
-                      </span>
                       {(test.attemptCount ?? 0) > 0 && (
-                        <span className="flex items-center gap-1.5">
-                          <Icon name="check_circle" className="text-[18px] text-primary" />
-                          Completed {test.attemptCount}x
-                        </span>
+                        <Badge variant="info">
+                          <Icon name="check_circle" className="text-[12px] mr-1" /> Taken {test.attemptCount}x
+                        </Badge>
                       )}
                     </div>
-
-                    {/* Module breakdown */}
-                    <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-3">
-                      {test.modulesSummary?.map((m, i) => (
-                        <div key={i} className="px-3 py-2 rounded-lg bg-surface-container-low text-xs">
-                          <div className="font-semibold text-on-surface">{m.name}</div>
-                          <div className="text-on-surface-variant">{m.questionCount}q · {m.timeLimitMinutes}min</div>
-                        </div>
-                      ))}
-                    </div>
+                    <p className="text-xs text-on-surface-variant">Digital SAT Year: {test.year} · Exam #{test.testNumber}</p>
                   </div>
 
-                  <div className="flex flex-col gap-3 md:items-end shrink-0">
+                  <div className="shrink-0">
                     <button
                       onClick={() => handleStart(test._id)}
                       disabled={locked}
@@ -105,16 +97,6 @@ function SATTestList() {
                     >
                       {locked ? "Upgrade to Access" : "Start Test"}
                     </button>
-                    {test.pdfUrl && (
-                      <a
-                        href={test.pdfUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
-                      >
-                        <Icon name="picture_as_pdf" className="text-[16px]" /> View PDF
-                      </a>
-                    )}
                   </div>
                 </div>
               </div>

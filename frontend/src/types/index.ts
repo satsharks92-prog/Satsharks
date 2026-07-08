@@ -198,6 +198,7 @@ export interface SATTest {
   description: string;
   year: number;
   testNumber: number;
+  isAdaptive?: boolean;
   modules: SATModule[];
   breakDurationMinutes: number;
   isActive: boolean;

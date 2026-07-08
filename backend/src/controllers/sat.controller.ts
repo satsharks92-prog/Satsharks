@@ -12,28 +12,53 @@ export const getSATTests = async (req: AuthRequest, res: Response) => {
     if (userSub === "FREE") filter.accessLevel = "FREE";
 
     const tests = await SATTest.find(filter)
-      .select("-modules.questions")
       .sort({ year: -1, testNumber: 1 });
 
     const testsWithMeta = await Promise.all(
       tests.map(async (t) => {
         const doc = t.toObject();
-        const totalQuestions = t.modules.reduce((s, m) => s + m.questions.length, 0);
-        const totalMinutes = t.modules.reduce((s, m) => s + m.timeLimitMinutes, 0) + t.breakDurationMinutes;
+        
+        let totalQuestions = 0;
+        let totalMinutes = 0;
+        let modulesSummary = [];
+
+        if (t.isAdaptive) {
+          // Adaptive: student only takes 4 modules: Mod 1 & Mod 2 of R&W, Mod 1 & Mod 2 of Math.
+          const rw1 = t.modules[0];
+          const rw2 = t.modules[1]; // Easier (or Harder, they have same count/time)
+          const math1 = t.modules[3];
+          const math2 = t.modules[4]; // Easier (or Harder)
+
+          totalQuestions = (rw1?.questions?.length || 0) + (rw2?.questions?.length || 0) + (math1?.questions?.length || 0) + (math2?.questions?.length || 0);
+          totalMinutes = (rw1?.timeLimitMinutes || 0) + (rw2?.timeLimitMinutes || 0) + (math1?.timeLimitMinutes || 0) + (math2?.timeLimitMinutes || 0) + t.breakDurationMinutes;
+
+          modulesSummary = [
+            { name: "Reading & Writing Module 1", section: "READING_WRITING" as const, questionCount: rw1?.questions?.length || 0, timeLimitMinutes: rw1?.timeLimitMinutes || 0 },
+            { name: "Reading & Writing Module 2 (Adaptive)", section: "READING_WRITING" as const, questionCount: rw2?.questions?.length || 0, timeLimitMinutes: rw2?.timeLimitMinutes || 0 },
+            { name: "Math Module 1", section: "MATH" as const, questionCount: math1?.questions?.length || 0, timeLimitMinutes: math1?.timeLimitMinutes || 0 },
+            { name: "Math Module 2 (Adaptive)", section: "MATH" as const, questionCount: math2?.questions?.length || 0, timeLimitMinutes: math2?.timeLimitMinutes || 0 }
+          ];
+        } else {
+          totalQuestions = t.modules.reduce((s, m) => s + (m.questions?.length || 0), 0);
+          totalMinutes = t.modules.reduce((s, m) => s + m.timeLimitMinutes, 0) + t.breakDurationMinutes;
+          modulesSummary = t.modules.map((m) => ({
+            name: m.name,
+            section: m.section,
+            questionCount: m.questions?.length || 0,
+            timeLimitMinutes: m.timeLimitMinutes,
+          }));
+        }
+
         const attemptCount = await SATTestAttempt.countDocuments({
           student: req.user?.userId, test: t._id, status: "COMPLETED",
         });
+
         return {
           ...doc,
           totalQuestions,
           totalMinutes,
           attemptCount,
-          modulesSummary: t.modules.map((m) => ({
-            name: m.name,
-            section: m.section,
-            questionCount: m.questions.length,
-            timeLimitMinutes: m.timeLimitMinutes,
-          })),
+          modulesSummary,
         };
       })
     );
@@ -76,7 +101,15 @@ export const startSATTest = async (req: AuthRequest, res: Response) => {
       correctCount: 0,
     }));
 
-    const totalQuestions = test.modules.reduce((s, m) => s + m.questions.length, 0);
+    let totalQuestions = 0;
+    if (test.isAdaptive) {
+      totalQuestions = (test.modules[0]?.questions.length || 0) +
+                       (test.modules[1]?.questions.length || 0) +
+                       (test.modules[3]?.questions.length || 0) +
+                       (test.modules[4]?.questions.length || 0);
+    } else {
+      totalQuestions = test.modules.reduce((s, m) => s + m.questions.length, 0);
+    }
 
     const attempt = await SATTestAttempt.create({
       student: req.user?.userId,
@@ -168,21 +201,41 @@ export const completeModule = async (req: AuthRequest, res: Response) => {
     modAttempt.score = correctCount;
     modAttempt.completedAt = new Date();
 
-    const nextModuleIndex = moduleIndex + 1;
-    const isBreakPoint = moduleIndex === 1 && test.modules.length > 2;
+    let nextModuleIndex = moduleIndex + 1;
+    let isBreakPoint = false;
+
+    if (test.isAdaptive) {
+      const scorePct = modAttempt.totalQuestions > 0 ? (correctCount / modAttempt.totalQuestions) * 100 : 0;
+      
+      if (moduleIndex === 0) {
+        // R&W Module 1 completed: route to R&W Module 2 (index 2 for Harder >= 65%, index 1 for Easier < 65%)
+        nextModuleIndex = scorePct >= 65 ? 2 : 1;
+      } else if (moduleIndex === 1 || moduleIndex === 2) {
+        // R&W Module 2 (Easier or Harder) completed: go to break, next is Math Module 1 (index 3)
+        isBreakPoint = true;
+        nextModuleIndex = 3;
+      } else if (moduleIndex === 3) {
+        // Math Module 1 completed: route to Math Module 2 (index 5 for Harder >= 65%, index 4 for Easier < 65%)
+        nextModuleIndex = scorePct >= 65 ? 5 : 4;
+      } else if (moduleIndex === 4 || moduleIndex === 5) {
+        // Math Module 2 (Easier or Harder) completed: end of test
+        return finalizeAttempt(attempt, res);
+      }
+    } else {
+      // Linear logic
+      nextModuleIndex = moduleIndex + 1;
+      isBreakPoint = moduleIndex === 1 && test.modules.length > 2;
+    }
 
     if (isBreakPoint) {
-      // After R&W Module 2, start break
       attempt.status = "ON_BREAK";
       attempt.breakStartedAt = new Date();
       attempt.currentModuleIndex = nextModuleIndex;
-    } else if (nextModuleIndex < test.modules.length) {
-      // Move to next module
+    } else if ((test.isAdaptive && nextModuleIndex < 6) || (!test.isAdaptive && nextModuleIndex < test.modules.length)) {
       attempt.currentModuleIndex = nextModuleIndex;
       attempt.moduleAttempts[nextModuleIndex].startedAt = new Date();
       attempt.status = "IN_PROGRESS";
     } else {
-      // All modules complete — finalize
       return finalizeAttempt(attempt, res);
     }
 
@@ -239,7 +292,12 @@ async function finalizeAttempt(attempt: any, res: Response) {
   let totalQuestions = 0;
   let totalTime = 0;
 
+  const test = await SATTest.findById(attempt.test);
+  const isAdaptive = test?.isAdaptive || false;
+
   for (const mod of attempt.moduleAttempts) {
+    if (isAdaptive && !mod.startedAt) continue;
+    
     totalCorrect += mod.correctCount;
     totalQuestions += mod.totalQuestions;
     if (mod.startedAt && mod.completedAt) {
@@ -267,7 +325,13 @@ export const getSATAttempt = async (req: AuthRequest, res: Response) => {
     const attempt = await SATTestAttempt.findOne({
       _id: req.params.id, student: req.user?.userId,
     })
-      .populate({ path: "test", select: "title year testNumber modules.name modules.section modules.timeLimitMinutes breakDurationMinutes" })
+      .populate({
+        path: "test",
+        populate: {
+          path: "modules.questions",
+          select: "text options correctAnswer explanation difficulty category"
+        }
+      })
       .populate({ path: "moduleAttempts.answers.question", select: "text options correctAnswer explanation difficulty category" });
 
     if (!attempt) return res.status(404).json({ success: false, error: "Attempt not found" });
@@ -297,6 +361,36 @@ export const getAllSATTestsAdmin = async (req: Request, res: Response) => {
   try {
     const tests = await SATTest.find().sort({ year: -1, testNumber: 1 });
     res.status(200).json({ success: true, tests });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// --- Admin: update SAT test active status / access level ---
+export const updateSATTestAdmin = async (req: Request, res: Response) => {
+  try {
+    const { title, year, testNumber, isActive, accessLevel } = req.body;
+    const update: any = {};
+    if (title !== undefined) update.title = title;
+    if (year !== undefined) update.year = year;
+    if (testNumber !== undefined) update.testNumber = testNumber;
+    if (isActive !== undefined) update.isActive = isActive;
+    if (accessLevel !== undefined) update.accessLevel = accessLevel;
+
+    const test = await SATTest.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (!test) return res.status(404).json({ success: false, error: "Test not found" });
+    res.status(200).json({ success: true, test });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+// --- Admin: delete SAT test ---
+export const deleteSATTestAdmin = async (req: Request, res: Response) => {
+  try {
+    const test = await SATTest.findByIdAndDelete(req.params.id);
+    if (!test) return res.status(404).json({ success: false, error: "Test not found" });
+    res.status(200).json({ success: true, message: "Test deleted" });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }
