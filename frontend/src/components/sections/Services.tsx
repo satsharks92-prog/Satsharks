@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Icon } from "../common/Icon";
+import { Link } from "@tanstack/react-router";
 
 export function Services() {
   const services = [
@@ -96,13 +97,13 @@ export function Services() {
 
               {/* Bottom Call to Action */}
               <div className="pt-6 mt-6 border-t border-outline-variant/30">
-                <a
-                  href="#booking"
+                <Link
+                  to="/booking"
                   className="inline-flex items-center gap-2 font-body text-[11px] font-bold uppercase tracking-[0.1em] text-accent group-hover:text-primary transition-all duration-300"
                 >
                   Request Details 
                   <Icon name="arrow_forward" className="text-[14px] group-hover:translate-x-1 transition-transform" />
-                </a>
+                </Link>
               </div>
             </motion.article>
           ))}

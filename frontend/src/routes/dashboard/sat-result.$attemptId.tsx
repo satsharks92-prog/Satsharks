@@ -158,25 +158,83 @@ function SATResult() {
                     {mod.answers.map((ans, ai) => {
                       const q = ans.question as Question;
                       if (!q || typeof q === "string") return null;
+
+                      const isAttempted = !!ans.selectedAnswer;
+                      let cardStyle = "border-outline-variant/40 bg-surface-container-low/20";
+                      let badgeText = "Not Attempted";
+                      let badgeVariant: "success" | "error" | "warning" | "info" | "default" = "warning";
+
+                      if (isAttempted) {
+                        if (ans.isCorrect) {
+                          cardStyle = "border-primary/30 bg-primary/5";
+                          badgeText = "Correct";
+                          badgeVariant = "success";
+                        } else {
+                          cardStyle = "border-error/30 bg-error/5";
+                          badgeText = "Incorrect";
+                          badgeVariant = "error";
+                        }
+                      }
+
                       return (
                         <div
                           key={ai}
-                          className={`p-4 rounded-lg border ${ans.isCorrect ? "border-primary/20 bg-primary/5" : "border-error/20 bg-error/5"}`}
+                          className={`rounded-xl p-6 border transition-all duration-300 hover:shadow-sm ${cardStyle}`}
                         >
-                          <div className="flex items-start justify-between mb-2">
-                            <span className="font-mono text-xs text-on-surface-variant">Q{ai + 1}</span>
-                            <Badge variant={ans.isCorrect ? "success" : "error"}>
-                              {ans.isCorrect ? "Correct" : "Incorrect"}
+                          <div className="flex items-start justify-between mb-3">
+                            <span className="font-mono text-xs text-on-surface-variant font-semibold">Question {ai + 1}</span>
+                            <Badge variant={badgeVariant}>
+                              {badgeText}
                             </Badge>
                           </div>
-                          <p className="text-sm mb-3 leading-relaxed line-clamp-3">{q.text}</p>
-                          <div className="flex gap-4 text-xs">
-                            <span>Your answer: <strong className={ans.isCorrect ? "text-primary" : "text-error"}>{ans.selectedAnswer || "—"}</strong></span>
-                            {!ans.isCorrect && <span>Correct: <strong className="text-primary">{q.correctAnswer}</strong></span>}
-                          </div>
+                          <p className="text-sm mb-4 leading-relaxed text-on-surface whitespace-pre-wrap">{q.text}</p>
+                          
+                          {q.options && q.options.length > 0 ? (
+                            <div className="space-y-2">
+                              {q.options.map((opt) => {
+                                const isSelected = ans.selectedAnswer === opt.label;
+                                const isCorrectOption = q.correctAnswer === opt.label;
+                                return (
+                                  <div
+                                    key={opt.label}
+                                    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-colors border ${
+                                      isCorrectOption
+                                        ? "bg-primary/15 text-primary font-semibold border-primary/30"
+                                        : isSelected && !ans.isCorrect
+                                        ? "bg-error/15 text-error border-error/30"
+                                        : "text-on-surface-variant border-transparent"
+                                    }`}
+                                  >
+                                    <span className="font-bold w-6">{opt.label}.</span>
+                                    <span>{opt.text}</span>
+                                    {isCorrectOption && <Icon name="check_circle" className="ml-auto text-primary text-[18px]" />}
+                                    {isSelected && !isCorrectOption && <Icon name="cancel" className="ml-auto text-error text-[18px]" />}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          ) : (
+                            /* Display answers for student-produced responses */
+                            <div className="space-y-2 bg-surface-container-low p-4 rounded-xl border border-outline-variant/30 text-sm max-w-md">
+                              <div className="flex justify-between items-center">
+                                <span className="text-on-surface-variant font-medium">Your Answer:</span>
+                                <span className={`font-mono font-bold ${!isAttempted ? "text-on-surface-variant italic" : ans.isCorrect ? "text-primary" : "text-error"}`}>
+                                  {ans.selectedAnswer || "Not Attempted"}
+                                </span>
+                              </div>
+                              <div className="flex justify-between items-center border-t border-outline-variant/30 pt-2">
+                                <span className="text-on-surface-variant font-medium">Correct Answer:</span>
+                                <span className="font-mono font-bold text-primary">
+                                  {q.correctAnswer}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+
                           {q.explanation && (
-                            <div className="mt-2 p-2 rounded bg-surface-container-low text-xs text-on-surface-variant">
-                              {q.explanation}
+                            <div className="mt-4 p-3 rounded-lg bg-surface-container-low text-xs text-on-surface-variant border border-outline-variant/20">
+                              <strong className="block mb-1 text-on-surface">Explanation:</strong> 
+                              <div className="whitespace-pre-wrap leading-relaxed">{q.explanation}</div>
                             </div>
                           )}
                         </div>

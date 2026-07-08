@@ -6,8 +6,6 @@ import { Hero } from "../components/sections/Hero";
 import { Stats } from "../components/sections/Stats";
 import { Services } from "../components/sections/Services";
 import { Testimonials } from "../components/sections/Testimonials";
-import { Process } from "../components/sections/Process";
-import { Booking } from "../components/sections/Booking";
 import { CTA } from "../components/sections/CTA";
 
 export const Route = createFileRoute("/")({
@@ -41,8 +39,6 @@ function Landing() {
         <Stats />
         <Services />
         <Testimonials />
-        <Process />
-        <Booking />
         <CTA />
       </main>
       <Footer />

@@ -185,16 +185,26 @@ export const completeModule = async (req: AuthRequest, res: Response) => {
     const questionMap = new Map(questions.map((q) => [q._id.toString(), q]));
 
     let correctCount = 0;
-    modAttempt.answers = (answers || []).map((a: any) => {
-      const q = questionMap.get(a.question);
-      const isCorrect = q ? q.correctAnswer === a.selectedAnswer : false;
+    const incomingAnswersMap = new Map<string, any>((answers || []).map((a: any) => [a.question.toString(), a]));
+
+    modAttempt.answers = mod.questions.map((qIdRef) => {
+      const qIdStr = qIdRef.toString();
+      const q = questionMap.get(qIdStr);
+      const incomingAns = incomingAnswersMap.get(qIdStr);
+      
+      const selectedAnswer = incomingAns?.selectedAnswer || null;
+      const isCorrect = q && selectedAnswer
+        ? q.correctAnswer.trim().toLowerCase() === selectedAnswer.trim().toLowerCase()
+        : false;
+
       if (isCorrect) correctCount++;
+
       return {
-        question: a.question,
-        selectedAnswer: a.selectedAnswer || null,
+        question: qIdRef,
+        selectedAnswer,
         isCorrect,
-        markedForReview: a.markedForReview || false,
-        timeSpent: a.timeSpent || 0,
+        markedForReview: incomingAns?.markedForReview || false,
+        timeSpent: incomingAns?.timeSpent || 0,
       };
     });
     modAttempt.correctCount = correctCount;
@@ -335,7 +345,50 @@ export const getSATAttempt = async (req: AuthRequest, res: Response) => {
       .populate({ path: "moduleAttempts.answers.question", select: "text options correctAnswer explanation difficulty category" });
 
     if (!attempt) return res.status(404).json({ success: false, error: "Attempt not found" });
-    res.status(200).json({ success: true, attempt });
+
+    const attemptObj = attempt.toObject();
+    const test = attemptObj.test as any;
+
+    if (test && test.modules) {
+      for (const ma of attemptObj.moduleAttempts) {
+        if (!ma.startedAt) continue;
+        const testMod = test.modules[ma.moduleIndex];
+        if (!testMod || !testMod.questions) continue;
+
+        // Map existing answers by question ID
+        const existingAnswersMap = new Map();
+        for (const ans of ma.answers) {
+          const qId = ans.question?._id?.toString() || ans.question?.toString();
+          if (qId) {
+            existingAnswersMap.set(qId, ans);
+          }
+        }
+
+        // Reconstruct answers list to match all questions of the module in order
+        const fullAnswers = testMod.questions.map((q: any) => {
+          const qId = q._id?.toString() || q.toString();
+          const existing = existingAnswersMap.get(qId);
+          if (existing) {
+            return {
+              ...existing,
+              question: q
+            };
+          } else {
+            return {
+              question: q,
+              selectedAnswer: null,
+              isCorrect: false,
+              markedForReview: false,
+              timeSpent: 0
+            };
+          }
+        });
+
+        ma.answers = fullAnswers;
+      }
+    }
+
+    res.status(200).json({ success: true, attempt: attemptObj });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }

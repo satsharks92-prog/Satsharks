@@ -13,10 +13,10 @@ import { Route as SuccessStoriesRouteImport } from './routes/success-stories'
 import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as BookingRouteImport } from './routes/booking'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as DashboardTestsRouteImport } from './routes/dashboard/tests'
 import { Route as DashboardSatTestsRouteImport } from './routes/dashboard/sat-tests'
 import { Route as DashboardPracticeRouteImport } from './routes/dashboard/practice'
 import { Route as DashboardHistoryRouteImport } from './routes/dashboard/history'
@@ -31,8 +31,6 @@ import { Route as AdminTestsRouteImport } from './routes/admin/tests'
 import { Route as AdminSuccessStoriesRouteImport } from './routes/admin/success-stories'
 import { Route as AdminQuestionsRouteImport } from './routes/admin/questions'
 import { Route as AdminContactRequestsRouteImport } from './routes/admin/contact-requests'
-import { Route as DashboardTestResultAttemptIdRouteImport } from './routes/dashboard/test-result.$attemptId'
-import { Route as DashboardTakeTestAttemptIdRouteImport } from './routes/dashboard/take-test.$attemptId'
 import { Route as DashboardSatRunnerAttemptIdRouteImport } from './routes/dashboard/sat-runner.$attemptId'
 import { Route as DashboardSatResultAttemptIdRouteImport } from './routes/dashboard/sat-result.$attemptId'
 import { Route as AdminReviewUploadUploadIdRouteImport } from './routes/admin/review-upload.$uploadId'
@@ -57,6 +55,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BookingRoute = BookingRouteImport.update({
+  id: '/booking',
+  path: '/booking',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -71,11 +74,6 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardTestsRoute = DashboardTestsRouteImport.update({
-  id: '/tests',
-  path: '/tests',
-  getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardSatTestsRoute = DashboardSatTestsRouteImport.update({
   id: '/sat-tests',
@@ -147,18 +145,6 @@ const AdminContactRequestsRoute = AdminContactRequestsRouteImport.update({
   path: '/admin/contact-requests',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DashboardTestResultAttemptIdRoute =
-  DashboardTestResultAttemptIdRouteImport.update({
-    id: '/test-result/$attemptId',
-    path: '/test-result/$attemptId',
-    getParentRoute: () => DashboardRoute,
-  } as any)
-const DashboardTakeTestAttemptIdRoute =
-  DashboardTakeTestAttemptIdRouteImport.update({
-    id: '/take-test/$attemptId',
-    path: '/take-test/$attemptId',
-    getParentRoute: () => DashboardRoute,
-  } as any)
 const DashboardSatRunnerAttemptIdRoute =
   DashboardSatRunnerAttemptIdRouteImport.update({
     id: '/sat-runner/$attemptId',
@@ -180,6 +166,7 @@ const AdminReviewUploadUploadIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/booking': typeof BookingRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/subscriptions': typeof SubscriptionsRoute
@@ -198,17 +185,15 @@ export interface FileRoutesByFullPath {
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
   '/dashboard/sat-tests': typeof DashboardSatTestsRoute
-  '/dashboard/tests': typeof DashboardTestsRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/admin/review-upload/$uploadId': typeof AdminReviewUploadUploadIdRoute
   '/dashboard/sat-result/$attemptId': typeof DashboardSatResultAttemptIdRoute
   '/dashboard/sat-runner/$attemptId': typeof DashboardSatRunnerAttemptIdRoute
-  '/dashboard/take-test/$attemptId': typeof DashboardTakeTestAttemptIdRoute
-  '/dashboard/test-result/$attemptId': typeof DashboardTestResultAttemptIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/booking': typeof BookingRoute
   '/contact': typeof ContactRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/success-stories': typeof SuccessStoriesRoute
@@ -226,18 +211,16 @@ export interface FileRoutesByTo {
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
   '/dashboard/sat-tests': typeof DashboardSatTestsRoute
-  '/dashboard/tests': typeof DashboardTestsRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/admin/review-upload/$uploadId': typeof AdminReviewUploadUploadIdRoute
   '/dashboard/sat-result/$attemptId': typeof DashboardSatResultAttemptIdRoute
   '/dashboard/sat-runner/$attemptId': typeof DashboardSatRunnerAttemptIdRoute
-  '/dashboard/take-test/$attemptId': typeof DashboardTakeTestAttemptIdRoute
-  '/dashboard/test-result/$attemptId': typeof DashboardTestResultAttemptIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/booking': typeof BookingRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/subscriptions': typeof SubscriptionsRoute
@@ -256,19 +239,17 @@ export interface FileRoutesById {
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
   '/dashboard/sat-tests': typeof DashboardSatTestsRoute
-  '/dashboard/tests': typeof DashboardTestsRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/admin/review-upload/$uploadId': typeof AdminReviewUploadUploadIdRoute
   '/dashboard/sat-result/$attemptId': typeof DashboardSatResultAttemptIdRoute
   '/dashboard/sat-runner/$attemptId': typeof DashboardSatRunnerAttemptIdRoute
-  '/dashboard/take-test/$attemptId': typeof DashboardTakeTestAttemptIdRoute
-  '/dashboard/test-result/$attemptId': typeof DashboardTestResultAttemptIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/booking'
     | '/contact'
     | '/dashboard'
     | '/subscriptions'
@@ -287,17 +268,15 @@ export interface FileRouteTypes {
     | '/dashboard/history'
     | '/dashboard/practice'
     | '/dashboard/sat-tests'
-    | '/dashboard/tests'
     | '/admin/'
     | '/dashboard/'
     | '/admin/review-upload/$uploadId'
     | '/dashboard/sat-result/$attemptId'
     | '/dashboard/sat-runner/$attemptId'
-    | '/dashboard/take-test/$attemptId'
-    | '/dashboard/test-result/$attemptId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/booking'
     | '/contact'
     | '/subscriptions'
     | '/success-stories'
@@ -315,17 +294,15 @@ export interface FileRouteTypes {
     | '/dashboard/history'
     | '/dashboard/practice'
     | '/dashboard/sat-tests'
-    | '/dashboard/tests'
     | '/admin'
     | '/dashboard'
     | '/admin/review-upload/$uploadId'
     | '/dashboard/sat-result/$attemptId'
     | '/dashboard/sat-runner/$attemptId'
-    | '/dashboard/take-test/$attemptId'
-    | '/dashboard/test-result/$attemptId'
   id:
     | '__root__'
     | '/'
+    | '/booking'
     | '/contact'
     | '/dashboard'
     | '/subscriptions'
@@ -344,18 +321,16 @@ export interface FileRouteTypes {
     | '/dashboard/history'
     | '/dashboard/practice'
     | '/dashboard/sat-tests'
-    | '/dashboard/tests'
     | '/admin/'
     | '/dashboard/'
     | '/admin/review-upload/$uploadId'
     | '/dashboard/sat-result/$attemptId'
     | '/dashboard/sat-runner/$attemptId'
-    | '/dashboard/take-test/$attemptId'
-    | '/dashboard/test-result/$attemptId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BookingRoute: typeof BookingRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   SubscriptionsRoute: typeof SubscriptionsRoute
@@ -404,6 +379,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/booking': {
+      id: '/booking'
+      path: '/booking'
+      fullPath: '/booking'
+      preLoaderRoute: typeof BookingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -424,13 +406,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/dashboard/tests': {
-      id: '/dashboard/tests'
-      path: '/tests'
-      fullPath: '/dashboard/tests'
-      preLoaderRoute: typeof DashboardTestsRouteImport
-      parentRoute: typeof DashboardRoute
     }
     '/dashboard/sat-tests': {
       id: '/dashboard/sat-tests'
@@ -530,20 +505,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContactRequestsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/test-result/$attemptId': {
-      id: '/dashboard/test-result/$attemptId'
-      path: '/test-result/$attemptId'
-      fullPath: '/dashboard/test-result/$attemptId'
-      preLoaderRoute: typeof DashboardTestResultAttemptIdRouteImport
-      parentRoute: typeof DashboardRoute
-    }
-    '/dashboard/take-test/$attemptId': {
-      id: '/dashboard/take-test/$attemptId'
-      path: '/take-test/$attemptId'
-      fullPath: '/dashboard/take-test/$attemptId'
-      preLoaderRoute: typeof DashboardTakeTestAttemptIdRouteImport
-      parentRoute: typeof DashboardRoute
-    }
     '/dashboard/sat-runner/$attemptId': {
       id: '/dashboard/sat-runner/$attemptId'
       path: '/sat-runner/$attemptId'
@@ -573,12 +534,9 @@ interface DashboardRouteChildren {
   DashboardHistoryRoute: typeof DashboardHistoryRoute
   DashboardPracticeRoute: typeof DashboardPracticeRoute
   DashboardSatTestsRoute: typeof DashboardSatTestsRoute
-  DashboardTestsRoute: typeof DashboardTestsRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardSatResultAttemptIdRoute: typeof DashboardSatResultAttemptIdRoute
   DashboardSatRunnerAttemptIdRoute: typeof DashboardSatRunnerAttemptIdRoute
-  DashboardTakeTestAttemptIdRoute: typeof DashboardTakeTestAttemptIdRoute
-  DashboardTestResultAttemptIdRoute: typeof DashboardTestResultAttemptIdRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
@@ -586,12 +544,9 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardHistoryRoute: DashboardHistoryRoute,
   DashboardPracticeRoute: DashboardPracticeRoute,
   DashboardSatTestsRoute: DashboardSatTestsRoute,
-  DashboardTestsRoute: DashboardTestsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardSatResultAttemptIdRoute: DashboardSatResultAttemptIdRoute,
   DashboardSatRunnerAttemptIdRoute: DashboardSatRunnerAttemptIdRoute,
-  DashboardTakeTestAttemptIdRoute: DashboardTakeTestAttemptIdRoute,
-  DashboardTestResultAttemptIdRoute: DashboardTestResultAttemptIdRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
@@ -600,6 +555,7 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BookingRoute: BookingRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   SubscriptionsRoute: SubscriptionsRoute,

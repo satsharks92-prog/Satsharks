@@ -48,10 +48,10 @@ function TestHistory() {
         <EmptyState
           icon="history"
           title="No test history yet"
-          description="Complete a diagnostic test to see your results here"
+          description="Complete a Digital SAT practice test to see your results here"
           action={
             <Link
-              to="/dashboard/tests"
+              to="/dashboard/sat-tests"
               className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-2.5 text-sm font-semibold text-on-primary hover:bg-accent transition-colors"
             >
               <Icon name="quiz" className="text-[18px]" /> Take a Test
@@ -83,7 +83,7 @@ function TestHistory() {
                       <Badge variant="info">{sectionLabel(a.test?.section || "FULL")}</Badge>
                     </td>
                     <td className="p-4 font-mono font-bold text-sm">
-                      {a.correctCount}/{a.totalQuestions}
+                      {a.totalCorrect ?? a.correctCount ?? 0}/{a.totalQuestions}
                     </td>
                     <td className="p-4">
                       <Badge variant={a.percentage >= 70 ? "success" : a.percentage >= 50 ? "warning" : "error"}>
@@ -91,14 +91,14 @@ function TestHistory() {
                       </Badge>
                     </td>
                     <td className="p-4 text-sm text-on-surface-variant">
-                      {Math.floor(a.timeTaken / 60)}m {a.timeTaken % 60}s
+                      {Math.floor((a.totalTimeTaken ?? a.timeTaken ?? 0) / 60)}m {(a.totalTimeTaken ?? a.timeTaken ?? 0) % 60}s
                     </td>
                     <td className="p-4 text-sm text-on-surface-variant">
                       {new Date(a.completedAt || a.createdAt).toLocaleDateString()}
                     </td>
                     <td className="p-4">
                       <Link
-                        to={`/dashboard/test-result/${a._id}`}
+                        to={`/dashboard/sat-result/${a._id}`}
                         className="text-primary hover:underline text-sm font-semibold"
                       >
                         Review

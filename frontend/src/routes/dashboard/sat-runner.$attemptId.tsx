@@ -362,9 +362,8 @@ function SATRunner() {
 
           {/* Center Timer */}
           <div className="flex flex-col items-center gap-1 justify-self-center">
-            <div className={`flex items-center gap-2 font-mono text-base font-bold min-w-[70px] justify-center transition-opacity ${
-              showTime ? "text-primary opacity-100" : "text-transparent opacity-0 pointer-events-none select-none"
-            } ${isWarning && showTime ? "text-error animate-pulse" : ""}`}>
+            <div className={`flex items-center gap-2 font-mono text-base font-bold min-w-[70px] justify-center transition-opacity ${showTime ? "text-primary opacity-100" : "text-transparent opacity-0 pointer-events-none select-none"
+              } ${isWarning && showTime ? "text-error animate-pulse" : ""}`}>
               <Icon name="timer" className="text-[18px]" />
               {formatTime(timeLeft)}
             </div>
@@ -433,14 +432,13 @@ function SATRunner() {
                     </span>
                     <span className="text-xs font-bold text-on-surface-variant uppercase tracking-wider">Question</span>
                   </div>
-                  
+
                   <button
                     onClick={() => toggleReview(q._id)}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                      currentAnswer?.markedForReview
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${currentAnswer?.markedForReview
                         ? "bg-accent text-primary"
                         : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high"
-                    }`}
+                      }`}
                   >
                     <Icon name={currentAnswer?.markedForReview ? "flag" : "outlined_flag"} className="text-[14px]" />
                     <span>{currentAnswer?.markedForReview ? "Flagged" : "Flag"}</span>
@@ -459,18 +457,16 @@ function SATRunner() {
                           <button
                             key={opt.label}
                             onClick={() => selectAnswer(q._id, opt.label)}
-                            className={`w-full flex items-center gap-4 py-3 px-4 rounded-xl border-2 text-left transition-all cursor-pointer ${
-                              selected
+                            className={`w-full flex items-center gap-4 py-3 px-4 rounded-xl border-2 text-left transition-all cursor-pointer ${selected
                                 ? "border-primary bg-primary/5 shadow-sm"
                                 : "border-outline-variant/40 hover:border-primary/40 hover:bg-surface-container-low"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                                selected
+                              className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${selected
                                   ? "bg-primary text-on-primary"
                                   : "bg-surface-container-high text-on-surface"
-                              }`}
+                                }`}
                             >
                               {opt.label}
                             </span>
@@ -508,11 +504,10 @@ function SATRunner() {
 
                   <button
                     onClick={() => toggleReview(q._id)}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${
-                      currentAnswer?.markedForReview
+                    className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition-colors cursor-pointer ${currentAnswer?.markedForReview
                         ? "bg-accent text-primary"
                         : "bg-surface-container-low text-on-surface-variant hover:bg-surface-container-high"
-                    }`}
+                      }`}
                   >
                     <Icon name={currentAnswer?.markedForReview ? "flag" : "outlined_flag"} className="text-[14px]" />
                     <span>{currentAnswer?.markedForReview ? "Flagged" : "Flag"}</span>
@@ -527,18 +522,16 @@ function SATRunner() {
                           <button
                             key={opt.label}
                             onClick={() => selectAnswer(q._id, opt.label)}
-                            className={`w-full flex items-center gap-4 py-3 px-4 rounded-xl border-2 text-left transition-all cursor-pointer ${
-                              selected
+                            className={`w-full flex items-center gap-4 py-3 px-4 rounded-xl border-2 text-left transition-all cursor-pointer ${selected
                                 ? "border-primary bg-primary/5 shadow-sm"
                                 : "border-outline-variant/40 hover:border-primary/40 hover:bg-surface-container-low"
-                            }`}
+                              }`}
                           >
                             <span
-                              className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
-                                selected
+                              className={`flex-shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${selected
                                   ? "bg-primary text-on-primary"
                                   : "bg-surface-container-high text-on-surface"
-                              }`}
+                                }`}
                             >
                               {opt.label}
                             </span>
@@ -611,15 +604,14 @@ function SATRunner() {
                           setCurrentQuestionIndex(i);
                           setShowNavGrid(false);
                         }}
-                        className={`relative h-9 w-9 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                          isCurrent
+                        className={`relative h-9 w-9 rounded-lg text-xs font-bold transition-all cursor-pointer ${isCurrent
                             ? isAnswered
                               ? "bg-primary text-on-primary border-b-[3px] border-b-accent ring-2 ring-primary/40 ring-offset-1"
                               : "bg-surface-container-low text-on-surface border-b-[3px] border-b-primary border-x border-t border-outline-variant/40 ring-2 ring-primary/40 ring-offset-1"
                             : isAnswered
-                            ? "bg-primary text-on-primary hover:bg-primary/90"
-                            : "bg-surface-container-low text-on-surface-variant/70 border border-outline-variant/30 hover:bg-surface-container-high"
-                        }`}
+                              ? "bg-primary text-on-primary hover:bg-primary/90"
+                              : "bg-surface-container-low text-on-surface-variant/70 border border-outline-variant/30 hover:bg-surface-container-high"
+                          }`}
                       >
                         {i + 1}
                         {isReview && (

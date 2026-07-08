@@ -65,7 +65,7 @@ function DashboardHome() {
               ) : (
                 <div className="text-center py-8">
                   <Icon name="psychology" className="text-4xl text-on-surface-variant/40 mb-2" />
-                  <p className="text-sm text-on-surface-variant">Take a diagnostic test to see your predicted score</p>
+                  <p className="text-sm text-on-surface-variant">Take a Digital SAT practice test to see your predicted score</p>
                 </div>
               )}
             </div>
@@ -82,7 +82,7 @@ function DashboardHome() {
                   {recentAttempts.map((a: any) => (
                     <Link
                       key={a._id}
-                      to={`/dashboard/test-result/${a._id}`}
+                      to={`/dashboard/sat-result/${a._id}`}
                       className="flex items-center justify-between p-4 rounded-xl border border-outline-variant/30 hover:bg-surface-container-low transition-colors group"
                     >
                       <div>
