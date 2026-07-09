@@ -2,6 +2,7 @@ import { Response } from "express";
 import PracticeSession from "../models/PracticeSession";
 import Question from "../models/Question";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { checkAnswerCorrectness } from "../utils/grading";
 
 export const submitPracticeAnswer = async (req: AuthRequest, res: Response) => {
   try {
@@ -11,7 +12,7 @@ export const submitPracticeAnswer = async (req: AuthRequest, res: Response) => {
     const question = await Question.findById(questionId);
     if (!question) return res.status(404).json({ success: false, error: "Question not found" });
 
-    const isCorrect = question.correctAnswer === selectedAnswer;
+    const isCorrect = checkAnswerCorrectness(question.correctAnswer, selectedAnswer);
 
     const session = await PracticeSession.create({
       student: studentId,

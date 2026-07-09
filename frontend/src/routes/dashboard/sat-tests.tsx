@@ -83,6 +83,21 @@ function SATTestList() {
                       )}
                     </div>
                     <p className="text-xs text-on-surface-variant">Digital SAT Year: {test.year} · Exam #{test.testNumber}</p>
+                    
+                    {/* PDF Actions */}
+                    {!locked && test.explanationPdfUrl && (
+                      <div className="mt-4 flex gap-3 flex-wrap">
+                        <a
+                          href={test.explanationPdfUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors text-xs font-semibold text-on-surface cursor-pointer"
+                        >
+                          <Icon name="description" className="text-[14px]" />
+                          <span>Explanations (PDF)</span>
+                        </a>
+                      </div>
+                    )}
                   </div>
 
                   <div className="shrink-0">

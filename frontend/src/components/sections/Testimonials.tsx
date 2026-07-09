@@ -8,41 +8,24 @@ export function Testimonials() {
   const [stories, setStories] = useState<any[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
-  const defaultTestimonials = [
-    {
-      name: "Sarah M.",
-      score: "Scored 1580 (+210)",
-      destination: "Stanford University '28",
-      quote:
-        "The personalized study plan was a complete game-changer. I felt confident, focused, and fully prepared on test day. Getting into my dream school still feels surreal!",
-      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&h=256&q=80",
-      videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    },
-    {
-      name: "David L.",
-      score: "Scored 1550 (+180)",
-      destination: "Princeton University '29",
-      quote:
-        "The mentors genuinely care about your success. The study material and timed drills perfectly mirrored the actual exam environment, removing all test-day anxiety.",
-      imageUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&h=256&q=80",
-      videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-    },
-    {
-      name: "Emily R.",
-      score: "Scored 1590 (+150)",
-      destination: "Yale University '28",
-      quote:
-        "I was struggling to break 700 in the Math section, but the targeted problem walkthroughs helped me achieve a perfect 800. I couldn't have done it without SAT Sharks!",
-      imageUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=256&h=256&q=80",
-    },
-  ];
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    api.get("/api/success-stories").then((res) => {
-      if (res.success && res.stories && res.stories.length > 0) {
-        setStories(res.stories.slice(0, 3));
-      }
-    });
+    setIsLoading(true);
+    api.get("/api/success-stories")
+      .then((res) => {
+        if (res.success && res.stories && res.stories.length > 0) {
+          setStories(res.stories.slice(0, 3));
+        } else {
+          setStories([]);
+        }
+      })
+      .catch(() => {
+        setStories([]);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   const getEmbedUrl = (url: string) => {
@@ -65,7 +48,29 @@ export function Testimonials() {
     return embedUrl.includes("youtube.com/embed") || embedUrl.includes("vimeo.com/video");
   };
 
-  const displayStories = stories.length > 0 ? stories : defaultTestimonials;
+  const TestimonialSkeleton = () => (
+    <div className="relative rounded-2xl bg-surface p-8 md:p-10 shark-shadow border border-outline-variant/40 flex flex-col items-center text-center justify-between min-h-[420px] animate-pulse">
+      <div className="flex flex-col items-center w-full">
+        {/* Avatar skeleton */}
+        <div className="w-20 h-20 rounded-full bg-surface-container-high mb-4" />
+        {/* Name skeleton */}
+        <div className="h-4 w-24 bg-surface-container-high rounded mb-2" />
+        {/* Score skeleton */}
+        <div className="h-3 w-32 bg-surface-container-high rounded mb-2" />
+        {/* Destination skeleton */}
+        <div className="h-3 w-40 bg-surface-container-high rounded mb-4" />
+      </div>
+      <div className="w-full">
+        <div className="h-[1px] w-full bg-outline-variant/20 my-4" />
+        {/* Quote lines skeleton */}
+        <div className="space-y-2">
+          <div className="h-3 w-full bg-surface-container-low rounded" />
+          <div className="h-3 w-5/6 bg-surface-container-low rounded mx-auto" />
+          <div className="h-3 w-4/6 bg-surface-container-low rounded mx-auto" />
+        </div>
+      </div>
+    </div>
+  );
 
   const container = {
     hidden: { opacity: 0 },
@@ -115,60 +120,68 @@ export function Testimonials() {
           viewport={{ once: true, margin: "-100px" }}
           className="mt-20 grid gap-8 md:grid-cols-3"
         >
-          {displayStories.map((t) => (
-            <motion.figure
-              key={t._id || t.name}
-              variants={item}
-              whileHover={{ y: -6 }}
-              className="relative rounded-2xl bg-surface p-8 md:p-10 shark-shadow border border-outline-variant/40 flex flex-col items-center text-center justify-between min-h-[420px]"
-            >
-              <div className="flex flex-col items-center w-full">
-                {/* Centered Large Student Avatar on Top */}
-                {t.imageUrl ? (
-                  <img
-                    src={t.imageUrl}
-                    alt={t.name}
-                    className="w-20 h-20 rounded-full object-cover border-2 border-primary/20 shadow-md mb-4"
-                  />
-                ) : (
-                  <div className="grid h-20 w-20 place-items-center rounded-full bg-primary text-accent font-display text-2xl font-bold border-2 border-accent/30 shadow-md mb-4">
-                    {t.name.charAt(0)}
+          {isLoading ? (
+            <>
+              <TestimonialSkeleton />
+              <TestimonialSkeleton />
+              <TestimonialSkeleton />
+            </>
+          ) : (
+            stories.map((t) => (
+              <motion.figure
+                key={t._id || t.name}
+                variants={item}
+                whileHover={{ y: -6 }}
+                className="relative rounded-2xl bg-surface p-8 md:p-10 shark-shadow border border-outline-variant/40 flex flex-col items-center text-center justify-between min-h-[420px]"
+              >
+                <div className="flex flex-col items-center w-full">
+                  {/* Centered Large Student Avatar on Top */}
+                  {t.imageUrl ? (
+                    <img
+                      src={t.imageUrl}
+                      alt={t.name}
+                      className="w-20 h-20 rounded-full object-cover border-2 border-primary/20 shadow-md mb-4"
+                    />
+                  ) : (
+                    <div className="grid h-20 w-20 place-items-center rounded-full bg-primary text-accent font-display text-2xl font-bold border-2 border-accent/30 shadow-md mb-4">
+                      {t.name.charAt(0)}
+                    </div>
+                  )}
+                  
+                  {/* Student Info */}
+                  <div className="font-body text-base font-bold text-primary">{t.name}</div>
+                  <div className="font-body text-xs font-bold uppercase tracking-[0.05em] text-accent mt-1">
+                    {t.score}
                   </div>
-                )}
-                
-                {/* Student Info */}
-                <div className="font-body text-base font-bold text-primary">{t.name}</div>
-                <div className="font-body text-xs font-bold uppercase tracking-[0.05em] text-accent mt-1">
-                  {t.score}
+                  <div className="mt-1 text-xs text-on-surface-variant flex items-center justify-center gap-1">
+                    <Icon name="school" className="text-[14px]" /> {t.university || t.destination}
+                  </div>
+  
+                  {/* Centered Watch Video button */}
+                  {t.videoUrl && (
+                    <button
+                      onClick={() => setSelectedVideo(t.videoUrl)}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-on-primary px-3.5 py-1.5 font-body text-xs font-bold uppercase tracking-wider transition-all duration-300 mt-3 border border-primary/20 cursor-pointer shadow-sm"
+                      title="Watch Video Testimonial"
+                    >
+                      <Icon name="play_arrow" className="text-[12px]" />
+                      Watch Video
+                    </button>
+                  )}
                 </div>
-                <div className="mt-1 text-xs text-on-surface-variant flex items-center justify-center gap-1">
-                  <Icon name="school" className="text-[14px]" /> {t.university || t.destination}
+  
+                <div className="w-full">
+                  {/* Divider Line */}
+                  <div className="h-[1px] w-full bg-outline-variant/30 my-4" />
+  
+                  {/* Testimonial Quote */}
+                  <blockquote className="text-on-surface leading-relaxed text-sm italic font-light">
+                    "{t.quote}"
+                  </blockquote>
                 </div>
-
-                {/* Centered Watch Video button */}
-                {t.videoUrl && (
-                  <button
-                    onClick={() => setSelectedVideo(t.videoUrl)}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-on-primary px-3.5 py-1.5 font-body text-xs font-bold uppercase tracking-wider transition-all duration-300 mt-3 border border-primary/20 cursor-pointer shadow-sm"
-                    title="Watch Video Testimonial"
-                  >
-                    <Icon name="play_arrow" className="text-[12px]" />
-                    Watch Video
-                  </button>
-                )}
-              </div>
-
-              <div className="w-full">
-                {/* Divider Line */}
-                <div className="h-[1px] w-full bg-outline-variant/30 my-4" />
-
-                {/* Testimonial Quote */}
-                <blockquote className="text-on-surface leading-relaxed text-sm italic font-light">
-                  "{t.quote}"
-                </blockquote>
-              </div>
-            </motion.figure>
-          ))}
+              </motion.figure>
+            ))
+          )}
         </motion.div>
 
         {/* View All Stories Button */}

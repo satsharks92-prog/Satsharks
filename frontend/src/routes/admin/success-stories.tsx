@@ -7,7 +7,7 @@ import { Icon } from "../../components/common/Icon";
 import { Input } from "../../components/ui/Input";
 import { Textarea } from "../../components/ui/Textarea";
 import { EmptyState } from "../../components/ui/EmptyState";
-import { api } from "../../services/api";
+import { api, API_BASE_URL, resolveImageUrl } from "../../services/api";
 import { useAuth } from "../../hooks/useAuth";
 
 export const Route = createFileRoute("/admin/success-stories")({
@@ -35,14 +35,77 @@ function AdminSuccessStories() {
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Hero feature banner student state
+  const [heroFeature, setHeroFeature] = useState<any>(null);
+  const [isHeroModalOpen, setIsHeroModalOpen] = useState(false);
+  const [heroFormData, setHeroFormData] = useState({
+    studentName: "", university: "", score: "", improvement: "", tag: "", imageUrl: ""
+  });
+  const [heroError, setHeroError] = useState("");
+  const [isHeroSubmitting, setIsHeroSubmitting] = useState(false);
+
   const fetchStories = async () => {
     const res = await api.get("/api/success-stories");
     if (res.success) setStories(res.stories || []);
   };
 
+  const fetchHeroFeature = async () => {
+    const res = await api.get("/api/success-stories/featured");
+    if (res.success) setHeroFeature(res.feature);
+  };
+
   useEffect(() => {
-    if (user?.role === "ADMIN") fetchStories();
+    if (user?.role === "ADMIN") {
+      fetchStories();
+      fetchHeroFeature();
+    }
   }, [user]);
+
+  const uploadImageFile = async (file: File): Promise<string | null> => {
+    const uploadData = new FormData();
+    uploadData.append("image", file);
+
+    const token = localStorage.getItem("accessToken");
+    const headers: HeadersInit = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/uploads/image`, {
+        method: "POST",
+        headers,
+        body: uploadData
+      });
+      const data = await res.json();
+      if (data.success) {
+        return data.url;
+      } else {
+        alert(data.error || "Image upload failed");
+        return null;
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Network error during image upload");
+      return null;
+    }
+  };
+
+  const handleHeroImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = await uploadImageFile(file);
+    if (url) {
+      setHeroFormData(prev => ({ ...prev, imageUrl: url }));
+    }
+  };
+
+  const handleStoryImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = await uploadImageFile(file);
+    if (url) {
+      setFormData(prev => ({ ...prev, imageUrl: url }));
+    }
+  };
 
   const openAddModal = () => {
     setEditingStory(null);
@@ -59,6 +122,35 @@ function AdminSuccessStories() {
     });
     setFormError("");
     setIsModalOpen(true);
+  };
+
+  const openEditHeroModal = () => {
+    if (heroFeature) {
+      setHeroFormData({
+        studentName: heroFeature.studentName,
+        university: heroFeature.university,
+        score: heroFeature.score,
+        improvement: heroFeature.improvement,
+        tag: heroFeature.tag,
+        imageUrl: heroFeature.imageUrl || ""
+      });
+    }
+    setHeroError("");
+    setIsHeroModalOpen(true);
+  };
+
+  const handleHeroSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setHeroError("");
+    setIsHeroSubmitting(true);
+    const res = await api.put("/api/success-stories/featured", heroFormData);
+    if (res.success) {
+      setIsHeroModalOpen(false);
+      fetchHeroFeature();
+    } else {
+      setHeroError(res.error || "Failed to save hero feature.");
+    }
+    setIsHeroSubmitting(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -92,6 +184,43 @@ function AdminSuccessStories() {
         </button>
       </div>
 
+      {/* Featured Hero Student Card */}
+      {heroFeature && (
+        <div className="mb-8 rounded-2xl bg-surface-container-low p-6 border border-outline-variant/30 flex flex-col md:flex-row gap-6 justify-between items-start md:items-center">
+          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+            {heroFeature.imageUrl ? (
+              <img
+                src={resolveImageUrl(heroFeature.imageUrl)}
+                alt={heroFeature.studentName}
+                className="w-16 h-16 rounded-xl object-cover border border-outline-variant/50 shadow-sm shrink-0"
+              />
+            ) : (
+              <div className="grid h-16 w-16 place-items-center rounded-xl bg-accent text-primary font-display text-xl font-bold shrink-0 shadow-sm">
+                ⭐
+              </div>
+            )}
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-bold text-lg text-on-surface">{heroFeature.studentName}</span>
+                <Badge variant="accent">{heroFeature.tag}</Badge>
+              </div>
+              <p className="text-sm text-on-surface-variant mt-1 font-semibold flex items-center gap-1">
+                <Icon name="school" className="text-sm" /> {heroFeature.university}
+              </p>
+              <p className="text-xs text-on-surface-variant/80 mt-1 font-mono">
+                SAT: <span className="font-bold text-primary">{heroFeature.score}</span> ({heroFeature.improvement})
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={openEditHeroModal}
+            className="px-5 py-2.5 rounded-xl border border-outline-variant hover:bg-surface-container-low text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer shrink-0"
+          >
+            <Icon name="edit" className="text-[16px]" /> Edit Hero Feature
+          </button>
+        </div>
+      )}
+
       {stories.length === 0 ? (
         <EmptyState icon="social_leaderboard" title="No success stories" description="Add your first success story!" />
       ) : (
@@ -101,7 +230,7 @@ function AdminSuccessStories() {
               <div>
                 <div className="flex items-center gap-4 mb-4">
                   {story.imageUrl ? (
-                    <img src={story.imageUrl} alt={story.name} className="w-12 h-12 rounded-full object-cover border border-outline-variant" />
+                    <img src={resolveImageUrl(story.imageUrl)} alt={story.name} className="w-12 h-12 rounded-full object-cover border border-outline-variant" />
                   ) : (
                     <div className="grid h-12 w-12 place-items-center rounded-full bg-primary text-on-primary font-display text-lg font-bold">{story.name.charAt(0)}</div>
                   )}
@@ -144,12 +273,59 @@ function AdminSuccessStories() {
             <Input label="Score *" value={formData.score} onChange={(e) => setFormData((p) => ({ ...p, score: e.target.value }))} required placeholder="e.g. Scored 1580 (+210)" />
             <Input label="University *" value={formData.university} onChange={(e) => setFormData((p) => ({ ...p, university: e.target.value }))} required placeholder="e.g. Harvard" />
           </div>
-          <Input label="Image URL" type="url" value={formData.imageUrl} onChange={(e) => setFormData((p) => ({ ...p, imageUrl: e.target.value }))} placeholder="https://..." />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input label="Image URL" type="url" value={formData.imageUrl} onChange={(e) => setFormData((p) => ({ ...p, imageUrl: e.target.value }))} placeholder="https://..." />
+            <div>
+              <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Or Upload Local Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleStoryImageChange}
+                className="block w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+              />
+            </div>
+          </div>
           <Input label="Video URL" type="url" value={formData.videoUrl} onChange={(e) => setFormData((p) => ({ ...p, videoUrl: e.target.value }))} placeholder="YouTube or MP4 URL" />
           <Textarea label="Quote *" value={formData.quote} onChange={(e) => setFormData((p) => ({ ...p, quote: e.target.value }))} required rows={3} placeholder="Student testimonial..." />
           <div className="flex gap-4 pt-4 border-t border-outline-variant/30">
             <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-2.5 rounded-xl border border-outline-variant hover:bg-surface-container-low text-sm font-semibold transition-colors cursor-pointer">Cancel</button>
             <button type="submit" disabled={isSubmitting} className="flex-1 py-2.5 rounded-xl bg-primary text-on-primary hover:bg-accent font-semibold transition-all disabled:opacity-50 cursor-pointer">{isSubmitting ? "Saving..." : "Save Story"}</button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Hero Feature Edit Modal */}
+      <Modal open={isHeroModalOpen} onClose={() => setIsHeroModalOpen(false)} title="Edit Hero Featured Student" icon="edit">
+        {heroError && (
+          <div className="mb-4 p-3 bg-error/15 text-error rounded-xl text-sm border border-error/25 flex items-center gap-2">
+            <Icon name="error" className="shrink-0" /><span>{heroError}</span>
+          </div>
+        )}
+        <form onSubmit={handleHeroSubmit} className="space-y-4">
+          <Input label="Student Name *" value={heroFormData.studentName} onChange={(e) => setHeroFormData((p) => ({ ...p, studentName: e.target.value }))} required placeholder="e.g. Admitted Student" />
+          <div className="grid grid-cols-2 gap-4">
+            <Input label="University / Subtitle *" value={heroFormData.university} onChange={(e) => setHeroFormData((p) => ({ ...p, university: e.target.value }))} required placeholder="e.g. Stanford University '28" />
+            <Input label="Badge Tag *" value={heroFormData.tag} onChange={(e) => setHeroFormData((p) => ({ ...p, tag: e.target.value }))} required placeholder="e.g. Top 1% Worldwide" />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Input label="SAT Score *" value={heroFormData.score} onChange={(e) => setHeroFormData((p) => ({ ...p, score: e.target.value }))} required placeholder="e.g. 1580" />
+            <Input label="Improvement Details *" value={heroFormData.improvement} onChange={(e) => setHeroFormData((p) => ({ ...p, improvement: e.target.value }))} required placeholder="e.g. +210 Improvement" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input label="Image URL" type="url" value={heroFormData.imageUrl} onChange={(e) => setHeroFormData((p) => ({ ...p, imageUrl: e.target.value }))} placeholder="https://..." />
+            <div>
+              <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Or Upload Local Image</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleHeroImageChange}
+                className="block w-full text-xs text-on-surface-variant file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+              />
+            </div>
+          </div>
+          <div className="flex gap-4 pt-4 border-t border-outline-variant/30">
+            <button type="button" onClick={() => setIsHeroModalOpen(false)} className="flex-1 py-2.5 rounded-xl border border-outline-variant hover:bg-surface-container-low text-sm font-semibold transition-colors cursor-pointer">Cancel</button>
+            <button type="submit" disabled={isHeroSubmitting} className="flex-1 py-2.5 rounded-xl bg-primary text-on-primary hover:bg-accent font-semibold transition-all disabled:opacity-50 cursor-pointer">{isHeroSubmitting ? "Saving..." : "Save Feature"}</button>
           </div>
         </form>
       </Modal>

@@ -79,3 +79,83 @@ export const deleteSuccessStory = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
+// --- Featured Hero Student Showcase ---
+import HeroFeature from "../models/HeroFeature";
+
+let mockHeroFeature = {
+  studentName: "Admitted Student",
+  university: "Stanford University '28",
+  score: "1580",
+  improvement: "+210 Improvement",
+  tag: "Top 1% Worldwide",
+  imageUrl: ""
+};
+
+export const getHeroFeature = async (req: Request, res: Response) => {
+  try {
+    if (!env.isDatabaseConfigured) {
+      return res.status(200).json({ success: true, feature: mockHeroFeature });
+    }
+
+    const feature = await HeroFeature.findOne();
+    if (!feature) {
+      return res.status(200).json({
+        success: true,
+        feature: {
+          studentName: "Admitted Student",
+          university: "Stanford University '28",
+          score: "1580",
+          improvement: "+210 Improvement",
+          tag: "Top 1% Worldwide",
+          imageUrl: ""
+        }
+      });
+    }
+    res.status(200).json({ success: true, feature });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+export const updateHeroFeature = async (req: Request, res: Response) => {
+  try {
+    const { studentName, university, score, improvement, tag, imageUrl } = req.body;
+
+    if (!env.isDatabaseConfigured) {
+      mockHeroFeature = {
+        studentName: studentName ?? mockHeroFeature.studentName,
+        university: university ?? mockHeroFeature.university,
+        score: score ?? mockHeroFeature.score,
+        improvement: improvement ?? mockHeroFeature.improvement,
+        tag: tag ?? mockHeroFeature.tag,
+        imageUrl: imageUrl !== undefined ? imageUrl : mockHeroFeature.imageUrl
+      };
+      return res.status(200).json({ success: true, feature: mockHeroFeature });
+    }
+
+    let feature = await HeroFeature.findOne();
+    if (!feature) {
+      feature = await HeroFeature.create({
+        studentName,
+        university,
+        score,
+        improvement,
+        tag,
+        imageUrl
+      });
+    } else {
+      feature.studentName = studentName ?? feature.studentName;
+      feature.university = university ?? feature.university;
+      feature.score = score ?? feature.score;
+      feature.improvement = improvement ?? feature.improvement;
+      feature.tag = tag ?? feature.tag;
+      feature.imageUrl = imageUrl !== undefined ? imageUrl : feature.imageUrl;
+      await feature.save();
+    }
+
+    res.status(200).json({ success: true, feature });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};

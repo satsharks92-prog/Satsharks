@@ -1,9 +1,32 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Icon } from "../common/Icon";
 import studentHero from "../../assets/student_hero.png";
 import { Link } from "@tanstack/react-router";
+import { api, resolveImageUrl } from "../../services/api";
 
 export function Hero() {
+  const [feature, setFeature] = useState({
+    studentName: "Admitted Student",
+    university: "Stanford University '28",
+    score: "1580",
+    improvement: "+210 Improvement",
+    tag: "Top 1% Worldwide",
+    imageUrl: ""
+  });
+
+  useEffect(() => {
+    api.get("/api/success-stories/featured").then((res) => {
+      if (res.success && res.feature) {
+        setFeature(res.feature);
+      }
+    });
+  }, []);
+
+  const resolveHeroImageUrl = (url: string) => {
+    if (!url) return studentHero;
+    return resolveImageUrl(url);
+  };
   return (
     <section id="top" className="relative pt-4 pb-28 md:pt-8 md:pb-40 overflow-hidden bg-background">
       {/* Background Subtle Textures */}
@@ -89,8 +112,8 @@ export function Hero() {
 
             {/* Main Student Portrait */}
             <img
-              src={studentHero}
-              alt="Elite Student Success"
+              src={resolveHeroImageUrl(feature.imageUrl)}
+              alt={feature.studentName}
               className="w-full h-auto object-cover rounded-xl shark-shadow border border-outline-variant/60"
             />
 
@@ -107,8 +130,8 @@ export function Hero() {
                   <Icon name="school" className="text-[18px]" />
                 </span>
                 <div>
-                  <h4 className="font-display text-[14px] font-bold text-primary leading-tight">Admitted Student</h4>
-                  <p className="font-body text-[10px] text-on-surface-variant font-medium">Stanford University '28</p>
+                  <h4 className="font-display text-[14px] font-bold text-primary leading-tight">{feature.studentName}</h4>
+                  <p className="font-body text-[10px] text-on-surface-variant font-medium">{feature.university}</p>
                 </div>
               </div>
             </motion.div>
@@ -122,17 +145,17 @@ export function Hero() {
               whileHover={{ y: -4 }}
             >
               <div className="flex items-center gap-3">
-                <span className="font-display text-[26px] font-extrabold text-accent leading-none">1580</span>
+                <span className="font-display text-[26px] font-extrabold text-accent leading-none">{feature.score}</span>
                 <div>
                   <h4 className="font-body text-[11px] font-bold uppercase tracking-[0.05em] leading-tight">SAT Score</h4>
-                  <p className="font-body text-[10px] text-on-primary/70 font-medium">+210 Improvement</p>
+                  <p className="font-body text-[10px] text-on-primary/70 font-medium">{feature.improvement}</p>
                 </div>
               </div>
             </motion.div>
 
             {/* Bottom mini credential badge */}
             <div className="absolute bottom-4 left-4 bg-surface/90 backdrop-blur-md px-3 py-1.5 rounded-lg border border-outline-variant/60 text-[10px] font-bold uppercase tracking-[0.08em] text-accent flex items-center gap-1">
-              <Icon name="star" className="text-[12px] fill-accent" /> Top 1% Worldwide
+              <Icon name="star" className="text-[12px] fill-accent" /> {feature.tag}
             </div>
           </motion.div>
         </div>

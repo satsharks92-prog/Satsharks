@@ -1,19 +1,14 @@
 import { Router } from "express";
 import { getPlans } from "../controllers/subscription.controller";
-import { authenticate } from "../middleware/auth.middleware";
-import {
-  requireActiveUser,
-  requireStudent,
-} from "../middleware/role.middleware";
+import { optionalAuthenticate } from "../middleware/auth.middleware";
 
 const router = Router();
 
 router.get(
   "/plans",
-  authenticate,
-  requireActiveUser(),
-  requireStudent(),
+  optionalAuthenticate,
   getPlans,
 );
 
 export default router;
+

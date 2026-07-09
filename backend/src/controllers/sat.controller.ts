@@ -3,6 +3,7 @@ import SATTest from "../models/SATTest";
 import SATTestAttempt from "../models/SATTestAttempt";
 import Question from "../models/Question";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { checkAnswerCorrectness } from "../utils/grading";
 
 // --- Student: list available SAT tests ---
 export const getSATTests = async (req: AuthRequest, res: Response) => {
@@ -194,7 +195,7 @@ export const completeModule = async (req: AuthRequest, res: Response) => {
       
       const selectedAnswer = incomingAns?.selectedAnswer || null;
       const isCorrect = q && selectedAnswer
-        ? q.correctAnswer.trim().toLowerCase() === selectedAnswer.trim().toLowerCase()
+        ? checkAnswerCorrectness(q.correctAnswer, selectedAnswer)
         : false;
 
       if (isCorrect) correctCount++;
@@ -311,9 +312,11 @@ async function finalizeAttempt(attempt: any, res: Response) {
     totalCorrect += mod.correctCount;
     totalQuestions += mod.totalQuestions;
     if (mod.startedAt && mod.completedAt) {
-      totalTime += Math.round(
+      const moduleLimitMinutes = test?.modules?.[mod.moduleIndex]?.timeLimitMinutes || 35;
+      const actualTimeSpent = Math.round(
         (new Date(mod.completedAt).getTime() - new Date(mod.startedAt).getTime()) / 1000
       );
+      totalTime += Math.min(actualTimeSpent, moduleLimitMinutes * 60);
     }
   }
 
@@ -412,7 +415,7 @@ export const getMySATAttempts = async (req: AuthRequest, res: Response) => {
 // --- Admin: list all SAT tests ---
 export const getAllSATTestsAdmin = async (req: Request, res: Response) => {
   try {
-    const tests = await SATTest.find().sort({ year: -1, testNumber: 1 });
+    const tests = await SATTest.find().populate("modules.questions").sort({ year: -1, testNumber: 1 });
     res.status(200).json({ success: true, tests });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
@@ -422,13 +425,17 @@ export const getAllSATTestsAdmin = async (req: Request, res: Response) => {
 // --- Admin: update SAT test active status / access level ---
 export const updateSATTestAdmin = async (req: Request, res: Response) => {
   try {
-    const { title, year, testNumber, isActive, accessLevel } = req.body;
+    const { title, year, testNumber, isActive, accessLevel, pdfUrl, explanationPdfUrl, rwScoreMapping, mathScoreMapping } = req.body;
     const update: any = {};
     if (title !== undefined) update.title = title;
     if (year !== undefined) update.year = year;
     if (testNumber !== undefined) update.testNumber = testNumber;
     if (isActive !== undefined) update.isActive = isActive;
     if (accessLevel !== undefined) update.accessLevel = accessLevel;
+    if (pdfUrl !== undefined) update.pdfUrl = pdfUrl;
+    if (explanationPdfUrl !== undefined) update.explanationPdfUrl = explanationPdfUrl;
+    if (rwScoreMapping !== undefined) update.rwScoreMapping = rwScoreMapping;
+    if (mathScoreMapping !== undefined) update.mathScoreMapping = mathScoreMapping;
 
     const test = await SATTest.findByIdAndUpdate(req.params.id, update, { new: true });
     if (!test) return res.status(404).json({ success: false, error: "Test not found" });

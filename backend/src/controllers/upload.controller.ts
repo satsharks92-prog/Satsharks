@@ -157,3 +157,18 @@ export const deleteUpload = async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
+// --- Generic Image Upload ---
+export const uploadImage = async (req: AuthRequest, res: Response) => {
+  try {
+    const file = (req as any).file;
+    if (!file) return res.status(400).json({ success: false, error: "Image file is required" });
+
+    res.status(201).json({
+      success: true,
+      url: `/uploads/${file.filename}`
+    });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};

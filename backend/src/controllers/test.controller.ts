@@ -3,6 +3,7 @@ import DiagnosticTest from "../models/DiagnosticTest";
 import TestAttempt from "../models/TestAttempt";
 import Question from "../models/Question";
 import { AuthRequest } from "../middleware/auth.middleware";
+import { checkAnswerCorrectness } from "../utils/grading";
 
 export const getTests = async (req: AuthRequest, res: Response) => {
   try {
@@ -138,8 +139,8 @@ export const submitTest = async (req: AuthRequest, res: Response) => {
     let correctCount = 0;
     const scoredAnswers = answers.map((a: any) => {
       const q = questionMap.get(a.question);
-      const isCorrect = q
-        ? (q.correctAnswer || "").trim().toLowerCase() === (a.selectedAnswer || "").trim().toLowerCase()
+      const isCorrect = q && a.selectedAnswer
+        ? checkAnswerCorrectness(q.correctAnswer, a.selectedAnswer)
         : false;
       if (isCorrect) correctCount++;
       return {

@@ -63,8 +63,21 @@ function SATResult() {
   const mathTotal = mathModules.reduce((s, m) => s + m.totalQuestions, 0);
 
   // Approximate SAT section scores (200-800 range per section)
-  const rwScoreScaled = rwTotal > 0 ? Math.round(200 + (rwCorrect / rwTotal) * 600) : 200;
-  const mathScoreScaled = mathTotal > 0 ? Math.round(200 + (mathCorrect / mathTotal) * 600) : 200;
+  const rwScoreMapping = test?.rwScoreMapping;
+  const mathScoreMapping = test?.mathScoreMapping;
+
+  const rwScoreScaled = rwTotal > 0
+    ? (rwScoreMapping && rwScoreMapping.length > rwCorrect
+        ? rwScoreMapping[rwCorrect]
+        : Math.round(200 + (rwCorrect / rwTotal) * 600))
+    : 200;
+
+  const mathScoreScaled = mathTotal > 0
+    ? (mathScoreMapping && mathScoreMapping.length > mathCorrect
+        ? mathScoreMapping[mathCorrect]
+        : Math.round(200 + (mathCorrect / mathTotal) * 600))
+    : 200;
+
   const totalScoreScaled = rwScoreScaled + mathScoreScaled;
 
   return (
@@ -72,7 +85,21 @@ function SATResult() {
       <div className="max-w-[1000px] mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold mb-2">SAT Test Results</h1>
-          <p className="text-on-surface-variant">{test?.title || "SAT Practice Test"}</p>
+          <p className="text-on-surface-variant mb-4">{test?.title || "SAT Practice Test"}</p>
+          
+          {test?.explanationPdfUrl && (
+            <div className="flex justify-center gap-3">
+              <a
+                href={test.explanationPdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-surface-container-lowest hover:bg-surface-container-low border border-outline-variant/60 rounded-xl text-xs font-bold uppercase tracking-wider text-on-surface transition-all duration-300 shadow-sm cursor-pointer"
+              >
+                <Icon name="description" className="text-[16px]" />
+                Explanations PDF
+              </a>
+            </div>
+          )}
         </div>
 
         {/* Overall Score */}

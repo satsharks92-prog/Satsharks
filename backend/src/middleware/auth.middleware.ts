@@ -20,3 +20,20 @@ export const authenticate = (req: AuthRequest, res: Response, next: NextFunction
     res.status(401).json({ success: false, error: "Invalid token" });
   }
 };
+
+export const optionalAuthenticate = (req: AuthRequest, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith("Bearer ")) {
+    return next();
+  }
+
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = verifyAccessToken(token);
+    req.user = decoded;
+    next();
+  } catch {
+    next();
+  }
+};
+

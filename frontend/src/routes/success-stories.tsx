@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Header } from "../components/layout/Header";
 import { Footer } from "../components/layout/Footer";
 import { Icon } from "../components/common/Icon";
-import { api } from "../services/api";
+import { api, resolveImageUrl } from "../services/api";
 
 export const Route = createFileRoute("/success-stories")({
   component: SuccessStories,
@@ -12,42 +12,23 @@ export const Route = createFileRoute("/success-stories")({
 function SuccessStories() {
   const [stories, setStories] = useState<any[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
-
-  const defaultTestimonials = [
-    {
-      name: "Sarah M.",
-      score: "Scored 1580 (+210)",
-      university: "Harvard University",
-      quote: "The personalized study plan was a game-changer.",
-      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=256&h=256&q=80",
-      videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    },
-    {
-      name: "David L.",
-      score: "Scored 1550 (+180)",
-      university: "Stanford University",
-      quote: "The instructors genuinely care about your success.",
-      imageUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=256&h=256&q=80",
-      videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-    },
-    {
-      name: "Emily R.",
-      score: "Scored 1590 (+150)",
-      university: "Yale University",
-      quote: "I was struggling to break 700 in the Math section, but the targeted problem walkthroughs helped me achieve a perfect 800.",
-      imageUrl: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=256&h=256&q=80",
-    },
-  ];
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchStories = async () => {
+      setIsLoading(true);
       try {
         const res = await api.get("/api/success-stories");
         if (res.success) {
           setStories(res.stories || []);
+        } else {
+          setStories([]);
         }
       } catch (e) {
         console.error("Failed to fetch stories", e);
+        setStories([]);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchStories();
@@ -78,7 +59,29 @@ function SuccessStories() {
     return embedUrl.includes("youtube.com/embed") || embedUrl.includes("vimeo.com/video");
   };
 
-  const displayStories = stories.length > 0 ? stories : defaultTestimonials;
+  const TestimonialSkeleton = () => (
+    <div className="relative rounded-2xl bg-surface-container-lowest p-8 shark-shadow border border-outline-variant/40 flex flex-col items-center text-center justify-between min-h-[420px] animate-pulse">
+      <div className="flex flex-col items-center w-full">
+        {/* Avatar skeleton */}
+        <div className="w-20 h-20 rounded-full bg-surface-container-high mb-4" />
+        {/* Name skeleton */}
+        <div className="h-4 w-24 bg-surface-container-high rounded mb-2" />
+        {/* Score skeleton */}
+        <div className="h-3 w-32 bg-surface-container-high rounded mb-2" />
+        {/* Destination skeleton */}
+        <div className="h-3 w-40 bg-surface-container-high rounded mb-4" />
+      </div>
+      <div className="w-full">
+        <div className="h-[1px] w-full bg-outline-variant/20 my-4" />
+        {/* Quote lines skeleton */}
+        <div className="space-y-2">
+          <div className="h-3 w-full bg-surface-container-low rounded" />
+          <div className="h-3 w-5/6 bg-surface-container-low rounded mx-auto" />
+          <div className="h-3 w-4/6 bg-surface-container-low rounded mx-auto" />
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background text-on-background animate-fade-up flex flex-col">
@@ -99,58 +102,66 @@ function SuccessStories() {
             </div>
             
             <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {displayStories.map((item) => (
-                <figure
-                  key={item._id || item.name}
-                  className="hover-lift relative rounded-2xl bg-surface-container-lowest p-8 shark-shadow border border-outline-variant/40 flex flex-col items-center text-center justify-between min-h-[420px]"
-                >
-                  <div className="flex flex-col items-center w-full">
-                    {/* Centered Large Student Avatar on Top */}
-                    {item.imageUrl ? (
-                      <img
-                        src={item.imageUrl}
-                        alt={item.name}
-                        className="w-20 h-20 rounded-full object-cover border-2 border-primary/20 shadow-md mb-4"
-                      />
-                    ) : (
-                      <div className="grid h-20 w-20 shrink-0 place-items-center rounded-full bg-primary text-on-primary font-display text-2xl font-bold border-2 border-primary/20 shadow-md mb-4 animate-fade-in">
-                        {item.name.charAt(0)}
+              {isLoading ? (
+                <>
+                  <TestimonialSkeleton />
+                  <TestimonialSkeleton />
+                  <TestimonialSkeleton />
+                </>
+              ) : (
+                stories.map((item) => (
+                  <figure
+                    key={item._id || item.name}
+                    className="hover-lift relative rounded-2xl bg-surface-container-lowest p-8 shark-shadow border border-outline-variant/40 flex flex-col items-center text-center justify-between min-h-[420px]"
+                  >
+                    <div className="flex flex-col items-center w-full">
+                      {/* Centered Large Student Avatar on Top */}
+                      {item.imageUrl ? (
+                        <img
+                          src={resolveImageUrl(item.imageUrl)}
+                          alt={item.name}
+                          className="w-20 h-20 rounded-full object-cover border-2 border-primary/20 shadow-md mb-4"
+                        />
+                      ) : (
+                        <div className="grid h-20 w-20 shrink-0 place-items-center rounded-full bg-primary text-on-primary font-display text-2xl font-bold border-2 border-primary/20 shadow-md mb-4 animate-fade-in">
+                          {item.name.charAt(0)}
+                        </div>
+                      )}
+                      
+                      {/* Student Info */}
+                      <div className="font-semibold text-on-surface text-lg">{item.name}</div>
+                      <div className="font-mono text-xs uppercase tracking-[0.08em] text-accent font-bold mt-1">
+                        {item.score}
                       </div>
-                    )}
-                    
-                    {/* Student Info */}
-                    <div className="font-semibold text-on-surface text-lg">{item.name}</div>
-                    <div className="font-mono text-xs uppercase tracking-[0.08em] text-accent font-bold mt-1">
-                      {item.score}
+                      <div className="mt-1 text-xs text-on-surface-variant flex items-center justify-center gap-1">
+                        <Icon name="school" className="text-[14px]" /> {item.university}
+                      </div>
+  
+                      {/* Centered Play Button */}
+                      {item.videoUrl && (
+                        <button
+                          onClick={() => setSelectedVideo(item.videoUrl)}
+                          className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-on-primary px-3.5 py-1.5 font-body text-xs font-bold uppercase tracking-wider transition-all duration-300 mt-3 border border-primary/20 cursor-pointer shadow-sm"
+                          title="Watch Video Testimonial"
+                        >
+                          <Icon name="play_arrow" className="text-[14px]" />
+                          Watch Video
+                        </button>
+                      )}
                     </div>
-                    <div className="mt-1 text-xs text-on-surface-variant flex items-center justify-center gap-1">
-                      <Icon name="school" className="text-[14px]" /> {item.university}
+  
+                    <div className="w-full">
+                      {/* Divider Line */}
+                      <div className="h-[1px] w-full bg-outline-variant/30 my-4" />
+  
+                      {/* Testimonial Quote */}
+                      <blockquote className="text-on-surface leading-relaxed text-sm italic font-light">
+                        "{item.quote}"
+                      </blockquote>
                     </div>
-
-                    {/* Centered Play Button */}
-                    {item.videoUrl && (
-                      <button
-                        onClick={() => setSelectedVideo(item.videoUrl)}
-                        className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary hover:text-on-primary px-3.5 py-1.5 font-body text-xs font-bold uppercase tracking-wider transition-all duration-300 mt-3 border border-primary/20 cursor-pointer shadow-sm"
-                        title="Watch Video Testimonial"
-                      >
-                        <Icon name="play_arrow" className="text-[14px]" />
-                        Watch Video
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="w-full">
-                    {/* Divider Line */}
-                    <div className="h-[1px] w-full bg-outline-variant/30 my-4" />
-
-                    {/* Testimonial Quote */}
-                    <blockquote className="text-on-surface leading-relaxed text-sm italic font-light">
-                      "{item.quote}"
-                    </blockquote>
-                  </div>
-                </figure>
-              ))}
+                  </figure>
+                ))
+              )}
             </div>
           </div>
         </section>

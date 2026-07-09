@@ -19,12 +19,10 @@ function Subscriptions() {
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
   const [error, setError] = useState("");
+  const [selectedRegion, setSelectedRegion] = useState<"LOCAL" | "INTERNATIONAL">("LOCAL");
 
   useEffect(() => {
-    if (!user) {
-      setPlans([]);
-      return;
-    }
+    if (isAuthLoading) return;
 
     const fetchPlans = async () => {
       setIsLoadingPlans(true);
@@ -33,7 +31,7 @@ function Subscriptions() {
       try {
         const res = await api.get("/api/subscriptions/plans");
         if (res.success) {
-          setPlans(getVisiblePlans(res.plans, user.region));
+          setPlans(res.plans);
         } else {
           setError(res.error || "Unable to load plans.");
         }
@@ -45,9 +43,11 @@ function Subscriptions() {
       }
     };
     fetchPlans();
-  }, [user]);
+  }, [user, isAuthLoading]);
 
-  const heading = user ? getPlanHeading(user.region) : "Sign In To View Your Plans";
+  const activeRegion = user ? user.region : selectedRegion;
+  const displayedPlans = user ? plans : getVisiblePlans(plans, selectedRegion);
+  const heading = getPlanHeading(activeRegion);
 
   return (
     <div className="min-h-screen bg-background text-on-background animate-fade-up flex flex-col">
@@ -65,8 +65,36 @@ function Subscriptions() {
               <p className="mt-6 text-lg text-on-surface-variant">
                 {user
                   ? "Your available plans are filtered to match your student profile."
-                  : "Create an account or log in so we can show the plans that match your student type."}
+                  : "Compare our pricing plans. Choose a plan to create an account and begin your journey."}
               </p>
+
+              {/* Guest Region Toggle */}
+              {!user && (
+                <div className="mt-8 flex justify-center">
+                  <div className="inline-flex rounded-xl bg-surface-container-high p-1 border border-outline-variant/60 shadow-sm">
+                    <button
+                      onClick={() => setSelectedRegion("LOCAL")}
+                      className={`rounded-lg px-6 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                        selectedRegion === "LOCAL"
+                          ? "bg-primary text-on-primary shadow-md"
+                          : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest"
+                      }`}
+                    >
+                      Local Plans
+                    </button>
+                    <button
+                      onClick={() => setSelectedRegion("INTERNATIONAL")}
+                      className={`rounded-lg px-6 py-2.5 text-xs font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer ${
+                        selectedRegion === "INTERNATIONAL"
+                          ? "bg-primary text-on-primary shadow-md"
+                          : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-highest"
+                      }`}
+                    >
+                      International Plans
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {isAuthLoading || isLoadingPlans ? (
@@ -77,23 +105,13 @@ function Subscriptions() {
               <div className="mt-16 rounded-2xl border border-error/30 bg-error/10 p-6 text-center font-medium text-error">
                 {error}
               </div>
-            ) : !user ? (
-              <div className="mt-16 flex justify-center">
-                <Link
-                  to="/auth/login"
-                  className="btn-shimmer inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-8 py-3.5 text-sm font-semibold text-on-primary shark-shadow hover:bg-primary-container transition-colors"
-                >
-                  Log In
-                  <Icon name="arrow_forward" className="text-[18px]" />
-                </Link>
-              </div>
-            ) : plans.length === 0 ? (
+            ) : displayedPlans.length === 0 ? (
               <div className="mt-16 rounded-2xl border border-outline-variant/40 bg-surface-container-lowest p-6 text-center font-medium text-on-surface-variant">
                 No plans are available for your student profile yet.
               </div>
             ) : (
-              <div className="mt-16 grid gap-8 md:grid-cols-2">
-                {plans.map((plan) => (
+              <div className="mt-16 grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
+                {displayedPlans.map((plan) => (
                   <div
                     key={plan._id || plan.id || plan.name}
                     className={`relative flex flex-col rounded-3xl p-8 transition-transform hover:-translate-y-2 ${
@@ -144,12 +162,26 @@ function Subscriptions() {
                         </li>
                       ))}
                     </ul>
-                    <Button
-                      variant={plan.highlight ? "glass" : "outline"}
-                      className="w-full py-3.5"
-                    >
-                      {plan.price === "$0" ? "Get Started Free" : "Subscribe Now"}
-                    </Button>
+                    {user ? (
+                      <Button
+                        variant={plan.highlight ? "glass" : "outline"}
+                        className="w-full py-3.5"
+                      >
+                        {plan.price === "$0" ? "Get Started Free" : "Subscribe Now"}
+                      </Button>
+                    ) : (
+                      <Link
+                        to="/auth/login"
+                        className="w-full"
+                      >
+                        <Button
+                          variant={plan.highlight ? "glass" : "outline"}
+                          className="w-full py-3.5"
+                        >
+                          {plan.price === "$0" ? "Get Started Free" : "Subscribe Now"}
+                        </Button>
+                      </Link>
+                    )}
                   </div>
                 ))}
               </div>

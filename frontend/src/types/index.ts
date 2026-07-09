@@ -204,6 +204,9 @@ export interface SATTest {
   isActive: boolean;
   accessLevel: "FREE" | "PAID";
   pdfUrl: string;
+  explanationPdfUrl?: string;
+  rwScoreMapping?: number[];
+  mathScoreMapping?: number[];
   totalQuestions?: number;
   totalMinutes?: number;
   attemptCount?: number;

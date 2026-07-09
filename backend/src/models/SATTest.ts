@@ -19,6 +19,9 @@ export interface ISATTest extends Document {
   isActive: boolean;
   accessLevel: "FREE" | "PAID";
   pdfUrl: string;
+  explanationPdfUrl: string;
+  rwScoreMapping: number[];
+  mathScoreMapping: number[];
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -47,6 +50,9 @@ const SATTestSchema: Schema = new Schema(
     isActive: { type: Boolean, default: true },
     accessLevel: { type: String, enum: ["FREE", "PAID"], default: "FREE" },
     pdfUrl: { type: String, default: "" },
+    explanationPdfUrl: { type: String, default: "" },
+    rwScoreMapping: { type: [Number], default: [] },
+    mathScoreMapping: { type: [Number], default: [] },
     createdBy: { type: Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }

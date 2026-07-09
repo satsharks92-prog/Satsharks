@@ -30,24 +30,20 @@ export const getPlans = async (req: AuthRequest, res: Response) => {
     const userRegion = req.user?.region;
     const allowedRoles = getAllowedPlanRoles(userRegion);
 
-    if (!allowedRoles) {
-      return res
-        .status(403)
-        .json({ success: false, error: "A valid student region is required." });
-    }
-
     if (!env.isDatabaseConfigured) {
+      const plans = allowedRoles
+        ? getVisiblePlans(phaseOneSubscriptionPlans, userRegion)
+        : phaseOneSubscriptionPlans;
       return res
         .status(200)
         .json({
           success: true,
-          plans: getVisiblePlans(phaseOneSubscriptionPlans, userRegion),
+          plans,
         });
     }
 
-    const plans = await SubscriptionPlan.find({
-      roleRequired: { $in: allowedRoles },
-    });
+    const filter = allowedRoles ? { roleRequired: { $in: allowedRoles } } : {};
+    const plans = await SubscriptionPlan.find(filter);
     res.status(200).json({ success: true, plans });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
