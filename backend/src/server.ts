@@ -7,9 +7,13 @@ import { connectDB } from "./config/db";
 
 const app = express();
 
+// Stripe webhook must come BEFORE express.json() because it needs the raw body
+import { stripeWebhook } from "./controllers/payment.controller";
+app.post("/api/payment/webhook/stripe", express.raw({ type: "application/json" }), stripeWebhook);
+
 // Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors({
   origin: env.frontendUrl,
   credentials: true
@@ -38,6 +42,11 @@ import practiceRoutes from "./routes/practice.routes";
 import uploadRoutes from "./routes/upload.routes";
 import adminAnalyticsRoutes from "./routes/admin-analytics.routes";
 import satRoutes from "./routes/sat.routes";
+import consultingRoutes from "./routes/consulting.routes";
+import essayRoutes from "./routes/essay.routes";
+import notificationRoutes from "./routes/notification.routes";
+import universityRoutes from "./routes/university.routes";
+import paymentRoutes from "./routes/payment.routes";
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -52,6 +61,11 @@ app.use("/api/practice", practiceRoutes);
 app.use("/api/uploads", uploadRoutes);
 app.use("/api/admin/analytics", adminAnalyticsRoutes);
 app.use("/api/sat", satRoutes);
+app.use("/api/consulting", consultingRoutes);
+app.use("/api/essays", essayRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/universities", universityRoutes);
+app.use("/api/payment", paymentRoutes);
 
 // Serve uploaded files
 import path from "path";

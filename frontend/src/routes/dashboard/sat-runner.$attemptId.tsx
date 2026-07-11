@@ -113,11 +113,19 @@ function SATRunner() {
         setPhase("MODULE");
         const mod = testData.modules[attempt.currentModuleIndex];
         const modAttempt = attempt.moduleAttempts[attempt.currentModuleIndex];
-        if (mod && modAttempt?.startedAt) {
-          const elapsed = Math.floor(
-            (Date.now() - new Date(modAttempt.startedAt).getTime()) / 1000
-          );
-          setTimeLeft(Math.max(0, mod.timeLimitMinutes * 60 - elapsed));
+        if (mod) {
+          if (modAttempt?.startedAt) {
+            const elapsed = Math.floor(
+              (Date.now() - new Date(modAttempt.startedAt).getTime()) / 1000
+            );
+            if (elapsed < 0 || elapsed > mod.timeLimitMinutes * 60 || elapsed < 5) {
+              setTimeLeft(mod.timeLimitMinutes * 60);
+            } else {
+              setTimeLeft(mod.timeLimitMinutes * 60 - elapsed);
+            }
+          } else {
+            setTimeLeft(mod.timeLimitMinutes * 60);
+          }
         }
       } else if (attempt.status === "COMPLETED") {
         setPhase("FINISHED");
@@ -352,18 +360,18 @@ function SATRunner() {
   return (
     <div className="h-screen bg-background text-on-background flex flex-col overflow-hidden">
       {/* Top Bar */}
-      <div className="sticky top-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40 px-6 py-2.5">
-        <div className="max-w-[1400px] mx-auto grid grid-cols-3 items-center w-full relative">
-          <div className="flex items-center gap-4 justify-self-start">
-            <h1 className="font-bold text-sm text-on-surface">
+      <div className="sticky top-0 z-40 bg-surface/95 backdrop-blur-md border-b border-outline-variant/40 px-3 sm:px-6 py-2.5">
+        <div className="max-w-[1400px] mx-auto flex flex-wrap md:grid md:grid-cols-3 items-center justify-between gap-2 w-full relative">
+          <div className="flex items-center gap-2 sm:gap-4 justify-self-start">
+            <h1 className="font-bold text-xs sm:text-sm text-on-surface whitespace-nowrap">
               {currentModule.name.replace(/\s*-\s*(Easier|Harder)/i, "")}
             </h1>
             <button
               onClick={() => setShowDirectionsModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors text-xs font-semibold cursor-pointer"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1 rounded-lg border border-outline-variant hover:bg-surface-container-low transition-colors text-[10px] sm:text-xs font-semibold cursor-pointer"
             >
-              <Icon name="info" className="text-[14px]" />
-              <span>Directions</span>
+              <Icon name="info" className="text-[12px] sm:text-[14px]" />
+              <span className="hidden xs:inline">Directions</span>
             </button>
           </div>
 
@@ -905,10 +913,10 @@ function SATRunner() {
       </div>
 
       {/* Footer Navigation Bar */}
-      <div className="border-t border-outline-variant/40 bg-surface-container-lowest px-6 py-3.5 z-40">
-        <div className="max-w-[1400px] mx-auto flex items-center justify-between relative">
+      <div className="border-t border-outline-variant/40 bg-surface-container-lowest px-3 sm:px-6 py-3.5 z-40">
+        <div className="max-w-[1400px] mx-auto flex flex-wrap items-center justify-between gap-y-2 relative">
           {/* Left: Student Name */}
-          <div className="text-sm font-bold text-on-surface">
+          <div className="hidden md:block text-sm font-bold text-on-surface">
             {user?.name || "Student"}
           </div>
 
@@ -916,10 +924,10 @@ function SATRunner() {
           <div className="relative">
             <button
               onClick={() => setShowNavGrid(!showNavGrid)}
-              className="flex items-center gap-2 px-5 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-sm font-bold cursor-pointer transition-all border border-outline-variant/40 shadow-sm"
+              className="flex items-center gap-1 sm:gap-2 px-3 sm:px-5 py-2 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface text-xs sm:text-sm font-bold cursor-pointer transition-all border border-outline-variant/40 shadow-sm whitespace-nowrap"
             >
-              Question {currentQuestionIndex + 1} of {questions.length}
-              <Icon name={showNavGrid ? "expand_more" : "expand_less"} className="text-[18px]" />
+              Q {currentQuestionIndex + 1} of {questions.length}
+              <Icon name={showNavGrid ? "expand_more" : "expand_less"} className="text-[16px] sm:text-[18px]" />
             </button>
 
             {showNavGrid && (
@@ -984,12 +992,12 @@ function SATRunner() {
           </div>
 
           {/* Right: Previous / Next Actions */}
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2.5">
             {/* Back Button */}
             <button
               onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
               disabled={currentQuestionIndex === 0}
-              className="flex items-center justify-center px-5 h-10 rounded-xl border border-outline-variant text-sm font-semibold disabled:opacity-30 disabled:pointer-events-none hover:bg-surface-container-low transition-all cursor-pointer"
+              className="flex items-center justify-center px-3 sm:px-5 h-9 sm:h-10 rounded-xl border border-outline-variant text-xs sm:text-sm font-semibold disabled:opacity-30 disabled:pointer-events-none hover:bg-surface-container-low transition-all cursor-pointer"
             >
               Back
             </button>
@@ -998,7 +1006,7 @@ function SATRunner() {
             {currentQuestionIndex < questions.length - 1 ? (
               <button
                 onClick={() => setCurrentQuestionIndex(currentQuestionIndex + 1)}
-                className="flex items-center justify-center px-6 h-10 rounded-xl bg-primary text-on-primary text-sm font-bold hover:bg-accent hover:text-primary transition-all cursor-pointer"
+                className="flex items-center justify-center px-4 sm:px-6 h-9 sm:h-10 rounded-xl bg-primary text-on-primary text-xs sm:text-sm font-bold hover:bg-accent hover:text-primary transition-all cursor-pointer"
               >
                 Next
               </button>

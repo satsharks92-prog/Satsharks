@@ -11,7 +11,10 @@ const navItems = [
   { to: "/admin/questions", label: "Questions", icon: "help_center" },
   { to: "/admin/uploads", label: "Uploads", icon: "upload_file" },
   { to: "/admin/success-stories", label: "Success Stories", icon: "social_leaderboard" },
-  { to: "/admin/contact-requests", label: "Contact Requests", icon: "mail" },
+  { to: "/admin/contact-requests", label: "Queries", icon: "mail" },
+  { to: "/admin/essays", label: "Essays", icon: "edit_note" },
+  { to: "/admin/consulting", label: "Consulting", icon: "account_balance" },
+  { to: "/admin/universities", label: "Universities", icon: "school" },
 ];
 
 export function AdminLayout({ children, activeItem }: { children: ReactNode; activeItem: string }) {

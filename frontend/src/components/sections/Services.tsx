@@ -98,7 +98,7 @@ export function Services() {
               {/* Bottom Call to Action */}
               <div className="pt-6 mt-6 border-t border-outline-variant/30">
                 <Link
-                  to="/booking"
+                  to={s.title === "Admissions Consulting" ? "/consulting" : s.title === "Premium Essay Advisory" ? "/dashboard/essays" : "/booking"}
                   className="inline-flex items-center gap-2 font-body text-[11px] font-bold uppercase tracking-[0.1em] text-accent group-hover:text-primary transition-all duration-300"
                 >
                   Request Details 

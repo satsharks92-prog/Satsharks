@@ -8,6 +8,8 @@ export interface IUser extends Document {
   country: string;
   region: "LOCAL" | "INTERNATIONAL";
   subscription: "FREE" | "PAID";
+  subscriptionPlan?: string;
+  subscriptionExpiry?: Date;
   status: "ACTIVE" | "SUSPENDED";
   createdAt: Date;
   updatedAt: Date;
@@ -39,6 +41,12 @@ const UserSchema: Schema = new Schema(
       enum: ["FREE", "PAID"],
       required: true,
       default: "FREE",
+    },
+    subscriptionPlan: {
+      type: String,
+    },
+    subscriptionExpiry: {
+      type: Date,
     },
     status: {
       type: String,

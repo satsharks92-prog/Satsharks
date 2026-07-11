@@ -19,10 +19,13 @@ function Contact() {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError("");
+    setSuccess(false);
     try {
       const res = await api.post("/api/contact/inquiry", {
         firstName, lastName, email, category, message
@@ -33,8 +36,11 @@ function Contact() {
         setLastName("");
         setEmail("");
         setMessage("");
+      } else {
+        setError(res.error || "Failed to submit inquiry. Please try again.");
       }
-    } catch (err) {
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred.");
       console.error(err);
     }
     setIsSubmitting(false);
@@ -85,7 +91,8 @@ function Contact() {
               className="lg:col-span-3 rounded-2xl bg-surface-container-lowest text-on-surface p-8 md:p-10 shark-shadow border border-outline-variant/40"
             >
               <h3 className="font-headline text-2xl font-semibold">Send us a message</h3>
-              {success && <div className="mt-4 p-4 bg-primary-container text-on-primary-container rounded-xl text-sm">Thanks for reaching out! We'll get back to you soon.</div>}
+              {success && <div className="mt-4 p-4 bg-primary-container text-on-primary-container rounded-xl text-sm font-semibold">Inquiry sent successfully! Our admin will review it and reply soon.</div>}
+              {error && <div className="mt-4 p-4 bg-error/10 text-error rounded-xl border border-error/30 text-sm">{error}</div>}
               <div className="mt-8 space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <Input label="First Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} type="text" placeholder="Jane" required />

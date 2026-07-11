@@ -1,7 +1,48 @@
 import { motion } from "framer-motion";
+import { useState } from "react";
 import { Icon } from "../common/Icon";
+import { api } from "../../services/api";
 
 export function CTA() {
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError("");
+    setSuccess(false);
+    
+    const parts = fullName.trim().split(" ");
+    const firstName = parts[0] || "Unknown";
+    const lastName = parts.slice(1).join(" ") || "User";
+
+    try {
+      const res = await api.post("/api/contact/inquiry", {
+        firstName,
+        lastName,
+        email,
+        category: "General Inquiry",
+        message
+      });
+      if (res.success) {
+        setSuccess(true);
+        setFullName("");
+        setEmail("");
+        setMessage("");
+      } else {
+        setError(res.error || "Failed to submit inquiry. Please try again.");
+      }
+    } catch (err: any) {
+      setError(err.message || "An unexpected error occurred.");
+    }
+    setIsSubmitting(false);
+  };
+
   return (
     <section
       id="contact"
@@ -81,23 +122,29 @@ export function CTA() {
           className="lg:col-span-6"
         >
           <form
-            onSubmit={(e) => e.preventDefault()}
+            onSubmit={handleSubmit}
             className="rounded-xl border border-accent/20 bg-surface text-on-surface p-8 md:p-10 shark-shadow"
           >
             <h3 className="font-display text-3xl font-bold text-primary">
               Send us a message
             </h3>
-            <p className="font-body text-xs font-light text-on-surface-variant/80 mt-1">
+            <p className="font-body text-xs font-light text-on-surface-variant/80 mt-1 mb-6">
               Complete the fields below to initiate your consultation ticket.
             </p>
             
-            <div className="mt-8 space-y-6">
+            {success && <div className="mb-6 p-4 bg-primary-container text-on-primary-container rounded-xl text-sm font-semibold">Inquiry sent successfully! Our admin will review it and reply soon.</div>}
+            {error && <div className="mb-6 p-4 bg-error/10 text-error rounded-xl border border-error/30 text-sm">{error}</div>}
+            
+            <div className="space-y-6">
               <div>
                 <label className="block font-body text-[10px] font-bold uppercase tracking-[0.12em] text-on-surface-variant">
                   Full Name
                 </label>
                 <input
                   type="text"
+                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   placeholder="Jane Doe"
                   className="mt-2 w-full rounded-lg border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface outline-none focus:border-accent focus:ring-1 focus:ring-accent/40 transition-all font-body font-light"
                 />
@@ -109,6 +156,9 @@ export function CTA() {
                 </label>
                 <input
                   type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   className="mt-2 w-full rounded-lg border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface outline-none focus:border-accent focus:ring-1 focus:ring-accent/40 transition-all font-body font-light"
                 />
@@ -120,6 +170,9 @@ export function CTA() {
                 </label>
                 <textarea
                   rows={4}
+                  required
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                   placeholder="Tell us about your educational background and target universities..."
                   className="mt-2 w-full rounded-lg border border-outline-variant bg-surface-container-low px-4 py-3 text-sm text-on-surface outline-none focus:border-accent focus:ring-1 focus:ring-accent/40 transition-all font-body font-light resize-none"
                 />
@@ -127,9 +180,10 @@ export function CTA() {
 
               <button
                 type="submit"
-                className="btn-shimmer mt-2 inline-flex w-full items-center justify-center gap-3 rounded-lg bg-primary px-6 py-4 text-xs font-bold uppercase tracking-[0.1em] text-on-primary shark-shadow hover:bg-accent transition-all duration-300 cursor-pointer"
+                disabled={isSubmitting}
+                className="btn-shimmer mt-2 inline-flex w-full items-center justify-center gap-3 rounded-lg bg-primary px-6 py-4 text-xs font-bold uppercase tracking-[0.1em] text-on-primary shark-shadow hover:bg-accent transition-all duration-300 cursor-pointer disabled:opacity-70"
               >
-                Submit Inquiry <Icon name="send" className="text-[16px]" />
+                {isSubmitting ? "Sending..." : "Submit Inquiry"} <Icon name="send" className="text-[16px]" />
               </button>
             </div>
           </form>

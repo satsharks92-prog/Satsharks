@@ -49,8 +49,15 @@ const CollageSkeleton = () => (
 );
 
 export function Hero() {
-  const [feature, setFeature] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [feature, setFeature] = useState<any>({
+    studentName: "Admitted Student",
+    university: "Stanford University '28",
+    score: "1580",
+    improvement: "+210 Improvement",
+    tag: "Top 1% Worldwide",
+    imageUrl: ""
+  });
 
   useEffect(() => {
     api.get("/api/success-stories/featured")
@@ -63,21 +70,21 @@ export function Hero() {
           img.src = imgUrl;
           img.onload = () => {
             setFeature(res.feature);
-            setLoading(false);
+            setIsLoading(false);
           };
           img.onerror = () => {
             setFeature(res.feature);
-            setLoading(false);
+            setIsLoading(false);
           };
         } else {
           setFeature(DEFAULT_FEATURE);
-          setLoading(false);
+          setIsLoading(false);
         }
       })
       .catch((err) => {
         console.error("Error fetching featured success story:", err);
         setFeature(DEFAULT_FEATURE);
-        setLoading(false);
+        setIsLoading(false);
       });
   }, []);
 
@@ -149,7 +156,7 @@ export function Hero() {
 
         {/* Right Side: Multi-layered Creative Collage */}
         <div className="lg:col-span-5 relative mt-8 lg:mt-0">
-          {loading || !feature ? (
+          {isLoading || !feature ? (
             <CollageSkeleton />
           ) : (
             <motion.div 

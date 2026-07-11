@@ -37,3 +37,9 @@ export const optionalAuthenticate = (req: AuthRequest, res: Response, next: Next
   }
 };
 
+export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (req.user?.role !== "ADMIN") {
+    return res.status(403).json({ success: false, error: "Forbidden: Admin access required" });
+  }
+  next();
+};

@@ -14,6 +14,7 @@ export const Route = createFileRoute("/admin/contact-requests")({
 function AdminContactRequests() {
   const { user } = useAuth();
   const [inquiries, setInquiries] = useState<any[]>([]);
+  const [replyTexts, setReplyTexts] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (user?.role === "ADMIN") {
@@ -27,6 +28,16 @@ function AdminContactRequests() {
     const res = await api.put(`/api/contact/${id}/status`, { status });
     if (res.success) {
       setInquiries((prev) => prev.map((i) => (i._id === id ? { ...i, status } : i)));
+    }
+  };
+
+  const submitReply = async (id: string, currentStatus: string) => {
+    const text = replyTexts[id];
+    if (!text) return;
+    const res = await api.put(`/api/contact/${id}/status`, { status: currentStatus, adminReply: text });
+    if (res.success) {
+      setInquiries((prev) => prev.map((i) => (i._id === id ? { ...i, adminReply: text, status: res.inquiry?.status || "RESOLVED" } : i)));
+      setReplyTexts((prev) => ({ ...prev, [id]: "" }));
     }
   };
 
@@ -77,6 +88,30 @@ function AdminContactRequests() {
                   <option value="RESOLVED">Resolved</option>
                 </select>
               </div>
+              
+              {inquiry.adminReply ? (
+                <div className="mt-4 p-4 rounded-xl bg-primary/10 border border-primary/20">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-primary mb-1">Admin Reply</h4>
+                  <p className="text-sm text-on-surface">{inquiry.adminReply}</p>
+                </div>
+              ) : (
+                <div className="mt-4 flex gap-2">
+                  <textarea
+                    placeholder="Type your reply here..."
+                    className="flex-1 rounded-xl border border-outline-variant bg-surface-container-low px-3 py-2 text-sm outline-none resize-none focus:border-primary"
+                    rows={2}
+                    value={replyTexts[inquiry._id] || ""}
+                    onChange={(e) => setReplyTexts({ ...replyTexts, [inquiry._id]: e.target.value })}
+                  />
+                  <button
+                    onClick={() => submitReply(inquiry._id, inquiry.status || "NEW")}
+                    disabled={!replyTexts[inquiry._id]}
+                    className="self-end px-4 py-2 bg-primary text-on-primary text-sm font-semibold rounded-xl hover:bg-accent hover:text-primary transition-colors disabled:opacity-50"
+                  >
+                    Reply
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -250,3 +250,53 @@ export interface SATTestAttempt {
   completedAt: string | null;
   createdAt: string;
 }
+
+export interface ConsultingRequest {
+  _id: string;
+  student: User | string;
+  level: "UNDERGRADUATE" | "GRADUATE";
+  secondaryType: "MATRIC" | "O_LEVEL" | "";
+  secondaryObtained: number | null;
+  secondaryTotal: number | null;
+  secondaryGrades: string;
+  higherType: "FSC" | "A_LEVEL" | "";
+  higherObtained: number | null;
+  higherTotal: number | null;
+  higherGrades: string;
+  gpa: string;
+  satScore: number;
+  gradeYear: string;
+  targetUniversities: string[];
+  extracurriculars: string;
+  budgetRange: string;
+  status: "PENDING" | "IN_REVIEW" | "COMPLETED";
+  adminNotes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Essay {
+  _id: string;
+  student: User | string;
+  type: "COMMON_APP" | "SUPPLEMENTAL" | "OTHER";
+  targetUniversity: string;
+  essayText: string;
+  fileUrl: string;
+  status: "PENDING" | "IN_REVIEW" | "REVIEWED";
+  adminFeedback: string;
+  reviewedBy: User | string | null;
+  reviewedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Notification {
+  _id: string;
+  user: User | string;
+  type: "ESSAY_SUBMITTED" | "ESSAY_REVIEWED" | "CONSULTING_SUBMITTED" | "PAYMENT_SUCCESS" | "ACCOUNT" | "TEST";
+  title: string;
+  message: string;
+  isRead: boolean;
+  createdAt: string;
+  updatedAt: string;
+}

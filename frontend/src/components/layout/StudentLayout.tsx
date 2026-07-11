@@ -7,6 +7,7 @@ import { Icon } from "../common/Icon";
 
 const navItems = [
   { to: "/dashboard", label: "Dashboard", icon: "dashboard" },
+  { to: "/dashboard/practice", label: "Practice Questions", icon: "fitness_center" },
   { to: "/dashboard/sat-tests", label: "Digital SAT Practice Tests", icon: "school" },
   { to: "/dashboard/history", label: "Test History", icon: "history" },
   { to: "/dashboard/analytics", label: "Analytics", icon: "insights" },

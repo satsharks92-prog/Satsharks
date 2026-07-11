@@ -17,6 +17,7 @@ function SATTestList() {
   const navigate = useNavigate();
   const [tests, setTests] = useState<SATTest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [startingTestId, setStartingTestId] = useState<string | null>(null);
 
   useEffect(() => {
     api.get("/api/sat").then((res) => {
@@ -26,11 +27,25 @@ function SATTestList() {
   }, []);
 
   const handleStart = async (testId: string) => {
+    setStartingTestId(testId);
     const res = await api.post(`/api/sat/${testId}/start`, {});
     if (res.success) {
       navigate({ to: `/dashboard/sat-runner/${res.attempt._id}` });
+    } else {
+      setStartingTestId(null);
     }
   };
+
+  if (startingTestId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <Icon name="hourglass_top" className="text-5xl text-primary mb-4 animate-pulse" />
+          <div className="text-on-surface-variant font-semibold">Loading your SAT test...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <StudentLayout activeItem="/dashboard/sat-tests">

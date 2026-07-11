@@ -20,6 +20,7 @@ function Subscriptions() {
   const [isLoadingPlans, setIsLoadingPlans] = useState(false);
   const [error, setError] = useState("");
   const [selectedRegion, setSelectedRegion] = useState<"LOCAL" | "INTERNATIONAL">("LOCAL");
+  const [processingPlanId, setProcessingPlanId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthLoading) return;
@@ -48,6 +49,24 @@ function Subscriptions() {
   const activeRegion = user ? user.region : selectedRegion;
   const displayedPlans = user ? plans : getVisiblePlans(plans, selectedRegion);
   const heading = getPlanHeading(activeRegion);
+
+  const handleSubscribe = async (planId: string) => {
+    setProcessingPlanId(planId);
+    setError("");
+    try {
+      const res = await api.post("/api/payment/create-checkout", { planId, region: selectedRegion });
+      if (res.success && res.url) {
+        window.location.href = res.url;
+      } else {
+        setError(res.error || "Failed to initiate checkout");
+      }
+    } catch (e) {
+      console.error("Payment error", e);
+      setError("An error occurred while connecting to payment gateway.");
+    } finally {
+      setProcessingPlanId(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-on-background animate-fade-up flex flex-col">
@@ -166,21 +185,20 @@ function Subscriptions() {
                       <Button
                         variant={plan.highlight ? "glass" : "outline"}
                         className="w-full py-3.5"
+                        onClick={() => handleSubscribe(plan.id || plan._id)}
+                        disabled={processingPlanId === (plan.id || plan._id)}
                       >
-                        {plan.price === "$0" ? "Get Started Free" : "Subscribe Now"}
+                        {processingPlanId === (plan.id || plan._id) ? "Processing..." : plan.price === "$0" ? "Get Started Free" : "Subscribe Now"}
                       </Button>
                     ) : (
-                      <Link
-                        to="/auth/login"
-                        className="w-full"
+                      <Button
+                        variant={plan.highlight ? "glass" : "outline"}
+                        className="w-full py-3.5"
+                        onClick={() => handleSubscribe(plan.id || plan._id)}
+                        disabled={processingPlanId === (plan.id || plan._id)}
                       >
-                        <Button
-                          variant={plan.highlight ? "glass" : "outline"}
-                          className="w-full py-3.5"
-                        >
-                          {plan.price === "$0" ? "Get Started Free" : "Subscribe Now"}
-                        </Button>
-                      </Link>
+                        {processingPlanId === (plan.id || plan._id) ? "Processing..." : plan.price === "$0" ? "Get Started Free" : "Subscribe Now"}
+                      </Button>
                     )}
                   </div>
                 ))}

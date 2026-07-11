@@ -20,4 +20,8 @@ export const env = {
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || "development_refresh_secret",
   isDatabaseConfigured: Boolean(process.env.DATABASE_URL),
   allowMockAuth: process.env.ALLOW_MOCK_AUTH === "true",
+  stripeSecretKey: process.env.STRIPE_SECRET_KEY || "",
+  stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET || "",
+  payproClientId: process.env.PAYPRO_CLIENT_ID || "",
+  payproSecretKey: process.env.PAYPRO_SECRET_KEY || "",
 };

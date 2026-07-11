@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Icon } from "../common/Icon";
 import logoImg from "@/assets/logo.png";
 import { useAuth } from "../../hooks/useAuth";
+import { NotificationBell } from "../common/NotificationBell";
 
 export function Header() {
   const navigate = useNavigate();
@@ -25,8 +26,8 @@ export function Header() {
 
   const links = [
     { to: "/", hash: "services", label: "Services" },
+    { to: "/consulting", hash: undefined, label: "Consulting" },
     { to: "/booking", hash: undefined, label: "Book Session" },
-    { to: "/success-stories", hash: undefined, label: "Success Stories" },
     { to: "/subscriptions", hash: undefined, label: "Pricing" },
     { to: "/contact", hash: undefined, label: "Contact" },
     ...(user?.role === "STUDENT" ? [{ to: "/dashboard/", hash: undefined, label: "Dashboard" }] : []),
@@ -44,26 +45,27 @@ export function Header() {
         <Link to="/" className="flex items-center gap-2 group transition-transform duration-300 hover:scale-[1.02]">
           <img src={logoImg} alt="SAT Sharks" className="h-12 md:h-16 w-auto relative -top-1 md:-top-1.5 mix-blend-multiply" />
         </Link>
-        <nav className="hidden items-center gap-8 lg:flex">
+        <nav className={`hidden items-center ${user ? "gap-4 xl:gap-6" : "gap-8"} lg:flex`}>
           {links.map((l) => (
             <Link
               key={l.label}
               to={l.to}
               hash={l.hash}
-              className="relative py-1 font-body text-[13px] font-semibold uppercase tracking-[0.08em] text-on-surface-variant hover:text-primary transition-colors duration-300 group"
+              className={`relative py-1 font-body ${user ? "text-[11px] xl:text-[12px]" : "text-[13px]"} font-semibold uppercase tracking-[0.08em] text-on-surface-variant hover:text-primary transition-colors duration-300 group whitespace-nowrap`}
             >
               {l.label}
               <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-accent transition-all duration-300 group-hover:w-full" />
             </Link>
           ))}
         </nav>
-        <div className="hidden lg:flex items-center gap-5">
+        <div className={`hidden lg:flex items-center ${user ? "gap-3 xl:gap-5" : "gap-5"}`}>
           {user ? (
             <div className="flex items-center gap-5">
-              <span className="font-body text-[13px] font-semibold uppercase tracking-[0.08em] text-on-surface">Hi, {user.name}</span>
+              <NotificationBell />
+              <span className="font-body text-[11px] xl:text-[12px] font-semibold uppercase tracking-[0.08em] text-on-surface whitespace-nowrap">Hi, {user.name}</span>
               <button
                 onClick={handleLogout}
-                className="text-[13px] font-bold uppercase tracking-[0.08em] text-on-surface-variant hover:text-accent transition-colors cursor-pointer"
+                className="text-[11px] xl:text-[12px] font-bold uppercase tracking-[0.08em] text-on-surface-variant hover:text-accent transition-colors cursor-pointer"
               >
                 Logout
               </button>

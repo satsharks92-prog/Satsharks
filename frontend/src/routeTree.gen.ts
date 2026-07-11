@@ -13,13 +13,17 @@ import { Route as SuccessStoriesRouteImport } from './routes/success-stories'
 import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as ConsultingRouteImport } from './routes/consulting'
 import { Route as BookingRouteImport } from './routes/booking'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as PaymentSuccessRouteImport } from './routes/payment.success'
+import { Route as PaymentCancelRouteImport } from './routes/payment.cancel'
 import { Route as DashboardSatTestsRouteImport } from './routes/dashboard/sat-tests'
 import { Route as DashboardPracticeRouteImport } from './routes/dashboard/practice'
 import { Route as DashboardHistoryRouteImport } from './routes/dashboard/history'
+import { Route as DashboardEssaysRouteImport } from './routes/dashboard/essays'
 import { Route as DashboardAnalyticsRouteImport } from './routes/dashboard/analytics'
 import { Route as AuthResetPasswordRouteImport } from './routes/auth/reset-password'
 import { Route as AuthRegisterRouteImport } from './routes/auth/register'
@@ -27,10 +31,13 @@ import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth/forgot-password'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminUploadsRouteImport } from './routes/admin/uploads'
+import { Route as AdminUniversitiesRouteImport } from './routes/admin/universities'
 import { Route as AdminTestsRouteImport } from './routes/admin/tests'
 import { Route as AdminSuccessStoriesRouteImport } from './routes/admin/success-stories'
 import { Route as AdminQuestionsRouteImport } from './routes/admin/questions'
+import { Route as AdminEssaysRouteImport } from './routes/admin/essays'
 import { Route as AdminContactRequestsRouteImport } from './routes/admin/contact-requests'
+import { Route as AdminConsultingRouteImport } from './routes/admin/consulting'
 import { Route as DashboardSatRunnerAttemptIdRouteImport } from './routes/dashboard/sat-runner.$attemptId'
 import { Route as DashboardSatResultAttemptIdRouteImport } from './routes/dashboard/sat-result.$attemptId'
 import { Route as AdminReviewUploadUploadIdRouteImport } from './routes/admin/review-upload.$uploadId'
@@ -55,6 +62,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ConsultingRoute = ConsultingRouteImport.update({
+  id: '/consulting',
+  path: '/consulting',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BookingRoute = BookingRouteImport.update({
   id: '/booking',
   path: '/booking',
@@ -75,6 +87,16 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PaymentSuccessRoute = PaymentSuccessRouteImport.update({
+  id: '/payment/success',
+  path: '/payment/success',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PaymentCancelRoute = PaymentCancelRouteImport.update({
+  id: '/payment/cancel',
+  path: '/payment/cancel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardSatTestsRoute = DashboardSatTestsRouteImport.update({
   id: '/sat-tests',
   path: '/sat-tests',
@@ -88,6 +110,11 @@ const DashboardPracticeRoute = DashboardPracticeRouteImport.update({
 const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
   id: '/history',
   path: '/history',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardEssaysRoute = DashboardEssaysRouteImport.update({
+  id: '/essays',
+  path: '/essays',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardAnalyticsRoute = DashboardAnalyticsRouteImport.update({
@@ -125,6 +152,11 @@ const AdminUploadsRoute = AdminUploadsRouteImport.update({
   path: '/admin/uploads',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUniversitiesRoute = AdminUniversitiesRouteImport.update({
+  id: '/admin/universities',
+  path: '/admin/universities',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminTestsRoute = AdminTestsRouteImport.update({
   id: '/admin/tests',
   path: '/admin/tests',
@@ -140,9 +172,19 @@ const AdminQuestionsRoute = AdminQuestionsRouteImport.update({
   path: '/admin/questions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminEssaysRoute = AdminEssaysRouteImport.update({
+  id: '/admin/essays',
+  path: '/admin/essays',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminContactRequestsRoute = AdminContactRequestsRouteImport.update({
   id: '/admin/contact-requests',
   path: '/admin/contact-requests',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminConsultingRoute = AdminConsultingRouteImport.update({
+  id: '/admin/consulting',
+  path: '/admin/consulting',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardSatRunnerAttemptIdRoute =
@@ -167,14 +209,18 @@ const AdminReviewUploadUploadIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/booking': typeof BookingRoute
+  '/consulting': typeof ConsultingRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/subscriptions': typeof SubscriptionsRoute
   '/success-stories': typeof SuccessStoriesRoute
+  '/admin/consulting': typeof AdminConsultingRoute
   '/admin/contact-requests': typeof AdminContactRequestsRoute
+  '/admin/essays': typeof AdminEssaysRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/success-stories': typeof AdminSuccessStoriesRoute
   '/admin/tests': typeof AdminTestsRoute
+  '/admin/universities': typeof AdminUniversitiesRoute
   '/admin/uploads': typeof AdminUploadsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -182,9 +228,12 @@ export interface FileRoutesByFullPath {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/essays': typeof DashboardEssaysRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
   '/dashboard/sat-tests': typeof DashboardSatTestsRoute
+  '/payment/cancel': typeof PaymentCancelRoute
+  '/payment/success': typeof PaymentSuccessRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/admin/review-upload/$uploadId': typeof AdminReviewUploadUploadIdRoute
@@ -194,13 +243,17 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/booking': typeof BookingRoute
+  '/consulting': typeof ConsultingRoute
   '/contact': typeof ContactRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/success-stories': typeof SuccessStoriesRoute
+  '/admin/consulting': typeof AdminConsultingRoute
   '/admin/contact-requests': typeof AdminContactRequestsRoute
+  '/admin/essays': typeof AdminEssaysRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/success-stories': typeof AdminSuccessStoriesRoute
   '/admin/tests': typeof AdminTestsRoute
+  '/admin/universities': typeof AdminUniversitiesRoute
   '/admin/uploads': typeof AdminUploadsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -208,9 +261,12 @@ export interface FileRoutesByTo {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/essays': typeof DashboardEssaysRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
   '/dashboard/sat-tests': typeof DashboardSatTestsRoute
+  '/payment/cancel': typeof PaymentCancelRoute
+  '/payment/success': typeof PaymentSuccessRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/admin/review-upload/$uploadId': typeof AdminReviewUploadUploadIdRoute
@@ -221,14 +277,18 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/booking': typeof BookingRoute
+  '/consulting': typeof ConsultingRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/subscriptions': typeof SubscriptionsRoute
   '/success-stories': typeof SuccessStoriesRoute
+  '/admin/consulting': typeof AdminConsultingRoute
   '/admin/contact-requests': typeof AdminContactRequestsRoute
+  '/admin/essays': typeof AdminEssaysRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/success-stories': typeof AdminSuccessStoriesRoute
   '/admin/tests': typeof AdminTestsRoute
+  '/admin/universities': typeof AdminUniversitiesRoute
   '/admin/uploads': typeof AdminUploadsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -236,9 +296,12 @@ export interface FileRoutesById {
   '/auth/register': typeof AuthRegisterRoute
   '/auth/reset-password': typeof AuthResetPasswordRoute
   '/dashboard/analytics': typeof DashboardAnalyticsRoute
+  '/dashboard/essays': typeof DashboardEssaysRoute
   '/dashboard/history': typeof DashboardHistoryRoute
   '/dashboard/practice': typeof DashboardPracticeRoute
   '/dashboard/sat-tests': typeof DashboardSatTestsRoute
+  '/payment/cancel': typeof PaymentCancelRoute
+  '/payment/success': typeof PaymentSuccessRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/admin/review-upload/$uploadId': typeof AdminReviewUploadUploadIdRoute
@@ -250,14 +313,18 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/booking'
+    | '/consulting'
     | '/contact'
     | '/dashboard'
     | '/subscriptions'
     | '/success-stories'
+    | '/admin/consulting'
     | '/admin/contact-requests'
+    | '/admin/essays'
     | '/admin/questions'
     | '/admin/success-stories'
     | '/admin/tests'
+    | '/admin/universities'
     | '/admin/uploads'
     | '/admin/users'
     | '/auth/forgot-password'
@@ -265,9 +332,12 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/dashboard/analytics'
+    | '/dashboard/essays'
     | '/dashboard/history'
     | '/dashboard/practice'
     | '/dashboard/sat-tests'
+    | '/payment/cancel'
+    | '/payment/success'
     | '/admin/'
     | '/dashboard/'
     | '/admin/review-upload/$uploadId'
@@ -277,13 +347,17 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/booking'
+    | '/consulting'
     | '/contact'
     | '/subscriptions'
     | '/success-stories'
+    | '/admin/consulting'
     | '/admin/contact-requests'
+    | '/admin/essays'
     | '/admin/questions'
     | '/admin/success-stories'
     | '/admin/tests'
+    | '/admin/universities'
     | '/admin/uploads'
     | '/admin/users'
     | '/auth/forgot-password'
@@ -291,9 +365,12 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/dashboard/analytics'
+    | '/dashboard/essays'
     | '/dashboard/history'
     | '/dashboard/practice'
     | '/dashboard/sat-tests'
+    | '/payment/cancel'
+    | '/payment/success'
     | '/admin'
     | '/dashboard'
     | '/admin/review-upload/$uploadId'
@@ -303,14 +380,18 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/booking'
+    | '/consulting'
     | '/contact'
     | '/dashboard'
     | '/subscriptions'
     | '/success-stories'
+    | '/admin/consulting'
     | '/admin/contact-requests'
+    | '/admin/essays'
     | '/admin/questions'
     | '/admin/success-stories'
     | '/admin/tests'
+    | '/admin/universities'
     | '/admin/uploads'
     | '/admin/users'
     | '/auth/forgot-password'
@@ -318,9 +399,12 @@ export interface FileRouteTypes {
     | '/auth/register'
     | '/auth/reset-password'
     | '/dashboard/analytics'
+    | '/dashboard/essays'
     | '/dashboard/history'
     | '/dashboard/practice'
     | '/dashboard/sat-tests'
+    | '/payment/cancel'
+    | '/payment/success'
     | '/admin/'
     | '/dashboard/'
     | '/admin/review-upload/$uploadId'
@@ -331,20 +415,26 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BookingRoute: typeof BookingRoute
+  ConsultingRoute: typeof ConsultingRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   SubscriptionsRoute: typeof SubscriptionsRoute
   SuccessStoriesRoute: typeof SuccessStoriesRoute
+  AdminConsultingRoute: typeof AdminConsultingRoute
   AdminContactRequestsRoute: typeof AdminContactRequestsRoute
+  AdminEssaysRoute: typeof AdminEssaysRoute
   AdminQuestionsRoute: typeof AdminQuestionsRoute
   AdminSuccessStoriesRoute: typeof AdminSuccessStoriesRoute
   AdminTestsRoute: typeof AdminTestsRoute
+  AdminUniversitiesRoute: typeof AdminUniversitiesRoute
   AdminUploadsRoute: typeof AdminUploadsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
   AuthRegisterRoute: typeof AuthRegisterRoute
   AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  PaymentCancelRoute: typeof PaymentCancelRoute
+  PaymentSuccessRoute: typeof PaymentSuccessRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminReviewUploadUploadIdRoute: typeof AdminReviewUploadUploadIdRoute
 }
@@ -379,6 +469,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/consulting': {
+      id: '/consulting'
+      path: '/consulting'
+      fullPath: '/consulting'
+      preLoaderRoute: typeof ConsultingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/booking': {
       id: '/booking'
       path: '/booking'
@@ -407,6 +504,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/payment/success': {
+      id: '/payment/success'
+      path: '/payment/success'
+      fullPath: '/payment/success'
+      preLoaderRoute: typeof PaymentSuccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/payment/cancel': {
+      id: '/payment/cancel'
+      path: '/payment/cancel'
+      fullPath: '/payment/cancel'
+      preLoaderRoute: typeof PaymentCancelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/sat-tests': {
       id: '/dashboard/sat-tests'
       path: '/sat-tests'
@@ -426,6 +537,13 @@ declare module '@tanstack/react-router' {
       path: '/history'
       fullPath: '/dashboard/history'
       preLoaderRoute: typeof DashboardHistoryRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/essays': {
+      id: '/dashboard/essays'
+      path: '/essays'
+      fullPath: '/dashboard/essays'
+      preLoaderRoute: typeof DashboardEssaysRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/analytics': {
@@ -477,6 +595,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUploadsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/universities': {
+      id: '/admin/universities'
+      path: '/admin/universities'
+      fullPath: '/admin/universities'
+      preLoaderRoute: typeof AdminUniversitiesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/tests': {
       id: '/admin/tests'
       path: '/admin/tests'
@@ -498,11 +623,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminQuestionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/essays': {
+      id: '/admin/essays'
+      path: '/admin/essays'
+      fullPath: '/admin/essays'
+      preLoaderRoute: typeof AdminEssaysRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/contact-requests': {
       id: '/admin/contact-requests'
       path: '/admin/contact-requests'
       fullPath: '/admin/contact-requests'
       preLoaderRoute: typeof AdminContactRequestsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/consulting': {
+      id: '/admin/consulting'
+      path: '/admin/consulting'
+      fullPath: '/admin/consulting'
+      preLoaderRoute: typeof AdminConsultingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/sat-runner/$attemptId': {
@@ -531,6 +670,7 @@ declare module '@tanstack/react-router' {
 
 interface DashboardRouteChildren {
   DashboardAnalyticsRoute: typeof DashboardAnalyticsRoute
+  DashboardEssaysRoute: typeof DashboardEssaysRoute
   DashboardHistoryRoute: typeof DashboardHistoryRoute
   DashboardPracticeRoute: typeof DashboardPracticeRoute
   DashboardSatTestsRoute: typeof DashboardSatTestsRoute
@@ -541,6 +681,7 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAnalyticsRoute: DashboardAnalyticsRoute,
+  DashboardEssaysRoute: DashboardEssaysRoute,
   DashboardHistoryRoute: DashboardHistoryRoute,
   DashboardPracticeRoute: DashboardPracticeRoute,
   DashboardSatTestsRoute: DashboardSatTestsRoute,
@@ -556,20 +697,26 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BookingRoute: BookingRoute,
+  ConsultingRoute: ConsultingRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   SubscriptionsRoute: SubscriptionsRoute,
   SuccessStoriesRoute: SuccessStoriesRoute,
+  AdminConsultingRoute: AdminConsultingRoute,
   AdminContactRequestsRoute: AdminContactRequestsRoute,
+  AdminEssaysRoute: AdminEssaysRoute,
   AdminQuestionsRoute: AdminQuestionsRoute,
   AdminSuccessStoriesRoute: AdminSuccessStoriesRoute,
   AdminTestsRoute: AdminTestsRoute,
+  AdminUniversitiesRoute: AdminUniversitiesRoute,
   AdminUploadsRoute: AdminUploadsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
   AuthRegisterRoute: AuthRegisterRoute,
   AuthResetPasswordRoute: AuthResetPasswordRoute,
+  PaymentCancelRoute: PaymentCancelRoute,
+  PaymentSuccessRoute: PaymentSuccessRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminReviewUploadUploadIdRoute: AdminReviewUploadUploadIdRoute,
 }

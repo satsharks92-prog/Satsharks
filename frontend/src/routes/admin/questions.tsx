@@ -136,6 +136,39 @@ function AdminQuestions() {
     }
   };
 
+  // Category Edit / Delete States & Handlers
+  const [editingCatId, setEditingCatId] = useState<string | null>(null);
+  const [editingCatName, setEditingCatName] = useState("");
+  const [editingCatSection, setEditingCatSection] = useState("MATH");
+
+  const startEditCategory = (c: QuestionCategory) => {
+    setEditingCatId(c._id);
+    setEditingCatName(c.name);
+    setEditingCatSection(c.section);
+  };
+
+  const handleUpdateCategory = async (id: string) => {
+    if (!editingCatName) return;
+    const res = await api.put(`/api/categories/${id}`, {
+      name: editingCatName,
+      section: editingCatSection
+    });
+    if (res.success) {
+      fetchCategories();
+      setEditingCatId(null);
+    }
+  };
+
+  const handleDeleteCategory = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this category? Questions under this category will need to be re-categorized.")) {
+      return;
+    }
+    const res = await api.delete(`/api/categories/${id}`);
+    if (res.success) {
+      fetchCategories();
+    }
+  };
+
   return (
     <AdminLayout activeItem="/admin/questions">
       <div className="flex items-center justify-between mb-6">
@@ -269,13 +302,63 @@ function AdminQuestions() {
 
       {/* Category Modal */}
       <Modal open={catModalOpen} onClose={() => setCatModalOpen(false)} title="Manage Categories" icon="category">
-        <div className="space-y-3 mb-6">
+        <div className="space-y-3 mb-6 max-h-[50vh] overflow-y-auto pr-1">
           {categories.map((c) => (
-            <div key={c._id} className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-outline-variant/30">
-              <div>
-                <span className="font-semibold text-sm">{c.name}</span>
-                <Badge variant="info" className="ml-2">{c.section === "MATH" ? "Math" : "R&W"}</Badge>
-              </div>
+            <div key={c._id} className="flex items-center justify-between px-4 py-2.5 rounded-lg border border-outline-variant/30 gap-2 bg-surface-container-lowest">
+              {editingCatId === c._id ? (
+                <div className="flex flex-1 items-center gap-2">
+                  <input
+                    type="text"
+                    value={editingCatName}
+                    onChange={(e) => setEditingCatName(e.target.value)}
+                    className="flex-1 rounded-xl border border-outline-variant bg-surface-container-low px-3 py-1.5 text-sm outline-none focus:border-primary transition-colors"
+                    required
+                  />
+                  <select
+                    value={editingCatSection}
+                    onChange={(e) => setEditingCatSection(e.target.value)}
+                    className="rounded-xl border border-outline-variant bg-surface-container-low px-2 py-1.5 text-sm outline-none focus:border-primary transition-colors"
+                  >
+                    <option value="MATH">Math</option>
+                    <option value="READING_WRITING">R&W</option>
+                  </select>
+                  <button
+                    onClick={() => handleUpdateCategory(c._id)}
+                    className="px-3 py-1.5 bg-primary text-on-primary rounded-lg text-xs font-semibold hover:bg-accent transition-colors cursor-pointer"
+                  >
+                    Save
+                  </button>
+                  <button
+                    onClick={() => setEditingCatId(null)}
+                    className="px-3 py-1.5 bg-surface-container-high hover:bg-surface-container-highest rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="font-semibold text-sm truncate">{c.name}</span>
+                    <Badge variant="info" className="shrink-0">{c.section === "MATH" ? "Math" : "R&W"}</Badge>
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    <button
+                      onClick={() => startEditCategory(c)}
+                      className="p-1 hover:bg-surface-container-high rounded transition-colors text-on-surface-variant hover:text-primary cursor-pointer"
+                      title="Edit Category"
+                    >
+                      <Icon name="edit" className="text-base" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCategory(c._id)}
+                      className="p-1 hover:bg-error/10 rounded transition-colors text-error cursor-pointer"
+                      title="Delete Category"
+                    >
+                      <Icon name="delete" className="text-base" />
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ))}
           {categories.length === 0 && <p className="text-sm text-on-surface-variant text-center py-4">No categories yet</p>}
