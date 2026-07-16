@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 
 import appCss from "../styles.css?url";
+import faviconUrl from "../assets/favicon.svg?url";
 import { reportAppError } from "../lib/error-reporting";
 import { Toaster } from "../components/ui/sonner";
 
@@ -78,13 +79,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "SAT Sharks — Achieve Your Dream SAT Score & College Admission" },
+      { title: "SAT Sharks | Achieve Your Dream SAT Score & College Admission" },
       {
         name: "description",
         content:
           "Personalized SAT preparation, expert college counseling, essay reviews, and proven strategies that give you the competitive edge.",
       },
-      { property: "og:title", content: "SAT Sharks — Achieve Your Dream SAT Score" },
+      { property: "og:title", content: "SAT Sharks | Achieve Your Dream SAT Score" },
       {
         property: "og:description",
         content:
@@ -95,6 +96,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
+      { rel: "icon", type: "image/svg+xml", href: faviconUrl },
       { rel: "stylesheet", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },

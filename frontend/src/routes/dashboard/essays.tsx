@@ -67,14 +67,14 @@ function EssaysDashboard() {
             </div>
             <div>
               <h3 className="font-display text-lg font-bold text-on-surface">Review Limit Reached</h3>
-              <p className="text-sm text-on-surface-variant mt-1">
-                You have reached the maximum number of essay reviews for your current plan.
-              </p>
+              <div className="mt-12 rounded-xl border border-outline-variant/30 bg-surface p-6 text-center shadow-sm">
+                <p className="mb-4 text-sm font-medium text-on-surface-variant">Upgrade to our comprehensive essay support package for guaranteed results.</p>
+                <Link to="/sat" className="btn-shimmer whitespace-nowrap rounded-xl bg-primary px-6 py-3 text-xs font-bold uppercase tracking-[0.08em] text-on-primary">
+                  View Packages
+                </Link>
+              </div>
             </div>
           </div>
-          <Link to="/subscriptions" className="btn-shimmer whitespace-nowrap rounded-xl bg-primary px-6 py-3 text-xs font-bold uppercase tracking-[0.08em] text-on-primary">
-            Upgrade Plan
-          </Link>
         </div>
       )}
 

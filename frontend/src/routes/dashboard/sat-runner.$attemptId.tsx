@@ -619,9 +619,9 @@ function SATRunner() {
                           
                           {/* Angle Texts */}
                           <g className="fill-primary stroke-none text-[10px] font-semibold">
-                            <text x="44" y="100">60°</text>
+                            <text x="78" y="100">60°</text>
                             <text x="34" y="32">30°</text>
-                            <text x="164" y="100">45°</text>
+                            <text x="202" y="100">45°</text>
                             <text x="154" y="46">45°</text>
                           </g>
                         </svg>

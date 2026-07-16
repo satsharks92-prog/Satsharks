@@ -34,6 +34,7 @@ export function Stats() {
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, margin: "-50px" }}
+          style={{ willChange: "opacity, transform" }}
           className="glass-card shark-shadow grid grid-cols-2 gap-y-8 py-10 md:grid-cols-4 md:py-12 rounded-2xl bg-surface/90"
         >
           {stats.map((s, idx) => (

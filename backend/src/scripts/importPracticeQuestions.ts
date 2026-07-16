@@ -22,8 +22,8 @@ interface ParsedSolution {
   explanation: string;
 }
 
-// Map each pair of files to a specific category and tags
-const FILE_MAP = [
+// Map each pair of files to a specific category and tags for folder 1 (original)
+const ORIGINAL_FILE_MAP = [
   {
     questions: "01_Overall_Structure_Questions.pdf",
     solutions: "02_Overall_Structure_Solutions.pdf",
@@ -198,10 +198,11 @@ function isIgnoredPracticeLine(line: string): boolean {
 }
 
 function parseOptionsFromLine(line: string, currentQ: ParsedQuestion): boolean {
-  const firstOptMatch = line.match(/[A-D][\)\.]\s/i) || line.match(/^\*\*?[A-D][\)\.]/i);
+  const firstOptMatch = line.match(/(?:^|[\s\*]+)([A-D][\)\.]\s)/i) || line.match(/^(\*\*?[A-D][\)\.])/i);
   if (!firstOptMatch) return false;
 
-  const firstOptIndex = line.indexOf(firstOptMatch[0]);
+  const labelMatch = firstOptMatch[1] || firstOptMatch[0];
+  const firstOptIndex = line.indexOf(labelMatch);
 
   // Append any prefix text to the previous option if one exists
   if (firstOptIndex > 0) {
@@ -243,9 +244,21 @@ function parseQuestions(text: string): ParsedQuestion[] {
     const line = lines[i];
     if (isIgnoredPracticeLine(line)) continue;
 
-    // Detect question start: "Q1.", "Q1. ", "Question 1", "**Q1. [Easy]**"
-    const mdMatch = line.match(/^\*\*Q(\d+)\.\s*\[(Easy|Medium|Hard)\]\*\*/i);
-    const textMatch = line.match(/^Q(\d+)\.\s*(?:\[(Easy|Medium|Hard)\]|\s*\|\s*(Easy|Medium|Hard))?/i) || line.match(/^Question\s+(\d+)\s*(?:\[(Easy|Medium|Hard)\])?/i);
+    // Detect question start:
+    // Format A (DOCX): Question 1    🟢 Easy    [Multiple Choice]
+    // Format B (MD): **1.** 🟢 Easy
+    // Format C (PDF): Q1., Q1. ● EASY, Q1. DIFFICULTY: EASY, 1 Easy
+    const mdMatch = line.match(/^\*\*Q?(\d+)\.\s*(?:\*\*|\s)*(?:🟢|🟡|🔴)?\s*\[?(Easy|Medium|Hard)\]?/i) || 
+                    line.match(/^\*\*(\d+)\.\*\*\s*(?:🟢|🟡|🔴)?\s*(Easy|Medium|Hard)/i) || 
+                    line.match(/^\*\*(\d+)\.\*\*\s*(Easy|Medium|Hard)/i) || 
+                    line.match(/^\*\*(\d+)\.\s*(?:🟢|🟡|🔴)?\s*(Easy|Medium|Hard)/i) ||
+                    line.match(/^##\s*Question\s+(\d+)\b/i);
+    
+    const textMatch = line.match(/^Question\s+(\d+)\s*(?:🟢|🟡|🔴)?\s*\[?(Easy|Medium|Hard)\]?/i) || 
+                      line.match(/^Q(\d+)\b(?:\.|\s)*(?:🟢|🟡|🔴)?\s*\[?(Easy|Medium|Hard)\]?/i) ||
+                      line.match(/^Q(\d+)\b/i) ||
+                      line.match(/^Question\s+(\d+)\b/i) ||
+                      line.match(/^(\d+)\s+(Easy|Medium|Hard)\b/i);
 
     if (mdMatch || textMatch) {
       // Flush previous
@@ -257,13 +270,18 @@ function parseQuestions(text: string): ParsedQuestion[] {
       }
 
       const qNum = parseInt((mdMatch ? mdMatch[1] : textMatch![1]), 10);
-      let diffStr = (mdMatch ? mdMatch[2] : (textMatch![2] || textMatch![3]))?.toUpperCase();
+      let diffStr = (mdMatch ? mdMatch[2] : textMatch![2])?.toUpperCase();
 
-      // If difficulty was not immediately matched on same line, look ahead 1 or 2 lines
+      // Lookahead for difficulty in next 3 lines
       if (!diffStr) {
-        for (let offset = 1; offset <= 2 && i + offset < lines.length; offset++) {
+        for (let offset = 1; offset <= 3 && i + offset < lines.length; offset++) {
           const nextLine = lines[i + offset];
-          if (/^\[(Easy|Medium|Hard)\]$/i.test(nextLine)) {
+          if (/^DIFFICULTY:\s*(Easy|Medium|Hard)/i.test(nextLine)) {
+            diffStr = nextLine.replace(/DIFFICULTY:\s*/i, "").toUpperCase();
+            i += offset;
+            break;
+          }
+          if (/^\[?(Easy|Medium|Hard)\]?$/i.test(nextLine)) {
             diffStr = nextLine.replace(/[\[\]]/g, "").toUpperCase();
             i += offset;
             break;
@@ -277,14 +295,20 @@ function parseQuestions(text: string): ParsedQuestion[] {
         text: "",
         options: []
       };
+      const matchedPrefix = mdMatch ? mdMatch[0] : textMatch![0];
+      const remainingText = line.substring(matchedPrefix.length).trim();
       textLines = [];
+      if (remainingText) {
+        const cleanRemaining = remainingText.replace(/^[:\-\s\.]\s*/, "");
+        textLines.push(cleanRemaining);
+      }
       continue;
     }
 
     if (!currentQ) continue;
 
     // Detect if this line starts options (e.g. starts with A) or A.)
-    const startsWithOptions = line.match(/^[A-D][\)\.]\s/i) || line.match(/^\*\*?[A-D][\)\.]/i);
+    const startsWithOptions = line.match(/^[A-D][\)\.]/i) || line.match(/^\*\*?[A-D][\)\.]/i);
     if (startsWithOptions) {
       // Flush question text if we are starting option A
       if (line.match(/^[A\(\*\s]*A[\)\.]/i)) {
@@ -335,8 +359,10 @@ function parseSolutions(text: string): ParsedSolution[] {
     if (isIgnoredPracticeLine(line)) continue;
 
     // Detect if this line starts a new solution block
-    // Formats: Q1., **Q1., Q1. [Easy], Q1. [Easy] Correct Answer: C
-    const qMatch = line.match(/^Q(\d+)\b/i) || line.match(/^\*\*Q(\d+)\b/i);
+    const qMatch = line.match(/^##\s*Question\s+(\d+)\b/i) ||
+                  line.match(/^Question\s+(\d+)\b/i) ||
+                  line.match(/^Q(\d+)\b/i) ||
+                  line.match(/^\*\*Q(\d+)\b/i);
 
     if (qMatch) {
       const qNum = parseInt(qMatch[1], 10);
@@ -349,42 +375,47 @@ function parseSolutions(text: string): ParsedSolution[] {
         explLines = [];
       }
 
-      // Look for Correct Answer in this line or subsequent lines (up to 3 lines)
+      // Look for Correct Answer in this line or subsequent lines (up to 4 lines)
       let ans = "";
       let matchedIndex = -1;
       let matchedLineOffset = 0;
 
-      for (let offset = 0; offset <= 3 && i + offset < lines.length; offset++) {
+      for (let offset = 0; offset <= 4 && i + offset < lines.length; offset++) {
         const checkLine = lines[i + offset];
-        const ansMatch = checkLine.match(/Correct Answer:\s*([A-D])/i);
+        const ansMatch = checkLine.match(/Correct Answer:\s*([A-D]|[\d\.\-\/]+)/i) || 
+                         checkLine.match(/Answer:\s*([A-D]|[\d\.\-\/]+)/i) ||
+                         checkLine.match(/n Correct Answer:\s*([A-D]|[\d\.\-\/]+)/i);
+                         
         if (ansMatch) {
-          ans = ansMatch[1].toUpperCase();
+          ans = ansMatch[1].trim();
+          const optMatch = ans.match(/^([A-D])(?:\s+|\)|\]|\b)/i) || ans.match(/^([A-D])$/i);
+          if (optMatch) {
+            ans = optMatch[1].toUpperCase();
+          }
           matchedIndex = ansMatch.index ?? -1;
           matchedLineOffset = offset;
           break;
         }
       }
 
-      if (ans) {
-        currentSol = {
-          questionNumber: qNum,
-          correctAnswer: ans,
-          explanation: ""
-        };
-        explLines = [];
+      currentSol = {
+        questionNumber: qNum,
+        correctAnswer: ans || "A",
+        explanation: ""
+      };
+      explLines = [];
 
-        // If Correct Answer was found in the same line, append any trailing text to explanation
-        if (matchedLineOffset === 0 && matchedIndex !== -1) {
-          const rest = line.substring(matchedIndex + "Correct Answer: X".length).trim();
-          if (rest) {
-            explLines.push(rest.replace(/^[:\|\s—\.-]+/, "").trim());
-          }
+      // If Correct Answer was found in the same line, append any trailing text to explanation
+      if (ans && matchedLineOffset === 0 && matchedIndex !== -1) {
+        const rest = line.substring(matchedIndex + "Correct Answer: X".length).trim();
+        if (rest) {
+          explLines.push(rest.replace(/^[:\|\s—\.-]+/, "").trim());
         }
-        
-        // Fast-forward the loop pointer if we consumed lines to find the answer
-        i += matchedLineOffset;
-        continue;
       }
+      
+      // Fast-forward the loop pointer if we consumed lines to find the answer
+      i += matchedLineOffset;
+      continue;
     }
 
     if (!currentSol) continue;
@@ -415,6 +446,89 @@ async function extractText(filePath: string, type: "pdf" | "docx" | "md"): Promi
   }
 }
 
+function getSolutionsFile(qFile: string): string | null {
+  if (qFile === "DSAT_Linear_Models_Q1_Questions_FINAL.pdf") {
+    return "DSAT_Linear_Models_Q2_Solutions_FINAL.pdf";
+  }
+  if (qFile === "DSAT_Questions_Only_FINAL.pdf") {
+    return "DSAT_Solutions_FINAL.pdf";
+  }
+  
+  const patterns = [
+    { q: /_QUESTIONS/i, s: "_SOLUTIONS" },
+    { q: /_Questions/i, s: "_Solutions" },
+    { q: / - Questions/i, s: " - Solutions" },
+    { q: / Questions/i, s: " Solutions" },
+    { q: /_Questions_Only/i, s: "_Solutions" }
+  ];
+  
+  for (const pat of patterns) {
+    if (pat.q.test(qFile)) {
+      return qFile.replace(pat.q, pat.s);
+    }
+  }
+  return null;
+}
+
+function cleanCategoryName(qFile: string): string {
+  let base = qFile
+    .replace(/\.pdf$/i, "")
+    .replace(/\.docx$/i, "")
+    .replace(/\.md$/i, "");
+    
+  if (base === "DSAT_Questions_Only_FINAL") {
+    return "SAT Practice: Function Notation & Linear Models";
+  }
+  if (base === "DSAT_Linear_Models_Q1_Questions_FINAL") {
+    return "SAT Practice: Creating Linear Models";
+  }
+  
+  base = base
+    .replace(/_Questions_Only_FINAL$/i, "")
+    .replace(/_Questions_FINAL$/i, "")
+    .replace(/_Questions_50MCQ$/i, "")
+    .replace(/_QUESTIONS$/i, "")
+    .replace(/_Questions$/i, "")
+    .replace(/ - Questions$/i, "")
+    .replace(/ Questions$/i, "")
+    .replace(/_Questions_v2$/i, "")
+    .replace(/_Questions_Only$/i, "");
+    
+  base = base.replace(/^DSAT_\d+_/i, "").replace(/^DSAT_Topic\d+_/i, "").replace(/^DSAT_/i, "");
+  base = base.replace(/_/g, " ").trim();
+  
+  const mapping: { [key: string]: string } = {
+    "AP": "Arithmetic Progression",
+    "CompAngleTrig": "Complementary Angle Trigonometry",
+    "DI": "Data Interpretation",
+    "LA": "Lines & Angles",
+    "LM": "Creating Linear Models",
+    "TP": "Triangle Properties",
+    "VSA": "Volume & Surface Area",
+    "SpecialRightTriangles": "Special Right Triangles",
+    "ExponentRules": "Exponent Rules & Properties",
+    "Discriminant": "Discriminant & Number of Solutions",
+    "NonlinearSystems": "Nonlinear Systems of Equations",
+    "UnitConversion": "Unit Conversion & Dimensional Analysis",
+    "Function Notation": "Function Notation & Evaluations",
+    "Linear Equations": "Linear Equations in One & Two Variables",
+    "Linear Inequalities": "Linear Inequalities",
+    "Systems of Linear Equations": "Systems of Linear Equations",
+    "Systems V2": "Systems of Linear Equations (Advanced)",
+    "Right Triangle Trigonometry": "Right Triangle Trigonometry",
+    "Statistics Mean Median": "Statistics: Mean & Median",
+    "Quadratic": "Quadratic Equations - Solving",
+    "Topic1 Quadratics": "Quadratic Equations - Solving",
+    "Topic2 Exponential": "Exponential Functions - Growth & Decay"
+  };
+  
+  if (mapping[base]) {
+    base = mapping[base];
+  }
+  
+  return `SAT Practice: ${base}`;
+}
+
 async function main() {
   const connected = await connectDB();
   if (!connected) throw new Error("Database connection failed");
@@ -426,19 +540,65 @@ async function main() {
   console.log(`Cleared ${deleteResult.deletedCount} old practice questions.`);
 
   const practicequestionsDir = path.resolve(__dirname, "../../../practicequestions");
+  const practicequestions2Dir = path.resolve(__dirname, "../../../practicequestions2");
 
-  for (const item of FILE_MAP) {
-    console.log(`\n-----------------------------------------`);
-    console.log(`Processing category: "${item.category}"`);
-    console.log(`-----------------------------------------`);
+  // Compile all items to import
+  const itemsToImport: {
+    qPath: string;
+    sPath: string;
+    category: string;
+    tag: string;
+    type: "pdf" | "docx" | "md";
+    section: "READING_WRITING" | "MATH";
+  }[] = [];
 
-    const qPath = path.join(practicequestionsDir, item.questions);
-    const sPath = path.join(practicequestionsDir, item.solutions);
+  // 1. ORIGINAL FOLDER 1 (Reading & Writing)
+  for (const item of ORIGINAL_FILE_MAP) {
+    itemsToImport.push({
+      qPath: path.join(practicequestionsDir, item.questions),
+      sPath: path.join(practicequestionsDir, item.solutions),
+      category: item.category,
+      tag: item.tag,
+      type: item.type as any,
+      section: "READING_WRITING"
+    });
+  }
 
-    if (!fs.existsSync(qPath) || !fs.existsSync(sPath)) {
-      console.warn(`Missing files for ${item.category}, skipping. (looked for ${item.questions} / ${item.solutions})`);
-      continue;
+  // 2. NEW FOLDER 2 (Math)
+  if (fs.existsSync(practicequestions2Dir)) {
+    const files2 = fs.readdirSync(practicequestions2Dir).filter(f => !f.includes("(1)"));
+    const questionFiles = files2.filter(f => f.toLowerCase().includes("question") || f.toLowerCase().includes("questions_only"));
+    
+    for (const qFile of questionFiles) {
+      const sFile = getSolutionsFile(qFile);
+      if (!sFile) continue;
+      
+      const qPath = path.join(practicequestions2Dir, qFile);
+      const sPath = path.join(practicequestions2Dir, sFile);
+      
+      if (!fs.existsSync(qPath) || !fs.existsSync(sPath)) continue;
+      
+      const categoryName = cleanCategoryName(qFile);
+      const tag = categoryName.replace("SAT Practice: ", "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      const ext = path.extname(qFile).substring(1) as any;
+      
+      itemsToImport.push({
+        qPath,
+        sPath,
+        category: categoryName,
+        tag,
+        type: ext,
+        section: "MATH"
+      });
     }
+  }
+
+  console.log(`Prepared ${itemsToImport.length} categories/topics for import.`);
+
+  for (const item of itemsToImport) {
+    console.log(`\n-----------------------------------------`);
+    console.log(`Processing category: "${item.category}" (${item.section})`);
+    console.log(`-----------------------------------------`);
 
     // 1. Ensure Category exists
     const categoryDoc = await QuestionCategory.findOneAndUpdate(
@@ -446,7 +606,7 @@ async function main() {
       {
         $set: {
           name: item.category,
-          section: "READING_WRITING",
+          section: item.section,
           description: `Topic-specific practice for ${item.category.replace("SAT Practice: ", "")}`
         }
       },
@@ -455,9 +615,9 @@ async function main() {
 
     // 2. Extract texts
     console.log(`Extracting text from questions file...`);
-    const qText = await extractText(qPath, item.type as any);
+    const qText = await extractText(item.qPath, item.type);
     console.log(`Extracting text from solutions file...`);
-    const sText = await extractText(sPath, item.type as any);
+    const sText = await extractText(item.sPath, item.type);
 
     // 3. Parse questions & solutions
     const parsedQuestions = parseQuestions(qText);
@@ -477,7 +637,7 @@ async function main() {
     for (const q of parsedQuestions) {
       const sol = solMap.get(q.questionNumber);
       if (!sol) {
-        console.warn(`  WARNING: No solution found for question #${q.questionNumber} in ${item.questions}`);
+        console.warn(`  WARNING: No solution found for question #${q.questionNumber} in ${path.basename(item.qPath)}`);
         continue;
       }
 
@@ -514,7 +674,7 @@ async function main() {
         explanation: formattedExplanation,
         category: categoryDoc._id,
         difficulty: q.difficulty,
-        section: "READING_WRITING",
+        section: item.section,
         tags: ["practice-question", item.tag],
         source: "MANUAL",
         status: "PUBLISHED"

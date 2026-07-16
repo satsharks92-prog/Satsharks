@@ -49,10 +49,11 @@ export const getQuestion = async (req: Request, res: Response) => {
 
 export const createQuestion = async (req: AuthRequest, res: Response) => {
   try {
-    const { text, options, correctAnswer, explanation, category, difficulty, section, tags } = req.body;
+    const { text, options, correctAnswer, explanation, category, difficulty, section, tags, imageUrl } = req.body;
     const question = await Question.create({
       text, options, correctAnswer, explanation, category, difficulty, section,
       tags: tags || [],
+      imageUrl: imageUrl || null,
       source: "MANUAL",
       status: "PUBLISHED",
       createdBy: req.user?.userId,
@@ -66,10 +67,10 @@ export const createQuestion = async (req: AuthRequest, res: Response) => {
 export const updateQuestion = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const { text, options, correctAnswer, explanation, category, difficulty, section, tags, status } = req.body;
+    const { text, options, correctAnswer, explanation, category, difficulty, section, tags, status, imageUrl } = req.body;
     const question = await Question.findByIdAndUpdate(
       id,
-      { text, options, correctAnswer, explanation, category, difficulty, section, tags, status },
+      { text, options, correctAnswer, explanation, category, difficulty, section, tags, status, imageUrl },
       { new: true, runValidators: true }
     );
     if (!question) return res.status(404).json({ success: false, error: "Question not found" });

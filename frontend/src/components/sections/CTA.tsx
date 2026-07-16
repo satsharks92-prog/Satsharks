@@ -75,22 +75,22 @@ export function CTA() {
 
           <div className="space-y-5 pt-4">
             <a
-              href="mailto:hello@satsharks.com"
+              href="mailto:satsharks@gmail.com"
               className="flex items-center gap-4 group hover:text-accent transition-colors"
             >
               <span className="grid h-12 w-12 place-items-center rounded-xl bg-white/5 border border-white/10 group-hover:border-accent/40 transition-colors">
                 <Icon name="mail" className="text-accent text-[20px]" />
               </span>
-              <span className="font-body text-sm font-semibold">hello@satsharks.com</span>
+              <span className="font-body text-sm font-semibold">satsharks@gmail.com</span>
             </a>
             <a
-              href="tel:+18005550199"
+              href="tel:+923164514334"
               className="flex items-center gap-4 group hover:text-accent transition-colors"
             >
               <span className="grid h-12 w-12 place-items-center rounded-xl bg-white/5 border border-white/10 group-hover:border-accent/40 transition-colors">
                 <Icon name="call" className="text-accent text-[20px]" />
               </span>
-              <span className="font-body text-sm font-semibold">+1 (800) 555-0199</span>
+              <span className="font-body text-sm font-semibold">+92 316 4514334</span>
             </a>
             <div className="flex items-center gap-4 group">
               <span className="grid h-12 w-12 place-items-center rounded-xl bg-white/5 border border-white/10 pointer-events-none">

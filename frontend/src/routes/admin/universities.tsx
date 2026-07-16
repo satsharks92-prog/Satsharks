@@ -127,6 +127,7 @@ function AdminUniversities() {
                 <th className="px-6 py-4 font-bold">Location</th>
                 <th className="px-6 py-4 font-bold">QS Rank</th>
                 <th className="px-6 py-4 font-bold">Tuition</th>
+                <th className="px-6 py-4 font-bold">Deadline</th>
                 <th className="px-6 py-4 font-bold">Programs</th>
               </tr>
             </thead>
@@ -160,6 +161,11 @@ function AdminUniversities() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-green-400 font-mono">
                       ${uni.tuition.toLocaleString()}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className="px-2.5 py-1 bg-error/10 text-error rounded-lg text-xs font-semibold">
+                        {uni.deadline}
+                      </span>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">

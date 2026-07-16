@@ -12,9 +12,10 @@ export interface IConsultingRequest extends Document {
   higherTotal: number | null;
   higherGrades: string;
   gpa: string;
-  satScore: number;
+  satScore: number | null;
   gradeYear: string;
   targetUniversities: string[];
+  selectedScholarship: string;
   extracurriculars: string;
   budgetRange: string;
   status: "PENDING" | "IN_REVIEW" | "COMPLETED";
@@ -50,20 +51,24 @@ const consultingRequestSchema = new Schema<IConsultingRequest>(
     },
     satScore: {
       type: Number,
-      required: true,
+      default: null,
     },
     gradeYear: {
       type: String,
-      required: true,
+      default: "",
     },
     targetUniversities: [
       {
         type: String,
       },
     ],
+    selectedScholarship: {
+      type: String,
+      default: "",
+    },
     extracurriculars: {
       type: String,
-      required: true,
+      default: "",
     },
     budgetRange: {
       type: String,

@@ -22,7 +22,7 @@ function PaymentCancel() {
             Your payment process was interrupted and you have not been charged. If you experienced an issue, please try again or contact support.
           </p>
           <div className="flex flex-col gap-4">
-            <Link to="/subscriptions">
+            <Link to="/sat">
               <Button className="w-full py-4">Try Again</Button>
             </Link>
             <Link to="/dashboard">

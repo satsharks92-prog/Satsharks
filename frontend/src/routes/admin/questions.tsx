@@ -9,7 +9,7 @@ import { Select } from "../../components/ui/Select";
 import { Textarea } from "../../components/ui/Textarea";
 import { SearchInput } from "../../components/ui/SearchInput";
 import { EmptyState } from "../../components/ui/EmptyState";
-import { api } from "../../services/api";
+import { api, API_BASE_URL, resolveImageUrl } from "../../services/api";
 import type { Question, QuestionCategory } from "../../types";
 
 export const Route = createFileRoute("/admin/questions")({
@@ -32,11 +32,55 @@ function AdminQuestions() {
   const [editingQ, setEditingQ] = useState<Question | null>(null);
   const [form, setForm] = useState({
     text: "", correctAnswer: "A", explanation: "", category: "", difficulty: "MEDIUM", section: "MATH",
-    tags: "",
+    tags: "", imageUrl: "",
     optA: "", optB: "", optC: "", optD: "",
   });
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState("");
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
+    e.preventDefault();
+    let file: File | null = null;
+    
+    if ('dataTransfer' in e) {
+      file = (e as React.DragEvent).dataTransfer.files[0];
+    } else if (e.target && 'files' in e.target && (e.target as HTMLInputElement).files) {
+      file = (e.target as HTMLInputElement).files![0];
+    }
+    
+    if (!file) return;
+    
+    setIsUploadingImage(true);
+    setImageUploadError("");
+    
+    const formData = new FormData();
+    formData.append("image", file);
+    
+    try {
+      const token = localStorage.getItem("accessToken");
+      const headers: HeadersInit = {};
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const url = API_BASE_URL ? `${API_BASE_URL}/api/uploads/image` : "/api/uploads/image";
+      const res = await fetch(url, {
+        method: "POST",
+        headers,
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success) {
+        setForm(p => ({ ...p, imageUrl: data.url }));
+      } else {
+        setImageUploadError(data.error || "Failed to upload image.");
+      }
+    } catch (err: any) {
+      setImageUploadError(err.message || "Network error");
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
 
   // Category modal
   const [catModalOpen, setCatModalOpen] = useState(false);
@@ -69,8 +113,9 @@ function AdminQuestions() {
 
   const openCreate = () => {
     setEditingQ(null);
-    setForm({ text: "", correctAnswer: "A", explanation: "", category: categories[0]?._id || "", difficulty: "MEDIUM", section: "MATH", tags: "", optA: "", optB: "", optC: "", optD: "" });
+    setForm({ text: "", correctAnswer: "A", explanation: "", category: categories[0]?._id || "", difficulty: "MEDIUM", section: "MATH", tags: "", imageUrl: "", optA: "", optB: "", optC: "", optD: "" });
     setFormError("");
+    setImageUploadError("");
     setModalOpen(true);
   };
 
@@ -80,11 +125,12 @@ function AdminQuestions() {
     setForm({
       text: q.text, correctAnswer: q.correctAnswer, explanation: q.explanation,
       category: cat, difficulty: q.difficulty, section: q.section,
-      tags: q.tags.join(", "),
+      tags: q.tags.join(", "), imageUrl: q.imageUrl || "",
       optA: q.options[0]?.text || "", optB: q.options[1]?.text || "",
       optC: q.options[2]?.text || "", optD: q.options[3]?.text || "",
     });
     setFormError("");
+    setImageUploadError("");
     setModalOpen(true);
   };
 
@@ -107,6 +153,7 @@ function AdminQuestions() {
       category: form.category,
       difficulty: form.difficulty,
       section: form.section,
+      imageUrl: form.imageUrl,
       tags: form.tags.split(",").map((t) => t.trim()).filter(Boolean),
     };
 
@@ -261,6 +308,38 @@ function AdminQuestions() {
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto pr-1">
+          <div>
+            <label className="mb-1.5 block font-mono text-[12px] uppercase tracking-[0.08em] text-on-surface-variant">Question Image (Optional)</label>
+            <div 
+              className={`border-2 border-dashed rounded-xl p-6 text-center transition-colors ${isUploadingImage ? 'opacity-50 pointer-events-none' : 'hover:border-primary border-outline-variant/50 bg-surface-container-low'}`}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={handleImageUpload}
+            >
+              {form.imageUrl ? (
+                <div className="flex flex-col items-center gap-3">
+                  <img src={form.imageUrl} alt="Uploaded preview" className="max-h-32 rounded-lg border border-outline-variant/30" />
+                  <div className="flex gap-2">
+                    <label className="px-3 py-1.5 bg-surface-container-high hover:bg-surface-container-highest rounded-lg text-xs font-semibold transition-colors cursor-pointer text-on-surface">
+                      Change Image
+                      <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploadingImage} />
+                    </label>
+                    <button type="button" onClick={() => setForm(p => ({ ...p, imageUrl: "" }))} className="px-3 py-1.5 bg-error/10 text-error hover:bg-error/20 rounded-lg text-xs font-semibold transition-colors cursor-pointer">
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center cursor-pointer h-full min-h-[100px]">
+                  <Icon name="cloud_upload" className="text-3xl text-on-surface-variant/50 mb-2" />
+                  <span className="text-sm text-on-surface-variant font-medium">
+                    {isUploadingImage ? "Uploading..." : "Drag and drop an image here or click to browse"}
+                  </span>
+                  {imageUploadError && <span className="text-xs text-error mt-2">{imageUploadError}</span>}
+                  <input type="file" className="hidden" accept="image/*" onChange={handleImageUpload} disabled={isUploadingImage} />
+                </label>
+              )}
+            </div>
+          </div>
           <Textarea label="Question Text *" value={form.text} onChange={(e) => setForm((p) => ({ ...p, text: e.target.value }))} rows={3} required placeholder="Enter the question..." />
           <div className="space-y-3">
             <label className="mb-1.5 block font-mono text-[12px] uppercase tracking-[0.08em] text-on-surface-variant">Answer Options *</label>

@@ -11,6 +11,8 @@ export interface IUser extends Document {
   subscriptionPlan?: string;
   subscriptionExpiry?: Date;
   status: "ACTIVE" | "SUSPENDED";
+  resetToken?: string;
+  resetTokenExpiry?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -54,6 +56,8 @@ const UserSchema: Schema = new Schema(
       required: true,
       default: "ACTIVE",
     },
+    resetToken: { type: String },
+    resetTokenExpiry: { type: Date },
   },
   { timestamps: true }
 );

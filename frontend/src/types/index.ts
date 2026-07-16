@@ -45,6 +45,7 @@ export interface Question {
   tags: string[];
   source: "MANUAL" | "AI_EXTRACTED" | "SAT";
   status: "DRAFT" | "REVIEW" | "PUBLISHED";
+  imageUrl?: string;
   createdBy: string;
   createdAt: string;
 }
@@ -264,9 +265,10 @@ export interface ConsultingRequest {
   higherTotal: number | null;
   higherGrades: string;
   gpa: string;
-  satScore: number;
+  satScore: number | null;
   gradeYear: string;
   targetUniversities: string[];
+  selectedScholarship: string;
   extracurriculars: string;
   budgetRange: string;
   status: "PENDING" | "IN_REVIEW" | "COMPLETED";
@@ -293,7 +295,7 @@ export interface Essay {
 export interface Notification {
   _id: string;
   user: User | string;
-  type: "ESSAY_SUBMITTED" | "ESSAY_REVIEWED" | "CONSULTING_SUBMITTED" | "PAYMENT_SUCCESS" | "ACCOUNT" | "TEST";
+  type: "ESSAY_SUBMITTED" | "ESSAY_REVIEWED" | "CONSULTING_SUBMITTED" | "PAYMENT_SUCCESS" | "ACCOUNT" | "TEST" | "CONTACT_INQUIRY" | "ADMIN_REPLY";
   title: string;
   message: string;
   isRead: boolean;

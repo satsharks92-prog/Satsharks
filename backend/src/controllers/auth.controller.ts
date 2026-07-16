@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import User from "../models/User";
 import { generateTokens } from "../utils/jwt";
+import { sendPasswordResetEmail } from "../utils/mailer";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -175,10 +177,31 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const resetPassword = async (req: Request, res: Response) => {
-  res
-    .status(200)
-    .json({
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      // Don't reveal if user exists or not for security
+      return res.status(200).json({
+        success: true,
+        message: "Reset instructions sent if email exists",
+      });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.resetToken = resetToken;
+    // Token expires in 1 hour
+    user.resetTokenExpiry = new Date(Date.now() + 3600000);
+    await user.save();
+
+    await sendPasswordResetEmail(user.email, resetToken);
+
+    res.status(200).json({
       success: true,
       message: "Reset instructions sent if email exists",
     });
+  } catch (error: any) {
+    res.status(500).json({ success: false, error: error.message });
+  }
 };

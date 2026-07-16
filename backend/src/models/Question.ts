@@ -14,8 +14,8 @@ export interface IQuestion extends Document {
   difficulty: "EASY" | "MEDIUM" | "HARD";
   section: "READING_WRITING" | "MATH";
   tags: string[];
-  source: "MANUAL" | "AI_EXTRACTED" | "SAT";
   status: "DRAFT" | "REVIEW" | "PUBLISHED";
+  imageUrl?: string;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -61,6 +61,7 @@ const QuestionSchema: Schema = new Schema(
       enum: ["DRAFT", "REVIEW", "PUBLISHED"],
       default: "DRAFT",
     },
+    imageUrl: { type: String, default: null },
     createdBy: { type: Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }

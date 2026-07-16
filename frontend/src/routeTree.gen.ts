@@ -9,9 +9,11 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UniversityMatcherRouteImport } from './routes/university-matcher'
 import { Route as SuccessStoriesRouteImport } from './routes/success-stories'
-import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
+import { Route as SatRouteImport } from './routes/sat'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CounselingAbroadRouteImport } from './routes/counseling-abroad'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ConsultingRouteImport } from './routes/consulting'
 import { Route as BookingRouteImport } from './routes/booking'
@@ -42,19 +44,29 @@ import { Route as DashboardSatRunnerAttemptIdRouteImport } from './routes/dashbo
 import { Route as DashboardSatResultAttemptIdRouteImport } from './routes/dashboard/sat-result.$attemptId'
 import { Route as AdminReviewUploadUploadIdRouteImport } from './routes/admin/review-upload.$uploadId'
 
+const UniversityMatcherRoute = UniversityMatcherRouteImport.update({
+  id: '/university-matcher',
+  path: '/university-matcher',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SuccessStoriesRoute = SuccessStoriesRouteImport.update({
   id: '/success-stories',
   path: '/success-stories',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SubscriptionsRoute = SubscriptionsRouteImport.update({
-  id: '/subscriptions',
-  path: '/subscriptions',
+const SatRoute = SatRouteImport.update({
+  id: '/sat',
+  path: '/sat',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CounselingAbroadRoute = CounselingAbroadRouteImport.update({
+  id: '/counseling-abroad',
+  path: '/counseling-abroad',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ContactRoute = ContactRouteImport.update({
@@ -211,9 +223,11 @@ export interface FileRoutesByFullPath {
   '/booking': typeof BookingRoute
   '/consulting': typeof ConsultingRoute
   '/contact': typeof ContactRoute
+  '/counseling-abroad': typeof CounselingAbroadRoute
   '/dashboard': typeof DashboardRouteWithChildren
-  '/subscriptions': typeof SubscriptionsRoute
+  '/sat': typeof SatRoute
   '/success-stories': typeof SuccessStoriesRoute
+  '/university-matcher': typeof UniversityMatcherRoute
   '/admin/consulting': typeof AdminConsultingRoute
   '/admin/contact-requests': typeof AdminContactRequestsRoute
   '/admin/essays': typeof AdminEssaysRoute
@@ -245,8 +259,10 @@ export interface FileRoutesByTo {
   '/booking': typeof BookingRoute
   '/consulting': typeof ConsultingRoute
   '/contact': typeof ContactRoute
-  '/subscriptions': typeof SubscriptionsRoute
+  '/counseling-abroad': typeof CounselingAbroadRoute
+  '/sat': typeof SatRoute
   '/success-stories': typeof SuccessStoriesRoute
+  '/university-matcher': typeof UniversityMatcherRoute
   '/admin/consulting': typeof AdminConsultingRoute
   '/admin/contact-requests': typeof AdminContactRequestsRoute
   '/admin/essays': typeof AdminEssaysRoute
@@ -279,9 +295,11 @@ export interface FileRoutesById {
   '/booking': typeof BookingRoute
   '/consulting': typeof ConsultingRoute
   '/contact': typeof ContactRoute
+  '/counseling-abroad': typeof CounselingAbroadRoute
   '/dashboard': typeof DashboardRouteWithChildren
-  '/subscriptions': typeof SubscriptionsRoute
+  '/sat': typeof SatRoute
   '/success-stories': typeof SuccessStoriesRoute
+  '/university-matcher': typeof UniversityMatcherRoute
   '/admin/consulting': typeof AdminConsultingRoute
   '/admin/contact-requests': typeof AdminContactRequestsRoute
   '/admin/essays': typeof AdminEssaysRoute
@@ -315,9 +333,11 @@ export interface FileRouteTypes {
     | '/booking'
     | '/consulting'
     | '/contact'
+    | '/counseling-abroad'
     | '/dashboard'
-    | '/subscriptions'
+    | '/sat'
     | '/success-stories'
+    | '/university-matcher'
     | '/admin/consulting'
     | '/admin/contact-requests'
     | '/admin/essays'
@@ -349,8 +369,10 @@ export interface FileRouteTypes {
     | '/booking'
     | '/consulting'
     | '/contact'
-    | '/subscriptions'
+    | '/counseling-abroad'
+    | '/sat'
     | '/success-stories'
+    | '/university-matcher'
     | '/admin/consulting'
     | '/admin/contact-requests'
     | '/admin/essays'
@@ -382,9 +404,11 @@ export interface FileRouteTypes {
     | '/booking'
     | '/consulting'
     | '/contact'
+    | '/counseling-abroad'
     | '/dashboard'
-    | '/subscriptions'
+    | '/sat'
     | '/success-stories'
+    | '/university-matcher'
     | '/admin/consulting'
     | '/admin/contact-requests'
     | '/admin/essays'
@@ -417,9 +441,11 @@ export interface RootRouteChildren {
   BookingRoute: typeof BookingRoute
   ConsultingRoute: typeof ConsultingRoute
   ContactRoute: typeof ContactRoute
+  CounselingAbroadRoute: typeof CounselingAbroadRoute
   DashboardRoute: typeof DashboardRouteWithChildren
-  SubscriptionsRoute: typeof SubscriptionsRoute
+  SatRoute: typeof SatRoute
   SuccessStoriesRoute: typeof SuccessStoriesRoute
+  UniversityMatcherRoute: typeof UniversityMatcherRoute
   AdminConsultingRoute: typeof AdminConsultingRoute
   AdminContactRequestsRoute: typeof AdminContactRequestsRoute
   AdminEssaysRoute: typeof AdminEssaysRoute
@@ -441,6 +467,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/university-matcher': {
+      id: '/university-matcher'
+      path: '/university-matcher'
+      fullPath: '/university-matcher'
+      preLoaderRoute: typeof UniversityMatcherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/success-stories': {
       id: '/success-stories'
       path: '/success-stories'
@@ -448,11 +481,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuccessStoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/subscriptions': {
-      id: '/subscriptions'
-      path: '/subscriptions'
-      fullPath: '/subscriptions'
-      preLoaderRoute: typeof SubscriptionsRouteImport
+    '/sat': {
+      id: '/sat'
+      path: '/sat'
+      fullPath: '/sat'
+      preLoaderRoute: typeof SatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -460,6 +493,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/counseling-abroad': {
+      id: '/counseling-abroad'
+      path: '/counseling-abroad'
+      fullPath: '/counseling-abroad'
+      preLoaderRoute: typeof CounselingAbroadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -699,9 +739,11 @@ const rootRouteChildren: RootRouteChildren = {
   BookingRoute: BookingRoute,
   ConsultingRoute: ConsultingRoute,
   ContactRoute: ContactRoute,
+  CounselingAbroadRoute: CounselingAbroadRoute,
   DashboardRoute: DashboardRouteWithChildren,
-  SubscriptionsRoute: SubscriptionsRoute,
+  SatRoute: SatRoute,
   SuccessStoriesRoute: SuccessStoriesRoute,
+  UniversityMatcherRoute: UniversityMatcherRoute,
   AdminConsultingRoute: AdminConsultingRoute,
   AdminContactRequestsRoute: AdminContactRequestsRoute,
   AdminEssaysRoute: AdminEssaysRoute,

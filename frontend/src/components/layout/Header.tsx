@@ -26,9 +26,9 @@ export function Header() {
 
   const links = [
     { to: "/", hash: "services", label: "Services" },
-    { to: "/consulting", hash: undefined, label: "Consulting" },
+    { to: "/university-matcher", hash: undefined, label: "University Matcher" },
     { to: "/booking", hash: undefined, label: "Book Session" },
-    { to: "/subscriptions", hash: undefined, label: "Pricing" },
+    { to: "/sat", hash: undefined, label: "Pricing" },
     { to: "/contact", hash: undefined, label: "Contact" },
     ...(user?.role === "STUDENT" ? [{ to: "/dashboard/", hash: undefined, label: "Dashboard" }] : []),
     ...(user?.role === "ADMIN" ? [{ to: "/admin", hash: undefined, label: "Admin Panel" }] : []),
@@ -51,6 +51,14 @@ export function Header() {
               key={l.label}
               to={l.to}
               hash={l.hash}
+              onClick={(e) => {
+                if (l.hash && window.location.pathname === l.to) {
+                  const el = document.getElementById(l.hash);
+                  if (el) {
+                    el.scrollIntoView({ behavior: "smooth" });
+                  }
+                }
+              }}
               className={`relative py-1 font-body ${user ? "text-[11px] xl:text-[12px]" : "text-[13px]"} font-semibold uppercase tracking-[0.08em] text-on-surface-variant hover:text-primary transition-colors duration-300 group whitespace-nowrap`}
             >
               {l.label}
@@ -103,7 +111,17 @@ export function Header() {
               key={l.label}
               to={l.to}
               hash={l.hash}
-              onClick={() => setOpen(false)}
+              onClick={(e) => {
+                setOpen(false);
+                if (l.hash && window.location.pathname === l.to) {
+                  setTimeout(() => {
+                    const el = document.getElementById(l.hash);
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth" });
+                    }
+                  }, 50);
+                }
+              }}
               className="block font-mono text-[13px] uppercase tracking-[0.08em] text-on-surface-variant hover:text-primary transition-colors"
             >
               {l.label}

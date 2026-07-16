@@ -4,6 +4,7 @@ import { Icon } from "../common/Icon";
 import studentHero from "../../assets/student_hero.png";
 import { Link } from "@tanstack/react-router";
 import { api, resolveImageUrl } from "../../services/api";
+import { useAuth } from "../../hooks/useAuth";
 
 const DEFAULT_FEATURE = {
   studentName: "Admitted Student",
@@ -49,6 +50,7 @@ const CollageSkeleton = () => (
 );
 
 export function Hero() {
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [feature, setFeature] = useState<any>({
     studentName: "Admitted Student",
@@ -119,18 +121,29 @@ export function Hero() {
           </p>
 
           <div className="flex flex-wrap items-center gap-4 pt-2">
-            <Link
-              to="/subscriptions"
-              className="btn-shimmer inline-flex items-center gap-3 rounded-xl bg-primary px-8 py-4 text-xs font-bold uppercase tracking-[0.1em] text-on-primary shark-shadow hover:bg-accent transition-all duration-300"
-            >
-              Book Class <Icon name="arrow_forward" className="text-[16px]" />
-            </Link>
-            <a
-              href="#services"
-              className="inline-flex items-center gap-3 rounded-xl border border-outline-variant bg-surface px-8 py-4 text-xs font-bold uppercase tracking-[0.1em] text-on-surface hover:bg-surface-container-low transition-all duration-300 group"
-            >
-              <Icon name="play_circle" className="text-[16px] text-accent group-hover:scale-110 transition-transform" /> Free Trial
-            </a>
+            {user?.role === "ADMIN" ? (
+              <Link
+                to="/admin"
+                className="btn-shimmer inline-flex items-center gap-3 rounded-xl bg-primary px-8 py-4 text-xs font-bold uppercase tracking-[0.1em] text-on-primary shark-shadow hover:bg-accent transition-all duration-300"
+              >
+                Go to the dashboard <Icon name="dashboard" className="text-[16px]" />
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/sat"
+                  className="btn-shimmer inline-flex items-center gap-3 rounded-xl bg-primary px-8 py-4 text-xs font-bold uppercase tracking-[0.1em] text-on-primary shark-shadow hover:bg-accent transition-all duration-300"
+                >
+                  Book Class <Icon name="arrow_forward" className="text-[16px]" />
+                </Link>
+                <Link
+                  to={user ? "/sat" : "/auth/login"}
+                  className="inline-flex items-center gap-3 rounded-xl border border-outline-variant bg-surface px-8 py-4 text-xs font-bold uppercase tracking-[0.1em] text-on-surface hover:bg-surface-container-low transition-all duration-300 group cursor-pointer"
+                >
+                  <Icon name="play_circle" className="text-[16px] text-accent group-hover:scale-110 transition-transform" /> Free Trial
+                </Link>
+              </>
+            )}
           </div>
 
           <div className="pt-6 border-t border-outline-variant/50 max-w-lg">
@@ -178,6 +191,10 @@ export function Hero() {
               <img
                 src={resolveHeroImageUrl(feature.imageUrl)}
                 alt={feature.studentName}
+                width={420}
+                height={525}
+                fetchPriority="high"
+                style={{ aspectRatio: "4/5" }}
                 className="w-full h-auto object-cover rounded-xl shark-shadow border border-outline-variant/60"
               />
 
@@ -186,6 +203,7 @@ export function Hero() {
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.6, duration: 0.6 }}
+                style={{ willChange: "transform, opacity" }}
                 className="absolute -left-8 top-12 glass-card shark-shadow p-4 rounded-xl max-w-[200px] border-l-4 border-l-accent"
                 whileHover={{ y: -4 }}
               >
@@ -205,6 +223,7 @@ export function Hero() {
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.8, duration: 0.6 }}
+                style={{ willChange: "transform, opacity" }}
                 className="absolute -right-8 bottom-12 bg-primary text-on-primary p-4 rounded-xl shark-shadow max-w-[190px]"
                 whileHover={{ y: -4 }}
               >

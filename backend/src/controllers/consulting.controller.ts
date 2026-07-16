@@ -25,6 +25,7 @@ export const submitConsultingRequest = async (req: AuthRequest, res: Response) =
       satScore, 
       gradeYear, 
       targetUniversities, 
+      selectedScholarship,
       extracurriculars, 
       budgetRange 
     } = req.body;
@@ -53,6 +54,7 @@ export const submitConsultingRequest = async (req: AuthRequest, res: Response) =
       satScore,
       gradeYear,
       targetUniversities,
+      selectedScholarship,
       extracurriculars,
       budgetRange,
     });
@@ -64,7 +66,7 @@ export const submitConsultingRequest = async (req: AuthRequest, res: Response) =
       user: userId,
       type: "CONSULTING_SUBMITTED",
       title: "Consulting Profile Submitted",
-      message: "Your profile has been successfully submitted to our counseling team.",
+      message: "Your application sent successfully to the admin for review.",
     });
 
     // Notify all admins

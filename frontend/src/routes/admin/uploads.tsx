@@ -133,7 +133,7 @@ function AdminUploads() {
                         <button onClick={() => handleExtract(u._id)} className="px-3 py-1 bg-secondary/10 text-secondary hover:bg-secondary/20 rounded text-sm font-semibold transition-colors cursor-pointer">Extract</button>
                       )}
                       {(u.status === "EXTRACTED" || u.status === "REVIEWED") && (
-                        <Link to={`/admin/review-upload/${u._id}`} className="px-3 py-1 bg-primary/10 text-primary hover:bg-primary/20 rounded text-sm font-semibold transition-colors">Review</Link>
+                        <Link to="/admin/review-upload/$uploadId" params={{ uploadId: u._id }} className="px-3 py-1 bg-primary/10 text-primary hover:bg-primary/20 rounded text-sm font-semibold transition-colors">Review</Link>
                       )}
                       <button onClick={() => handleDelete(u._id)} className="px-3 py-1 bg-error/10 text-error hover:bg-error/20 rounded text-sm transition-colors cursor-pointer">Delete</button>
                     </div>
