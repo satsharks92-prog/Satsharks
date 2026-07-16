@@ -57,7 +57,7 @@ export function AdminLayout({ children, activeItem }: { children: ReactNode; act
             ))}
           </nav>
         </aside>
-        <div className="flex-1 p-6 lg:p-10">{children}</div>
+        <div className="flex-1 min-w-0 p-6 lg:p-10">{children}</div>
       </main>
     </div>
   );

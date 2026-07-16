@@ -6,7 +6,7 @@ import { Booking } from "../components/sections/Booking";
 export const Route = createFileRoute("/booking")({
   head: () => ({
     meta: [
-      { title: "Book a Session — SAT Sharks" },
+      { title: "Book a Session | SAT Sharks" },
       {
         name: "description",
         content: "Schedule your private SAT preparation and college admissions consultation.",

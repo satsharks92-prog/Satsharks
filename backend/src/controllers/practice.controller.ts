@@ -9,6 +9,17 @@ export const submitPracticeAnswer = async (req: AuthRequest, res: Response) => {
     const { questionId, selectedAnswer, timeSpent } = req.body;
     const studentId = req.user?.userId;
 
+    if (req.user?.subscription === "FREE") {
+      const count = await PracticeSession.countDocuments({ student: studentId });
+      if (count >= 20) {
+        return res.status(403).json({
+          success: false,
+          error: "You have reached the free limit of 20 practice questions. Please upgrade to a Premium plan to unlock unlimited access to all 3,686 questions!",
+          limitReached: true,
+        });
+      }
+    }
+
     const question = await Question.findById(questionId);
     if (!question) return res.status(404).json({ success: false, error: "Question not found" });
 

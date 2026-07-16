@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, ReactNode } from "react";
 import { StudentLayout } from "../../components/layout/StudentLayout";
 import { Badge } from "../../components/ui/Badge";
@@ -7,6 +7,7 @@ import { Select } from "../../components/ui/Select";
 import { EmptyState } from "../../components/ui/EmptyState";
 import { ZoomableImage } from "../../components/ui/ZoomableImage";
 import { api } from "../../services/api";
+import { useAuth } from "../../hooks/useAuth";
 import type { Question, QuestionCategory } from "../../types";
 
 export const Route = createFileRoute("/dashboard/practice")({
@@ -35,6 +36,7 @@ const getRWTextSplit = (text: string) => {
 };
 
 function Practice() {
+  const { user } = useAuth();
   const [questions, setQuestions] = useState<Question[]>([]);
   const [categories, setCategories] = useState<QuestionCategory[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -43,6 +45,22 @@ function Practice() {
   const [result, setResult] = useState<{ isCorrect: boolean; correctAnswer: string; explanation: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ total: 0, correct: 0 });
+  const [totalSolved, setTotalSolved] = useState(0);
+
+  const fetchPracticeHistory = async () => {
+    try {
+      const res = await api.get("/api/practice/history?limit=1");
+      if (res.success) {
+        setTotalSolved(res.pagination?.total || 0);
+      }
+    } catch (err) {
+      console.error("Failed to load practice history", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchPracticeHistory();
+  }, []);
   const [timeSpent, setTimeSpent] = useState(0);
 
   // Filters
@@ -109,6 +127,12 @@ function Practice() {
         total: prev.total + 1,
         correct: prev.correct + (res.result.isCorrect ? 1 : 0),
       }));
+      setTotalSolved((prev) => prev + 1);
+    } else {
+      alert(res.error || "Failed to submit answer");
+      if (res.limitReached) {
+        fetchPracticeHistory();
+      }
     }
   };
 
@@ -716,6 +740,22 @@ function Practice() {
         </div>
       </div>
 
+      {user?.subscription === "FREE" && (
+        <div className="mb-6 p-4 rounded-xl bg-surface-container-low border border-outline-variant/40 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Icon name="help_center" className="text-primary text-[18px]" />
+            <span className="text-xs font-semibold text-on-surface">
+              Practice Limit: {totalSolved} / 20 questions solved
+            </span>
+          </div>
+          {totalSolved >= 20 && (
+            <Link to="/sat" className="text-xs font-bold text-accent hover:underline">
+              Upgrade to Premium for Unlimited Questions
+            </Link>
+          )}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8 w-full items-center">
         <Select
           label=""
@@ -752,7 +792,7 @@ function Practice() {
         />
         <button
           onClick={() => setIsPracticeMode(true)}
-          disabled={!q}
+          disabled={!q || (user?.subscription === "FREE" && totalSolved >= 20)}
           className="w-full h-[40px] px-6 rounded-xl bg-primary text-on-primary font-bold text-sm hover:bg-accent transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm shrink-0"
         >
           <Icon name="open_in_full" className="text-[18px]" />
@@ -760,7 +800,23 @@ function Practice() {
         </button>
       </div>
 
-      {loading ? (
+      {user?.subscription === "FREE" && totalSolved >= 20 ? (
+        <div className="rounded-2xl bg-surface-container-lowest text-on-surface p-10 text-center border border-outline-variant/40 shark-shadow max-w-xl mx-auto my-8">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-accent/15 text-accent mb-6">
+            <Icon name="lock" className="text-[32px]" />
+          </div>
+          <h2 className="font-display text-2xl font-bold mb-4">Practice Limit Reached</h2>
+          <p className="text-sm text-on-surface-variant leading-relaxed mb-6">
+            You have solved the free limit of 20 practice questions. To continue solving the remaining 3,666+ prep questions and boost your score, upgrade to our Premium plan!
+          </p>
+          <Link
+            to="/sat"
+            className="btn-shimmer inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-3.5 text-xs font-bold uppercase tracking-[0.08em] text-on-primary shark-shadow hover:bg-accent transition-all duration-300 cursor-pointer"
+          >
+            Upgrade to Premium
+          </Link>
+        </div>
+      ) : loading ? (
         <div className="text-center py-12 text-on-surface-variant">Loading questions...</div>
       ) : !q ? (
         <EmptyState icon="help_center" title="No questions found" description="Try adjusting your filters" />

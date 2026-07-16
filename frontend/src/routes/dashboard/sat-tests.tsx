@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import { StudentLayout } from "../../components/layout/StudentLayout";
 import { Badge } from "../../components/ui/Badge";
@@ -18,6 +18,8 @@ function SATTestList() {
   const [tests, setTests] = useState<SATTest[]>([]);
   const [loading, setLoading] = useState(true);
   const [startingTestId, setStartingTestId] = useState<string | null>(null);
+
+  const lockedCount = tests.filter((t) => t.accessLevel === "PAID" && user?.subscription === "FREE").length;
 
   useEffect(() => {
     api.get("/api/sat").then((res) => {
@@ -72,6 +74,26 @@ function SATTestList() {
         </div>
       </div>
 
+      {lockedCount > 0 && (
+        <div className="mb-6 p-5 rounded-2xl bg-surface-container-low border border-outline-variant/40 flex flex-col sm:flex-row items-center justify-between gap-4 shark-shadow">
+          <div className="flex items-center gap-4">
+            <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-accent/15 flex items-center justify-center text-accent">
+              <Icon name="lock" className="text-[20px]" />
+            </div>
+            <div>
+              <div className="font-bold text-sm text-on-surface">Upgrade to Premium to Unlock {lockedCount} Mock Tests!</div>
+              <div className="text-xs text-on-surface-variant font-medium">You currently have a FREE subscription. Upgrade to gain unlimited access to all premium full-length adaptive Digital SAT tests.</div>
+            </div>
+          </div>
+          <Link
+            to="/sat"
+            className="btn-shimmer bg-primary text-on-primary hover:bg-accent text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-lg whitespace-nowrap cursor-pointer transition-all duration-300"
+          >
+            Upgrade Now
+          </Link>
+        </div>
+      )}
+
       {loading ? (
         <div className="text-center py-12 text-on-surface-variant">Loading SAT tests...</div>
       ) : tests.length === 0 ? (
@@ -98,7 +120,7 @@ function SATTestList() {
                       )}
                     </div>
                     <p className="text-xs text-on-surface-variant">Digital SAT Year: {test.year} · Exam #{test.testNumber}</p>
-                    
+
                     {/* PDF Actions */}
                     {!locked && test.explanationPdfUrl && (
                       <div className="mt-4 flex gap-3 flex-wrap">
@@ -116,17 +138,21 @@ function SATTestList() {
                   </div>
 
                   <div className="shrink-0">
-                    <button
-                      onClick={() => handleStart(test._id)}
-                      disabled={locked}
-                      className={`px-8 py-3.5 rounded-xl text-sm font-bold uppercase tracking-widest transition-all ${
-                        locked
-                          ? "bg-surface-container-high text-on-surface-variant cursor-not-allowed"
-                          : "btn-shimmer bg-primary text-on-primary shark-shadow hover:bg-accent cursor-pointer"
-                      }`}
-                    >
-                      {locked ? "Upgrade to Access" : "Start Test"}
-                    </button>
+                    {locked ? (
+                      <Link
+                        to="/sat"
+                        className="inline-block text-center px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all btn-shimmer bg-accent text-primary shark-shadow hover:bg-accent/90 cursor-pointer"
+                      >
+                        Upgrade to Access
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={() => handleStart(test._id)}
+                        className="px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all btn-shimmer bg-primary text-on-primary shark-shadow hover:bg-accent cursor-pointer"
+                      >
+                        Start Test
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

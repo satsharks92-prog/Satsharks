@@ -8,9 +8,7 @@ import { checkAnswerCorrectness } from "../utils/grading";
 // --- Student: list available SAT tests ---
 export const getSATTests = async (req: AuthRequest, res: Response) => {
   try {
-    const userSub = req.user?.subscription;
     const filter: any = { isActive: true };
-    if (userSub === "FREE") filter.accessLevel = "FREE";
 
     const tests = await SATTest.find(filter)
       .sort({ year: -1, testNumber: 1 });

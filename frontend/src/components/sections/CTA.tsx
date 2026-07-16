@@ -92,24 +92,6 @@ export function CTA() {
               </span>
               <span className="font-body text-sm font-semibold">+92 316 4514334</span>
             </a>
-            <div className="flex items-center gap-4 group">
-              <span className="grid h-12 w-12 place-items-center rounded-xl bg-white/5 border border-white/10 pointer-events-none">
-                <Icon name="location_on" className="text-accent text-[20px]" />
-              </span>
-              <span className="font-body text-sm font-semibold">123 Education Lane, Boston, MA</span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3 pt-6">
-            {["share", "thumb_up", "favorite"].map((i) => (
-              <motion.button
-                key={i}
-                whileHover={{ y: -3 }}
-                className="grid h-11 w-11 place-items-center rounded-xl bg-white/5 border border-white/10 hover:border-accent/40 text-on-primary hover:text-accent transition-colors cursor-pointer"
-              >
-                <Icon name={i} className="text-[18px]" />
-              </motion.button>
-            ))}
           </div>
         </motion.div>
 

@@ -11,13 +11,13 @@ import { CTA } from "../components/sections/CTA";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "SAT Sharks — Achieve Your Dream SAT Score & College Admission" },
+      { title: "SAT Sharks | Achieve Your Dream SAT Score & College Admission" },
       {
         name: "description",
         content:
           "Personalized SAT preparation, expert college counseling, essay reviews, and proven strategies.",
       },
-      { property: "og:title", content: "SAT Sharks — Achieve Your Dream SAT Score" },
+      { property: "og:title", content: "SAT Sharks | Achieve Your Dream SAT Score" },
       {
         property: "og:description",
         content: "Personalized SAT prep, college counseling, and essay reviews.",
