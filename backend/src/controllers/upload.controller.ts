@@ -64,7 +64,7 @@ export const triggerExtraction = async (req: AuthRequest, res: Response) => {
     upload.status = "PROCESSING";
     await upload.save();
 
-    // Simulated extraction — replace with real PDF parsing + AI in production
+    // Simulated extraction , replace with real PDF parsing + AI in production
     const sampleExtracted = [
       {
         text: "Sample extracted question from the uploaded PDF. What is the value of x if 2x + 5 = 15?",

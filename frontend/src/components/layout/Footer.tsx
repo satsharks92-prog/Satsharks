@@ -3,7 +3,7 @@ import logoImg from "@/assets/logo.png";
 
 export function Footer() {
   return (
-    <footer className="bg-primary border-t border-accent/30 text-on-primary/80">
+    <footer className="bg-primary border-t border-accent/30 text-white">
       <div className="mx-auto max-w-[1200px] px-6 py-16">
         {/* Main Footer Content */}
         <div className="grid grid-cols-1 gap-10 pb-12 border-b border-white/10 md:grid-cols-12 md:gap-8">
@@ -17,7 +17,7 @@ export function Footer() {
                 style={{ filter: "brightness(0) invert(1)" }}
               />
             </Link>
-            <p className="font-body text-[13px] leading-relaxed text-on-primary/70 max-w-sm">
+            <p className="font-body text-[13px] leading-relaxed text-white max-w-sm">
               From SAT to the Ivy League 🦈<br/>
               Elite Admissions Strategy Experts<br/>
               SAT Mastery | Personal Statements + ECs<br/>
@@ -27,7 +27,7 @@ export function Footer() {
 
           {/* Column 1: Prep */}
           <div className="md:col-span-3 flex flex-col gap-4">
-            <h4 className="font-display text-sm font-extrabold uppercase tracking-wider text-on-primary">
+            <h4 className="font-display text-sm font-extrabold uppercase tracking-wider text-white">
               SAT Prep
             </h4>
             <ul className="flex flex-col gap-2.5 font-body text-xs font-semibold">
@@ -51,7 +51,7 @@ export function Footer() {
 
           {/* Column 2: Consulting */}
           <div className="md:col-span-3 flex flex-col gap-4">
-            <h4 className="font-display text-sm font-extrabold uppercase tracking-wider text-on-primary">
+            <h4 className="font-display text-sm font-extrabold uppercase tracking-wider text-white">
               Consulting
             </h4>
             <ul className="flex flex-col gap-2.5 font-body text-xs font-semibold">
@@ -80,7 +80,7 @@ export function Footer() {
 
           {/* Column 3: Contact/Company */}
           <div className="md:col-span-2 flex flex-col gap-4">
-            <h4 className="font-display text-sm font-extrabold uppercase tracking-wider text-on-primary">
+            <h4 className="font-display text-sm font-extrabold uppercase tracking-wider text-white">
               Company
             </h4>
             <ul className="flex flex-col gap-2.5 font-body text-xs font-semibold">
@@ -106,12 +106,12 @@ export function Footer() {
         {/* Bottom Bar: Copyright & Compliance */}
         <div className="flex flex-col items-center justify-between gap-6 pt-8 md:flex-row text-center md:text-left">
           <div className="flex flex-col gap-1.5">
-            <p className="font-body text-[10px] font-medium tracking-wider text-on-primary/50">
+            <p className="font-body text-[10px] font-medium tracking-wider text-white">
               © {new Date().getFullYear()} SAT Sharks. All rights reserved. Admissions Consulting & SAT Prep Excellence.
             </p>
           </div>
           
-          <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-body text-[10px] font-bold uppercase tracking-[0.1em] text-on-primary/60">
+          <ul className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 font-body text-[10px] font-bold uppercase tracking-[0.1em] text-white">
             <li>
               <Link to="/" className="hover:text-accent transition-colors duration-300">
                 Privacy Policy

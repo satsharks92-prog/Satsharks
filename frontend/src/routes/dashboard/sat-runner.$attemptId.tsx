@@ -320,7 +320,7 @@ function SATRunner() {
               onClick={handleEndBreak}
               className="w-full btn-shimmer bg-primary text-on-primary py-3.5 rounded-xl font-semibold hover:bg-accent transition-colors cursor-pointer"
             >
-              Resume Test — Start Math Section
+              Resume Test , Start Math Section
             </button>
             <p className="text-xs text-on-surface-variant">You can resume early or wait for the timer</p>
           </div>

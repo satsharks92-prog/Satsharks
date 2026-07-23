@@ -74,7 +74,7 @@ function Contact() {
                 </div>
                 <h3 className="font-headline text-xl font-semibold">Email Us</h3>
                 <p className="mt-2 text-sm text-on-surface-variant mb-4">We usually respond within 24 hours.</p>
-                <a href="mailto:hello@satsharks.com" className="font-mono text-[14px] font-semibold text-primary hover:underline">hello@satsharks.com</a>
+                <a href="mailto:satsharks@gmail.com" className="font-mono text-[14px] font-semibold text-primary hover:underline">satsharks@gmail.com</a>
               </div>
               <div className="rounded-2xl bg-surface-container-lowest text-on-surface p-8 shark-shadow border border-outline-variant/40 hover-lift">
                 <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary-fixed text-primary mb-4">
@@ -82,7 +82,7 @@ function Contact() {
                 </div>
                 <h3 className="font-headline text-xl font-semibold">Call Us</h3>
                 <p className="mt-2 text-sm text-on-surface-variant mb-4">Available Mon-Fri, 9am-6pm EST.</p>
-                <a href="tel:+18005550199" className="font-mono text-[14px] font-semibold text-primary hover:underline">+1 (800) 555-0199</a>
+                <a href="tel:+923164514334" className="font-mono text-[14px] font-semibold text-primary hover:underline">+92 316 451 4334</a>
               </div>
             </div>
             

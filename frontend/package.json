@@ -1,7 +1,6 @@
 {
   "name": "frontend",
   "private": true,
-  "packageManager": "npm@10.9.2",
   "sideEffects": false,
   "type": "module",
   "scripts": {

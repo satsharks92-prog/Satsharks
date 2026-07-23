@@ -6,6 +6,7 @@ import {
   getMyEssays,
   getAllEssays,
   updateEssay,
+  deleteEssay,
 } from "../controllers/essay.controller";
 
 const router = Router();
@@ -15,5 +16,6 @@ router.get("/my", authenticate, requireActiveUser(), getMyEssays);
 
 router.get("/admin/all", authenticate, requireAdmin(), getAllEssays);
 router.put("/admin/:id", authenticate, requireAdmin(), updateEssay);
+router.delete("/admin/:id", authenticate, requireAdmin(), deleteEssay);
 
 export default router;

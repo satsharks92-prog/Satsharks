@@ -147,23 +147,6 @@ export function Hero() {
           </div>
 
           <div className="pt-6 border-t border-outline-variant/50 max-w-lg">
-            <p className="font-body text-[11px] font-bold uppercase tracking-[0.12em] text-on-surface-variant mb-4">
-              Accepted Students Enrolled At:
-            </p>
-            <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-[12px] font-semibold text-on-surface font-body">
-              <span className="flex items-center gap-1.5 hover:text-accent transition-colors">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Harvard University
-              </span>
-              <span className="flex items-center gap-1.5 hover:text-accent transition-colors">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Yale University
-              </span>
-              <span className="flex items-center gap-1.5 hover:text-accent transition-colors">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Stanford University
-              </span>
-              <span className="flex items-center gap-1.5 hover:text-accent transition-colors">
-                <span className="h-1.5 w-1.5 rounded-full bg-accent" /> Princeton University
-              </span>
-            </div>
           </div>
         </motion.div>
 

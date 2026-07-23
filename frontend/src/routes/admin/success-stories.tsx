@@ -7,7 +7,7 @@ import { Icon } from "../../components/common/Icon";
 import { Input } from "../../components/ui/Input";
 import { Textarea } from "../../components/ui/Textarea";
 import { EmptyState } from "../../components/ui/EmptyState";
-import { api, API_BASE_URL, resolveImageUrl } from "../../services/api";
+import { api, getBackendUrl, resolveImageUrl } from "../../services/api";
 import { useAuth } from "../../hooks/useAuth";
 
 export const Route = createFileRoute("/admin/success-stories")({
@@ -70,7 +70,7 @@ function AdminSuccessStories() {
     if (token) headers["Authorization"] = `Bearer ${token}`;
 
     try {
-      const res = await fetch(`${API_BASE_URL}/api/uploads/image`, {
+      const res = await fetch(`${getBackendUrl()}/api/uploads/image`, {
         method: "POST",
         headers,
         body: uploadData
@@ -274,7 +274,7 @@ function AdminSuccessStories() {
             <Input label="University *" value={formData.university} onChange={(e) => setFormData((p) => ({ ...p, university: e.target.value }))} required placeholder="e.g. Harvard" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input label="Image URL" type="url" value={formData.imageUrl} onChange={(e) => setFormData((p) => ({ ...p, imageUrl: e.target.value }))} placeholder="https://..." />
+            <Input label="Image URL" type="text" value={formData.imageUrl} onChange={(e) => setFormData((p) => ({ ...p, imageUrl: e.target.value }))} placeholder="/uploads/... or https://..." />
             <div>
               <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Or Upload Local Image</label>
               <input
@@ -312,7 +312,7 @@ function AdminSuccessStories() {
             <Input label="Improvement Details *" value={heroFormData.improvement} onChange={(e) => setHeroFormData((p) => ({ ...p, improvement: e.target.value }))} required placeholder="e.g. +210 Improvement" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input label="Image URL" type="url" value={heroFormData.imageUrl} onChange={(e) => setHeroFormData((p) => ({ ...p, imageUrl: e.target.value }))} placeholder="https://..." />
+            <Input label="Image URL" type="text" value={heroFormData.imageUrl} onChange={(e) => setHeroFormData((p) => ({ ...p, imageUrl: e.target.value }))} placeholder="/uploads/... or https://..." />
             <div>
               <label className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Or Upload Local Image</label>
               <input

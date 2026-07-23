@@ -33,12 +33,12 @@ function useRegion() {
 // ── Pricing Config (edit these) ──
 const PRICING = {
   pk: {
-    group: { amount: "Rs 40,000", period: "/ full course" },
+    group:    { amount: "Rs 40,000",  period: "/ full course" },
     oneOnOne: { amount: "Rs 100,000", period: "/ month" },
   },
   intl: {
-    group: { amount: "$400", period: "/ full course" },
-    oneOnOne: { amount: "$800", period: "/ month" },
+    group:    { amount: "$400",  period: "/ full course" },
+    oneOnOne: { amount: "$800",  period: "/ month" },
   },
 };
 
@@ -276,10 +276,10 @@ export default function SATPrepPage() {
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
               <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(59,125,216,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M17 21V19C17 16.79 15.21 15 13 15H5C2.79 15 1 16.79 1 19V21" stroke="#3B7DD8" strokeWidth="2" strokeLinecap="round" />
-                  <circle cx="9" cy="7" r="4" stroke="#3B7DD8" strokeWidth="2" />
-                  <path d="M23 21V19C23 17.14 21.73 15.57 20 15.13" stroke="#3B7DD8" strokeWidth="2" strokeLinecap="round" />
-                  <circle cx="19" cy="7" r="3" stroke="#3B7DD8" strokeWidth="2" />
+                  <path d="M17 21V19C17 16.79 15.21 15 13 15H5C2.79 15 1 16.79 1 19V21" stroke="#3B7DD8" strokeWidth="2" strokeLinecap="round"/>
+                  <circle cx="9" cy="7" r="4" stroke="#3B7DD8" strokeWidth="2"/>
+                  <path d="M23 21V19C23 17.14 21.73 15.57 20 15.13" stroke="#3B7DD8" strokeWidth="2" strokeLinecap="round"/>
+                  <circle cx="19" cy="7" r="3" stroke="#3B7DD8" strokeWidth="2"/>
                 </svg>
               </div>
               <h3 style={{ fontSize: "22px", fontWeight: 700, color: "#0F1B2D", margin: 0 }}>Group Sessions</h3>
@@ -310,7 +310,7 @@ export default function SATPrepPage() {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", marginTop: "12px", color: "#3B7DD8", fontSize: "13px", fontWeight: 600 }}>
               {activeTier === 0 ? "Tap to collapse" : "See full course details"}
               <span style={{ transform: activeTier === 0 ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s ease", display: "inline-flex" }}>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="#3B7DD8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="#3B7DD8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </span>
             </div>
           </div>
@@ -335,8 +335,8 @@ export default function SATPrepPage() {
             <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
               <div style={{ width: "36px", height: "36px", borderRadius: "10px", background: "rgba(245,166,35,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M20 21V19C20 16.79 18.21 15 16 15H8C5.79 15 4 16.79 4 19V21" stroke="#F5A623" strokeWidth="2" strokeLinecap="round" />
-                  <circle cx="12" cy="7" r="4" stroke="#F5A623" strokeWidth="2" />
+                  <path d="M20 21V19C20 16.79 18.21 15 16 15H8C5.79 15 4 16.79 4 19V21" stroke="#F5A623" strokeWidth="2" strokeLinecap="round"/>
+                  <circle cx="12" cy="7" r="4" stroke="#F5A623" strokeWidth="2"/>
                 </svg>
               </div>
               <h3 style={{ fontSize: "22px", fontWeight: 700, color: "#0F1B2D", margin: 0 }}>1-on-1 Sessions</h3>
@@ -367,7 +367,7 @@ export default function SATPrepPage() {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", marginTop: "12px", color: "#F5A623", fontSize: "13px", fontWeight: 600 }}>
               {activeTier === 1 ? "Tap to collapse" : "See full course details"}
               <span style={{ transform: activeTier === 1 ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.3s ease", display: "inline-flex" }}>
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 5L7 9L11 5" stroke="#F5A623" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </span>
             </div>
           </div>

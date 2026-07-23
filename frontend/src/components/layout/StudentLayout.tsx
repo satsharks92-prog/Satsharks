@@ -33,9 +33,24 @@ export function StudentLayout({ children, activeItem }: { children: ReactNode; a
       <Header />
       <div className="flex-1 flex max-w-[1400px] mx-auto w-full">
         <aside className="w-64 border-r border-outline-variant/30 p-6 hidden md:block">
-          <h2 className="font-bold mb-6 text-on-surface-variant uppercase tracking-widest text-xs">
-            Student Portal
-          </h2>
+          <div className="mb-6">
+            <h2 className="font-bold mb-1.5 text-on-surface-variant uppercase tracking-widest text-xs">
+              Student Portal
+            </h2>
+            {user?.subscription === "PAID" ? (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-500 border border-amber-500/25">
+                <Icon name="workspace_premium" className="text-xs" /> Premium Member
+              </span>
+            ) : user?.hasPendingPayment ? (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-500 border border-blue-500/25 animate-pulse">
+                <Icon name="hourglass_empty" className="text-xs" /> Pending Approval
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-surface-container-high text-on-surface-variant border border-outline-variant/30">
+                <Icon name="account_circle" className="text-xs" /> Free Account
+              </span>
+            )}
+          </div>
           <nav className="space-y-1">
             {navItems.map((item) => (
               <Link

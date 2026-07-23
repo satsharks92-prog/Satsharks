@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import User from "../models/User";
+import PaymentProof from "../models/PaymentProof";
 import { AuthRequest } from "../middleware/auth.middleware";
 
 export const getCurrentUser = async (req: AuthRequest, res: Response) => {
@@ -7,13 +8,32 @@ export const getCurrentUser = async (req: AuthRequest, res: Response) => {
     if (!req.user) return res.status(401).json({ success: false, error: "Unauthorized" });
 
     if (!process.env.DATABASE_URL) {
-      return res.status(200).json({ success: true, user: req.user });
+      return res.status(200).json({ success: true, user: { ...req.user, hasPendingPayment: false } });
     }
 
     const user = await User.findById(req.user.userId).select("-password");
     if (!user) return res.status(404).json({ success: false, error: "User not found" });
 
-    res.status(200).json({ success: true, user: { id: user.id, name: user.name, email: user.email, role: user.role, country: user.country, region: user.region, subscription: user.subscription, status: user.status } });
+    let hasPendingPayment = false;
+    if (process.env.DATABASE_URL) {
+      const pending = await PaymentProof.findOne({ user: user.id, status: "PENDING" });
+      hasPendingPayment = !!pending;
+    }
+
+    res.status(200).json({
+      success: true,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        country: user.country,
+        region: user.region,
+        subscription: user.subscription,
+        status: user.status,
+        hasPendingPayment
+      }
+    });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
   }

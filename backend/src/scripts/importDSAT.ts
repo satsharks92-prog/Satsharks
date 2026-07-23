@@ -154,7 +154,7 @@ function parseQuestionsFile(filePath: string): ParsedModule[] {
       continue;
     }
 
-    // Check for Section headers (supporting separate or combined format, e.g., "Section 1: Reading & Writing — Module 1" or "Section 1 — Module 1")
+    // Check for Section headers (supporting separate or combined format, e.g., "Section 1: Reading & Writing , Module 1" or "Section 1 , Module 1")
     const isSec1 = /^Section\s*1\b/i.test(cleanLine);
     const isSec2 = /^Section\s*2\b/i.test(cleanLine);
 
@@ -218,7 +218,7 @@ function parseQuestionsFile(filePath: string): ParsedModule[] {
     if (/^--\s*\d+\s*of\s*\d+\s*--$/i.test(cleanLine)) continue;
     if (/^Total:\s*\d+\s*Questions/i.test(cleanLine)) continue;
     if (/^Approximately\s*\d+%/i.test(cleanLine)) continue;
-    if (/^\(Student-produced response\s*—\s*grid-in\)/i.test(cleanLine)) continue;
+    if (/^\(Student-produced response\s*,\s*grid-in\)/i.test(cleanLine)) continue;
     if (cleanLine.startsWith("These questions are 100% original")) continue;
     if (cleanLine.startsWith("ADAPTIVE DIGITAL SAT")) continue;
     if (cleanLine.startsWith("DSAT_Dec_2024")) continue;
@@ -400,7 +400,7 @@ function parseSolutionsFile(filePath: string): ParsedSolModule[] {
       continue;
     }
 
-    // Check for Section headers (supporting separate or combined format, e.g., "Section 1: Reading & Writing — Module 1" or "Section 1 — Module 1")
+    // Check for Section headers (supporting separate or combined format, e.g., "Section 1: Reading & Writing , Module 1" or "Section 1 , Module 1")
     const isSec1 = /^Section\s*1\b/i.test(cleanLine);
     const isSec2 = /^Section\s*2\b/i.test(cleanLine);
 
@@ -437,7 +437,7 @@ function parseSolutionsFile(filePath: string): ParsedSolModule[] {
     if (qMatch) {
       flushSol();
       const questionNumber = parseInt(qMatch[1], 10);
-      const rest = qMatch[2].replace(/^[:\s—\.-]+/, "").trim(); // strip leading colon, dash, dot, space
+      const rest = qMatch[2].replace(/^[:\s,\.-]+/, "").trim(); // strip leading colon, dash, dot, space
 
       // Check if the answer is inline
       const hasAnswerInline = /^[A-D](?:\s+|\)|\]|$)/i.test(rest) || 

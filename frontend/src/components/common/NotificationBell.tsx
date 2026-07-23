@@ -87,6 +87,8 @@ export function NotificationBell() {
       navigate({ to: isAdmin ? "/admin/contact-requests" : "/contact" as any });
     } else if (notif.type === "ADMIN_REPLY") {
       navigate({ to: "/contact" as any });
+    } else if (notif.type === "PAYMENT_SUCCESS" || notif.type === "ACCOUNT") {
+      navigate({ to: isAdmin ? "/admin/users" : "/dashboard" as any });
     }
   };
 

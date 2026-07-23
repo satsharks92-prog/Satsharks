@@ -308,7 +308,7 @@ function AdminTests() {
       </Modal>
 
       {/* Manage Test Questions Modal */}
-      <Modal open={questionsModalOpen} onClose={() => setQuestionsModalOpen(false)} title={`Manage Test Questions — ${activeTestForQuestions?.title}`} icon="list_alt" maxWidth="max-w-5xl">
+      <Modal open={questionsModalOpen} onClose={() => setQuestionsModalOpen(false)} title={`Manage Test Questions , ${activeTestForQuestions?.title}`} icon="list_alt" maxWidth="max-w-5xl">
         {activeTestForQuestions && (
           <div className="flex flex-col md:flex-row gap-6 max-h-[70vh]">
             {/* Left side: Module Selector */}
@@ -473,7 +473,7 @@ function AdminTests() {
       </Modal>
 
       {/* Edit Scoring Table Modal */}
-      <Modal open={scoringModalOpen} onClose={() => setScoringModalOpen(false)} title={`Scoring Table (Marks Schema) — ${activeTestForScoring?.title}`} icon="score" maxWidth="max-w-2xl">
+      <Modal open={scoringModalOpen} onClose={() => setScoringModalOpen(false)} title={`Scoring Table (Marks Schema) , ${activeTestForScoring?.title}`} icon="score" maxWidth="max-w-2xl">
         {scoringError && (
           <div className="mb-4 p-3 bg-error/15 text-error rounded-xl text-sm border border-error/25 flex items-center gap-2">
             <Icon name="error" className="shrink-0" /><span>{scoringError}</span>

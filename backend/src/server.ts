@@ -15,10 +15,23 @@ app.post("/api/payment/webhook/stripe", express.raw({ type: "application/json" }
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors({
-  origin: env.frontendUrl,
+  origin: (origin, callback) => {
+    // In dev, allow all origins (LAN IPs, localhost, etc.)
+    if (env.nodeEnv !== "production") {
+      return callback(null, true);
+    }
+    // In production, only allow configured frontend URL
+    const allowed = [env.frontendUrl];
+    if (!origin || allowed.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error("Not allowed by CORS"));
+  },
   credentials: true
 }));
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" } // Allow images to load cross-origin
+}));
 app.use(morgan("dev"));
 
 // Connect to database (or run in mock mode)
@@ -67,9 +80,13 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/universities", universityRoutes);
 app.use("/api/payment", paymentRoutes);
 
-// Serve uploaded files
+// Serve uploaded files with cross-origin headers so images load from any network origin
 import path from "path";
-app.use("/uploads", express.static(path.resolve(__dirname, "../uploads")));
+app.use("/uploads", (req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  next();
+}, express.static(path.resolve(__dirname, "../uploads")));
 
 // Error handling middleware
 app.use((err: any, req: Request, res: Response, _next: NextFunction) => {

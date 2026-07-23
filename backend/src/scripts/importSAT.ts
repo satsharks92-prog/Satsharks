@@ -88,7 +88,7 @@ function parseMarkdown(content: string): ParsedModule[] {
 
     if (!currentQuestion) continue;
 
-    // Skill line — starts text collection
+    // Skill line , starts text collection
     const skillMatch = trimmed.match(/^\*Skill: (.+)\*$/);
     if (skillMatch) {
       currentQuestion.skill = skillMatch[1].trim();
@@ -97,7 +97,7 @@ function parseMarkdown(content: string): ParsedModule[] {
       continue;
     }
 
-    // Option lines — A) B) C) D)
+    // Option lines , A) B) C) D)
     const optionMatch = trimmed.match(/^([A-D])\)\s+(.+)/);
     if (optionMatch) {
       if (phase === "COLLECTING_TEXT" && textLines.length > 0) {
@@ -154,7 +154,7 @@ function parseMarkdown(content: string): ParsedModule[] {
       continue;
     }
 
-    // Explanation — single-line or multi-line
+    // Explanation , single-line or multi-line
     if (trimmed.startsWith("*(Explanation:")) {
       let expl = trimmed;
       if (!trimmed.endsWith(")*")) {
@@ -275,7 +275,7 @@ async function createSATTest(
 ) {
   const existing = await SATTest.findOne({ year, testNumber });
   if (existing) {
-    console.log(`SAT Test ${year} #${testNumber} already exists — updating question references.`);
+    console.log(`SAT Test ${year} #${testNumber} already exists , updating question references.`);
     existing.modules = modules.map((mod) => ({
       name: mod.sectionName,
       section: mod.section,
@@ -297,7 +297,7 @@ async function createSATTest(
   }));
 
   const test = await SATTest.create({
-    title: `SAT Practice Test ${testNumber} — ${year}`,
+    title: `SAT Practice Test ${testNumber} , ${year}`,
     description: `Official-format Digital SAT practice test #${testNumber}, ${year} edition. 98 questions across 4 modules.`,
     year,
     testNumber,

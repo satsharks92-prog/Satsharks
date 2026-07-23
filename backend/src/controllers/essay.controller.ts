@@ -136,3 +136,19 @@ export const updateEssay = async (req: AuthRequest, res: Response) => {
     return res.status(500).json({ success: false, error: "Server Error" });
   }
 };
+
+export const deleteEssay = async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const essay = await Essay.findByIdAndDelete(id);
+
+    if (!essay) {
+      return res.status(404).json({ success: false, error: "Essay not found" });
+    }
+
+    return res.status(200).json({ success: true, message: "Essay deleted successfully" });
+  } catch (error: any) {
+    console.error("Delete Essay Error:", error);
+    return res.status(500).json({ success: false, error: "Server Error" });
+  }
+};

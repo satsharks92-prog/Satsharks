@@ -8,6 +8,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<string | null>;
   register: (name: string, email: string, password?: string, country?: string) => Promise<string | null>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -67,8 +68,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("accessToken");
   };
 
+  const refreshUser = async () => {
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      try {
+        const res = await api.get("/api/users/me");
+        if (res.success) {
+          setUser(res.user);
+        }
+      } catch (e) {
+        console.error("Refresh user profile failed:", e);
+      }
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

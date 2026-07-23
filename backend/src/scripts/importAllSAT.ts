@@ -198,8 +198,8 @@ function parseSATText(text: string): ParsedModule[] {
       continue;
     }
 
-    const sectionOnlyMatch = line.match(/^#{1,2}\s*SECTION\s+(\d+)\s*(?:—|-|:)\s*(.+)$/i)
-      || line.match(/^SECTION\s+(\d+)\s*(?:—|-|:)\s*(.+)$/i);
+    const sectionOnlyMatch = line.match(/^#{1,2}\s*SECTION\s+(\d+)\s*(?:,|-|:)\s*(.+)$/i)
+      || line.match(/^SECTION\s+(\d+)\s*(?:,|-|:)\s*(.+)$/i);
     if (sectionOnlyMatch) {
       flushQuestion();
       maybeCreateModuleFromSectionOnly(parseInt(sectionOnlyMatch[1], 10), sectionOnlyMatch[2]);
@@ -215,7 +215,7 @@ function parseSATText(text: string): ParsedModule[] {
       continue;
     }
 
-    const questionMatch = line.match(/^Question\s+(\d+)(?:\s+Skill:\s*(.+?))?(?:\s*(?:-|—|:)?\s*(.*))?$/i);
+    const questionMatch = line.match(/^Question\s+(\d+)(?:\s+Skill:\s*(.+?))?(?:\s*(?:-|,|:)?\s*(.*))?$/i);
     if (questionMatch) {
       flushQuestion();
       const questionNumber = parseInt(questionMatch[1], 10);
@@ -407,7 +407,7 @@ async function createSATTest(
 ) {
   const existing = await SATTest.findOne({ year, testNumber });
   if (existing) {
-    console.log(`SAT Test ${year} #${testNumber} already exists — updating question references.`);
+    console.log(`SAT Test ${year} #${testNumber} already exists , updating question references.`);
     existing.modules = modules.map((mod) => ({
       name: mod.sectionName,
       section: mod.section,
@@ -429,7 +429,7 @@ async function createSATTest(
   }));
 
   const test = await SATTest.create({
-    title: `SAT Practice Test ${testNumber} — 2024`,
+    title: `SAT Practice Test ${testNumber} , 2024`,
     description: `Official-format Digital SAT practice test #${testNumber}, 2024 edition. Extracted from the corresponding PDF file.`,
     year: 2024,
     testNumber,

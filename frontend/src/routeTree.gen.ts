@@ -37,6 +37,7 @@ import { Route as AdminUniversitiesRouteImport } from './routes/admin/universiti
 import { Route as AdminTestsRouteImport } from './routes/admin/tests'
 import { Route as AdminSuccessStoriesRouteImport } from './routes/admin/success-stories'
 import { Route as AdminQuestionsRouteImport } from './routes/admin/questions'
+import { Route as AdminPaymentsRouteImport } from './routes/admin/payments'
 import { Route as AdminEssaysRouteImport } from './routes/admin/essays'
 import { Route as AdminContactRequestsRouteImport } from './routes/admin/contact-requests'
 import { Route as AdminConsultingRouteImport } from './routes/admin/consulting'
@@ -184,6 +185,11 @@ const AdminQuestionsRoute = AdminQuestionsRouteImport.update({
   path: '/admin/questions',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
+  id: '/admin/payments',
+  path: '/admin/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminEssaysRoute = AdminEssaysRouteImport.update({
   id: '/admin/essays',
   path: '/admin/essays',
@@ -231,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/admin/consulting': typeof AdminConsultingRoute
   '/admin/contact-requests': typeof AdminContactRequestsRoute
   '/admin/essays': typeof AdminEssaysRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/success-stories': typeof AdminSuccessStoriesRoute
   '/admin/tests': typeof AdminTestsRoute
@@ -266,6 +273,7 @@ export interface FileRoutesByTo {
   '/admin/consulting': typeof AdminConsultingRoute
   '/admin/contact-requests': typeof AdminContactRequestsRoute
   '/admin/essays': typeof AdminEssaysRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/success-stories': typeof AdminSuccessStoriesRoute
   '/admin/tests': typeof AdminTestsRoute
@@ -303,6 +311,7 @@ export interface FileRoutesById {
   '/admin/consulting': typeof AdminConsultingRoute
   '/admin/contact-requests': typeof AdminContactRequestsRoute
   '/admin/essays': typeof AdminEssaysRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/admin/questions': typeof AdminQuestionsRoute
   '/admin/success-stories': typeof AdminSuccessStoriesRoute
   '/admin/tests': typeof AdminTestsRoute
@@ -341,6 +350,7 @@ export interface FileRouteTypes {
     | '/admin/consulting'
     | '/admin/contact-requests'
     | '/admin/essays'
+    | '/admin/payments'
     | '/admin/questions'
     | '/admin/success-stories'
     | '/admin/tests'
@@ -376,6 +386,7 @@ export interface FileRouteTypes {
     | '/admin/consulting'
     | '/admin/contact-requests'
     | '/admin/essays'
+    | '/admin/payments'
     | '/admin/questions'
     | '/admin/success-stories'
     | '/admin/tests'
@@ -412,6 +423,7 @@ export interface FileRouteTypes {
     | '/admin/consulting'
     | '/admin/contact-requests'
     | '/admin/essays'
+    | '/admin/payments'
     | '/admin/questions'
     | '/admin/success-stories'
     | '/admin/tests'
@@ -449,6 +461,7 @@ export interface RootRouteChildren {
   AdminConsultingRoute: typeof AdminConsultingRoute
   AdminContactRequestsRoute: typeof AdminContactRequestsRoute
   AdminEssaysRoute: typeof AdminEssaysRoute
+  AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminQuestionsRoute: typeof AdminQuestionsRoute
   AdminSuccessStoriesRoute: typeof AdminSuccessStoriesRoute
   AdminTestsRoute: typeof AdminTestsRoute
@@ -663,6 +676,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminQuestionsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/payments': {
+      id: '/admin/payments'
+      path: '/admin/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminPaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/essays': {
       id: '/admin/essays'
       path: '/admin/essays'
@@ -747,6 +767,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminConsultingRoute: AdminConsultingRoute,
   AdminContactRequestsRoute: AdminContactRequestsRoute,
   AdminEssaysRoute: AdminEssaysRoute,
+  AdminPaymentsRoute: AdminPaymentsRoute,
   AdminQuestionsRoute: AdminQuestionsRoute,
   AdminSuccessStoriesRoute: AdminSuccessStoriesRoute,
   AdminTestsRoute: AdminTestsRoute,

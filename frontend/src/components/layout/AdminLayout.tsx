@@ -7,6 +7,7 @@ import { Icon } from "../common/Icon";
 const navItems = [
   { to: "/admin", label: "Dashboard", icon: "dashboard" },
   { to: "/admin/users", label: "Users", icon: "group" },
+  { to: "/admin/payments", label: "Payments", icon: "payments" },
   { to: "/admin/tests", label: "Tests", icon: "quiz" },
   { to: "/admin/questions", label: "Questions", icon: "help_center" },
   { to: "/admin/uploads", label: "Uploads", icon: "upload_file" },

@@ -61,7 +61,6 @@ function Practice() {
   useEffect(() => {
     fetchPracticeHistory();
   }, []);
-  const [timeSpent, setTimeSpent] = useState(0);
 
   // Filters
   const [section, setSection] = useState("");
@@ -79,15 +78,51 @@ function Practice() {
     });
   }, []);
 
+  const [timeSpent, setTimeSpent] = useState(0);
+  const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+
   useEffect(() => {
-    let interval: any;
-    if (isPracticeMode && !showResult) {
+    let interval: NodeJS.Timeout;
+    if (isPracticeMode && isTimerRunning) {
       interval = setInterval(() => {
-        setTimeSpent((prev) => prev + 1);
+        setTimeSpent((t) => t + 1);
+        setTimeRemaining((prev) => {
+          if (prev === null) return null;
+          if (prev <= 1) {
+            setIsTimerRunning(false);
+            setTimeout(() => {
+              alert("Time's up! Your practice session timer has ended. You can continue practicing without any interruptions.");
+            }, 50);
+            return 0;
+          }
+          return prev - 1;
+        });
       }, 1000);
     }
     return () => clearInterval(interval);
-  }, [isPracticeMode, showResult, currentIdx]);
+  }, [isPracticeMode, isTimerRunning]);
+
+  const formatTime = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+  };
+
+  const handleTimerClick = () => {
+    if (timeRemaining === null || timeRemaining === 0) {
+      const input = window.prompt("How many minutes do you want to set for this practice session?", "15");
+      const mins = parseInt(input || "0", 10);
+      if (mins > 0) {
+        setTimeRemaining(mins * 60);
+        setIsTimerRunning(true);
+      }
+    } else {
+      setIsTimerRunning(!isTimerRunning);
+    }
+  };
+
+
 
   const fetchQuestions = async () => {
     setLoading(true);
@@ -104,7 +139,6 @@ function Practice() {
       setSelectedAnswer(null);
       setShowResult(false);
       setResult(null);
-      setTimeSpent(0);
     }
     setLoading(false);
   };
@@ -118,7 +152,7 @@ function Practice() {
     const res = await api.post("/api/practice/answer", {
       questionId: questions[currentIdx]._id,
       selectedAnswer,
-      timeSpent: timeSpent,
+      timeSpent,
     });
     if (res.success) {
       setResult(res.result);
@@ -179,6 +213,32 @@ function Practice() {
               <Icon name="logout" className="text-[13px]" />
               <span>Exit</span>
             </button>
+            
+            <button
+              onClick={handleTimerClick}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border transition-colors text-xs font-bold cursor-pointer ${
+                isTimerRunning 
+                  ? "border-primary bg-primary/10 text-primary" 
+                  : "border-outline-variant hover:bg-surface-container-low text-on-surface-variant"
+              }`}
+            >
+              <Icon name={timeRemaining === null || timeRemaining === 0 ? "timer" : isTimerRunning ? "pause" : "play_arrow"} className="text-[13px]" />
+              <span className="font-mono">
+                {timeRemaining === null ? "Set Timer" : formatTime(timeRemaining)}
+              </span>
+            </button>
+            {timeRemaining !== null && !isTimerRunning && (
+              <button
+                onClick={() => {
+                  setTimeRemaining(null);
+                  setIsTimerRunning(false);
+                }}
+                className="flex items-center justify-center p-1 rounded-lg border border-outline-variant hover:bg-surface-container-low text-on-surface-variant transition-colors"
+                title="Clear Timer"
+              >
+                <Icon name="close" className="text-[14px]" />
+              </button>
+            )}
           </div>
 
           {/* Center/Middle: Filters Row */}

@@ -7,6 +7,7 @@ export interface User {
   region: "LOCAL" | "INTERNATIONAL";
   subscription: "FREE" | "PAID";
   status: "ACTIVE" | "SUSPENDED";
+  hasPendingPayment?: boolean;
 }
 
 export interface SubscriptionPlan {

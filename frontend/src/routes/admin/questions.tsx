@@ -9,7 +9,7 @@ import { Select } from "../../components/ui/Select";
 import { Textarea } from "../../components/ui/Textarea";
 import { SearchInput } from "../../components/ui/SearchInput";
 import { EmptyState } from "../../components/ui/EmptyState";
-import { api, API_BASE_URL, resolveImageUrl } from "../../services/api";
+import { api, getBackendUrl, resolveImageUrl } from "../../services/api";
 import type { Question, QuestionCategory } from "../../types";
 
 export const Route = createFileRoute("/admin/questions")({
@@ -63,7 +63,7 @@ function AdminQuestions() {
       const headers: HeadersInit = {};
       if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const url = API_BASE_URL ? `${API_BASE_URL}/api/uploads/image` : "/api/uploads/image";
+      const url = `${getBackendUrl()}/api/uploads/image`;
       const res = await fetch(url, {
         method: "POST",
         headers,
@@ -271,7 +271,7 @@ function AdminQuestions() {
                         )}
                       </div>
                     </td>
-                    <td className="p-4 text-sm">{typeof q.category === "object" ? q.category.name : "—"}</td>
+                    <td className="p-4 text-sm">{typeof q.category === "object" ? q.category.name : ","}</td>
                     <td className="p-4">
                       <Badge variant={q.difficulty === "EASY" ? "success" : q.difficulty === "HARD" ? "error" : "warning"}>{q.difficulty}</Badge>
                     </td>

@@ -61,7 +61,7 @@ function scoreUniversity(uni: any, profile: any) {
     reasons.push("Partial scholarships could make this affordable");
   } else {
     score += 3;
-    warnings.push("Tuition exceeds budget — scholarships needed");
+    warnings.push("Tuition exceeds budget , scholarships needed");
   }
 
   // 3. Test scores

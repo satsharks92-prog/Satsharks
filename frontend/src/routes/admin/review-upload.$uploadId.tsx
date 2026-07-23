@@ -84,7 +84,7 @@ function ReviewUpload() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold">Review Extracted Questions</h1>
-          <p className="text-on-surface-variant text-sm mt-1">{upload.title} — {upload.fileName}</p>
+          <p className="text-on-surface-variant text-sm mt-1">{upload.title} , {upload.fileName}</p>
         </div>
         <div className="flex items-center gap-3">
           <Badge variant={upload.status === "PUBLISHED" ? "success" : "info"}>{upload.status}</Badge>

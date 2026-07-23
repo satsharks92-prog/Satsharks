@@ -131,6 +131,20 @@ function ReviewEssayModal({ essay, onClose, onSuccess }: { essay: Essay, onClose
     setIsSubmitting(false);
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm("Are you sure you want to delete this essay request?")) return;
+    setIsSubmitting(true);
+    try {
+      const res = await api.delete(`/api/essays/admin/${essay._id}`);
+      if (res.success) {
+        onSuccess();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    setIsSubmitting(false);
+  };
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
@@ -184,11 +198,16 @@ function ReviewEssayModal({ essay, onClose, onSuccess }: { essay: Essay, onClose
           </div>
         </div>
         
-        <div className="border-t border-outline-variant/40 px-6 py-4 shrink-0 flex items-center justify-end gap-3 bg-surface-container-lowest rounded-b-3xl">
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={handleUpdate} disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Review"}
+        <div className="border-t border-outline-variant/40 px-6 py-4 shrink-0 flex items-center justify-between gap-3 bg-surface-container-lowest rounded-b-3xl">
+          <Button variant="outline" className="text-error border-error/50 hover:bg-error/10 hover:text-error" onClick={handleDelete} disabled={isSubmitting}>
+            Delete
           </Button>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={onClose} disabled={isSubmitting}>Cancel</Button>
+            <Button onClick={handleUpdate} disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save Review"}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

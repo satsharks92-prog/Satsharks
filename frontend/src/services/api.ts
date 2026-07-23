@@ -6,14 +6,20 @@ export const API_BASE_URL = (
 
 export const resolveImageUrl = (url: string) => {
   if (!url) return "";
+  // Already an absolute URL (e.g. external image links)
   if (url.startsWith("http")) return url;
-  
-  const isDev = (
-    (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.DEV) ||
-    (typeof process !== "undefined" && process.env && process.env.NODE_ENV === "development")
-  );
-  const base = isDev ? "http://localhost:5000" : "";
-  return `${base}${url}`;
+  // In production with explicit backend URL configured, prepend it
+  if (API_BASE_URL) return `${API_BASE_URL}${url}`;
+  // In dev, the Vite proxy forwards /uploads/* → localhost:5000
+  // so keep the path relative and let the proxy do its job
+  return url;
+};
+
+// Returns the backend base URL prefix for raw fetch() calls (e.g. file uploads).
+// In dev: returns "" so requests stay relative and go through the Vite /api proxy.
+// In prod: returns the configured API_BASE_URL.
+export const getBackendUrl = (): string => {
+  return API_BASE_URL || "";
 };
 
 const getUrl = (url: string) => url.startsWith("http") ? url : `${API_BASE_URL}${url}`;

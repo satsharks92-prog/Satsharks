@@ -181,7 +181,7 @@ function isIgnoredPracticeLine(line: string): boolean {
   if (/DOC \d+/i.test(trimmed)) return true;
   if (/QUESTIONS ONLY/i.test(trimmed)) return true;
   if (/Detailed Solutions/i.test(trimmed)) return true;
-  if (/Evidence\s*—\s*/i.test(trimmed)) return true;
+  if (/Evidence\s*,\s*/i.test(trimmed)) return true;
   return false;
 }
 
@@ -390,7 +390,7 @@ function parseSolutions(text: string): ParsedSolution[] {
       if (ans && matchedLineOffset === 0 && matchedIndex !== -1) {
         const rest = line.substring(matchedIndex + "Correct Answer: X".length).trim();
         if (rest) {
-          explLines.push(rest.replace(/^[:\|\s—\.-]+/, "").trim());
+          explLines.push(rest.replace(/^[:\|\s,\.-]+/, "").trim());
         }
       }
       

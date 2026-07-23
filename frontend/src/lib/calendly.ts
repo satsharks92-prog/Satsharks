@@ -55,7 +55,7 @@ const loadCalendlyScript = () =>
   });
 
 export const openCalendly = async () => {
-  const calendlyUrl = import.meta.env.VITE_CALENDLY_URL || import.meta.env.NEXT_PUBLIC_CALENDLY_URL;
+  const calendlyUrl = import.meta.env.VITE_CALENDLY_URL || import.meta.env.NEXT_PUBLIC_CALENDLY_URL || "https://calendly.com/satsharks92/30min";
 
   if (!calendlyUrl) {
     throw new Error("Calendly URL is not configured.");

@@ -45,10 +45,10 @@ export function Stats() {
                 idx < 3 ? "md:border-r md:border-outline-variant/50" : ""
               }`}
             >
-              <div className="font-display text-4xl md:text-5xl font-extrabold tracking-tight text-primary">
+              <div className="font-sans text-4xl md:text-5xl font-bold tracking-tight text-primary/90">
                 {s.v}
               </div>
-              <div className="mt-2 font-body text-[11px] font-bold uppercase tracking-[0.15em] text-on-surface-variant/80">
+              <div className="mt-2 font-body text-[12px] font-bold uppercase tracking-[0.15em] text-on-surface-variant">
                 {s.l}
               </div>
             </motion.div>
