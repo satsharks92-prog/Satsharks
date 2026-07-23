@@ -5,6 +5,7 @@ import { Footer } from "../components/layout/Footer";
 import { useAuth } from "../hooks/useAuth";
 import { Modal } from "../components/ui/Modal";
 import { Icon } from "../components/common/Icon";
+import { getBackendUrl } from "../services/api";
 
 export const Route = createFileRoute("/sat")({
   component: SATPrepPage,
@@ -258,7 +259,7 @@ function SATPrepPage() {
 
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch("/api/payment/upload-proof", {
+      const res = await fetch(`${getBackendUrl()}/api/payment/upload-proof`, {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
@@ -282,7 +283,7 @@ function SATPrepPage() {
     setUploadError("");
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch("/api/payment/create-checkout", {
+      const res = await fetch(`${getBackendUrl()}/api/payment/create-checkout`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

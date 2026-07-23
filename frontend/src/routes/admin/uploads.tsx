@@ -6,7 +6,7 @@ import { Badge } from "../../components/ui/Badge";
 import { Icon } from "../../components/common/Icon";
 import { Input } from "../../components/ui/Input";
 import { EmptyState } from "../../components/ui/EmptyState";
-import { api } from "../../services/api";
+import { api, getBackendUrl } from "../../services/api";
 import type { PracticeTestUpload } from "../../types";
 
 export const Route = createFileRoute("/admin/uploads")({
@@ -42,7 +42,7 @@ function AdminUploads() {
 
     try {
       const token = localStorage.getItem("accessToken");
-      const res = await fetch("/api/uploads/practice-test", {
+      const res = await fetch(`${getBackendUrl()}/api/uploads/practice-test`, {
         method: "POST",
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData,
